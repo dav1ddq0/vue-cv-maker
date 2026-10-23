@@ -157,6 +157,8 @@ export default {
     template: 'Plantilla',
     accentColor: 'Color de acento',
     palette: 'Colores sugeridos',
+    cvLanguage: 'Idioma del CV',
+    cvLanguageHint: 'Fechas y títulos de sección del documento. No cambia el idioma de la aplicación.',
     fonts: {
       sourceSans: 'Compacta y muy legible',
       inter: 'Moderna y neutra',

@@ -6,7 +6,7 @@ import { useI18n } from '@/i18n'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { applyTemplateDefaults, templates } from '@/templates/registry'
 import BaseField from '@/components/ui/BaseField.vue'
-import { FONT_OPTIONS, PALETTE, isSameColor } from '@/core/stylePresets'
+import { CV_LANGUAGES, FONT_OPTIONS, PALETTE, isSameColor } from '@/core/stylePresets'
 
 const cv = useCvStore()
 const ui = useUiStore()
@@ -106,6 +106,14 @@ function previewAccent(id: string): string {
           <select :id="id" v-model="style.fontFamily" :disabled="!fontSupported">
             <option v-for="font in FONT_OPTIONS" :key="font.id" :value="font.value">
               {{ font.label }} · {{ t(`style.fonts.${font.id}`) }}
+            </option>
+          </select>
+        </BaseField>
+
+        <BaseField v-slot="{ id }" :label="t('style.cvLanguage')" :hint="t('style.cvLanguageHint')">
+          <select :id="id" v-model="cv.data.meta.language">
+            <option v-for="language in CV_LANGUAGES" :key="language.code" :value="language.code">
+              {{ language.label }}
             </option>
           </select>
         </BaseField>

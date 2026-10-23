@@ -34,3 +34,25 @@ describe('font options', () => {
     }
   })
 })
+
+describe('CV languages', () => {
+  it('only offers languages every template table covers', async () => {
+    const { CV_LANGUAGES } = await import('@/core/stylePresets')
+    const { formatPartialDate, levelAccessibleLabel, resolveSections } = await import('@/templates/shared')
+    const { createSampleCV } = await import('@/core/sample')
+
+    for (const { code } of CV_LANGUAGES) {
+      // A language missing from a table silently falls back to Spanish, so compare
+      // against the Spanish output: a covered language must produce its own text.
+      if (code !== 'es') {
+        expect(formatPartialDate('2023-04', code)).not.toBe(formatPartialDate('2023-04', 'es'))
+        expect(levelAccessibleLabel(3, code)).not.toBe(levelAccessibleLabel(3, 'es'))
+        const cv = createSampleCV()
+        cv.meta.language = code
+        const titles = resolveSections(cv).map((s) => s.title)
+        const spanish = resolveSections({ ...cv, meta: { ...cv.meta, language: 'es' } }).map((s) => s.title)
+        expect(titles).not.toEqual(spanish)
+      }
+    }
+  })
+})

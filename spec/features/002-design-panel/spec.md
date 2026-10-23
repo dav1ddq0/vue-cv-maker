@@ -1,6 +1,6 @@
 # 002 · Design panel: palette, fonts and CV language
 
-**Status:** proposed
+**Status:** implemented ✅ (visually checked: palette, language; font select disabled on templates without `customFont`)
 
 ## What it does
 
@@ -25,36 +25,36 @@ lets the user change it.
 
 ### Palette
 
-- [ ] Five swatches: `#ffd86f`, `#7c55e4`, `#f2614c`, `#10cf65`, `#334fdc`.
-- [ ] Clicking one sets `style.accentColor`; the active one is marked
+- [x] Five swatches: `#ffd86f`, `#7c55e4`, `#f2614c`, `#10cf65`, `#334fdc`.
+- [x] Clicking one sets `style.accentColor`; the active one is marked
       (not by colour alone) and exposed with `aria-pressed`.
-- [ ] The free colour input still works and, when its value is not a swatch, no
+- [x] The free colour input still works and, when its value is not a swatch, no
       swatch is marked.
-- [ ] Disabled with the existing reason when the template lacks `accentColor`.
+- [x] Disabled with the existing reason when the template lacks `accentColor`.
 
 ### Fonts
 
-- [ ] No new dependency and no network font loading: only font stacks that resolve
+- [x] No new dependency and no network font loading: only font stacks that resolve
       to fonts already on the system, each with a generic fallback.
-- [ ] Every template's own default font is in the list (so the select never shows
+- [x] Every template's own default font is in the list (so the select never shows
       blank after picking a template).
-- [ ] Each option has a short description from i18n (es + en).
-- [ ] Web fonts such as Roboto, Lato or Poppins are NOT included (they would need a
+- [x] Each option has a short description from i18n (es + en).
+- [x] Web fonts such as Roboto, Lato or Poppins are NOT included (they would need a
       bundled font package; tracked as out of scope below).
 
 ### CV language
 
-- [ ] A selector with Spanish and English sets `meta.language`.
-- [ ] It does not change the UI language, and changing the UI language does not
+- [x] A selector with Spanish and English sets `meta.language`.
+- [x] It does not change the UI language, and changing the UI language does not
       change it.
-- [ ] Dates, section titles and the level label in the preview follow it.
-- [ ] Undo/redo and autosave treat it like any other change.
+- [x] Dates, section titles and the level label in the preview follow it.
+- [x] Undo/redo and autosave treat it like any other change.
 
 ### Quality
 
-- [ ] No change to `src/types/cv.ts` (so no migration).
-- [ ] Strings in `es.ts` and `en.ts`; `npm test` and `npm run build` pass.
-- [ ] Tests for the palette and font-list data and for the language selector.
+- [x] No change to `src/types/cv.ts` (so no migration).
+- [x] Strings in `es.ts` and `en.ts`; `npm test` and `npm run build` pass.
+- [x] Tests for the palette and font-list data and for the language selector.
 
 ## Out of scope
 

@@ -39,3 +39,15 @@ export const FONT_OPTIONS: FontOption[] = [
   { id: 'tahoma', label: 'Tahoma', value: "Tahoma, 'DejaVu Sans', Verdana, sans-serif" },
   { id: 'verdana', label: 'Verdana', value: "Verdana, 'DejaVu Sans', Geneva, sans-serif" },
 ]
+
+export interface CvLanguageOption {
+  code: string
+  /** Written in its own language so it stays readable whatever the UI language is. */
+  label: string
+}
+
+/** Languages the templates have month names, section titles and level labels for. */
+export const CV_LANGUAGES: CvLanguageOption[] = [
+  { code: 'es', label: 'Español' },
+  { code: 'en', label: 'English' },
+]

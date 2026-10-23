@@ -157,6 +157,8 @@ const en: typeof es = {
     template: 'Template',
     accentColor: 'Accent color',
     palette: 'Suggested colors',
+    cvLanguage: 'CV language',
+    cvLanguageHint: 'Dates and section titles in the document. Does not change the app language.',
     fonts: {
       sourceSans: 'Compact and very readable',
       inter: 'Modern and neutral',
