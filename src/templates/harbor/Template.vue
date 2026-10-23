@@ -209,14 +209,18 @@ const languages = computed(() => resolveLanguages(props.data))
 
 .lang {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6em;
+  gap: 0.1em 0.6em;
   margin-bottom: 0.3em;
 }
 
+/* `overflow-wrap: anywhere` (from .side-item) would let the name shrink to a few letters
+   before the level marks wrapped below it; break-word only breaks a word that cannot fit. */
 .lang-name {
   margin: 0;
+  overflow-wrap: break-word;
 }
 
 .main {
