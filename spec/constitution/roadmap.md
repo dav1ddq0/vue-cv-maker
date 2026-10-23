@@ -23,7 +23,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **008** · Interface contracts: `skillLevels` capability, i18n key guard
 - **009** · Modern file upload (photo and import)
 - **012** · Section library (presets over custom sections)
-- **013** · Mobile experience (touch-first flow ≤ 640px) — in progress
+- **013** · Mobile experience (touch-first flow: step sheet, dock, bottom sheets, fitted preview)
 
 ## Next 🔜
 

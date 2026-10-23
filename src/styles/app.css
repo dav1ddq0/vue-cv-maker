@@ -134,4 +134,20 @@ textarea {
   input:not([type='range'], [type='checkbox'], [type='radio'], [type='file'], [type='color']) {
     min-height: 44px;
   }
+
+  /* A slider's grab area is its box, not just the thumb. */
+  input[type='range'] {
+    min-height: 44px;
+  }
+
+  /* Checkboxes and radios: a bigger box, and the whole label row is the tap target. */
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 22px;
+    height: 22px;
+  }
+
+  label:has(> input[type='checkbox'], > input[type='radio']) {
+    min-height: 44px;
+  }
 }

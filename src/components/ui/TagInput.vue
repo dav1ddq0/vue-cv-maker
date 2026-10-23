@@ -93,4 +93,17 @@ function onKeydown(event: KeyboardEvent) {
 .entry:focus {
   outline: none;
 }
+
+/* Touch: taller chips so the remove button is a full-size target without overlapping its neighbours. */
+@media (pointer: coarse) {
+  .tag {
+    min-height: 44px;
+    padding: 0 0.2em 0 0.9em;
+  }
+
+  .remove {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
 </style>
