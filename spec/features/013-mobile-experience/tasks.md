@@ -2,7 +2,7 @@
 
 - [x] 1 · `useIsPhone` + safe-area tokens — commit: `338fa39`
 - [x] 2 · `stepStatus` + tests — commit: `080b71b`
-- [ ] 3 · Step header and step sheet
+- [x] 3 · Step header and step sheet (`BottomSheet` is reused by 5 and 7) — commit: `cab0e3d`
 - [ ] 4 · Mobile dock
 - [ ] 5 · Section picker sheet
 - [ ] 6 · Style step: sticky preview + carousel
