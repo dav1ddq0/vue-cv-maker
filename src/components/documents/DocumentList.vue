@@ -7,12 +7,18 @@ import { formatDate, useI18n } from '@/i18n'
 import { createSampleCV } from '@/core/sample'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
+import { useIsPhone } from '@/composables/useIsPhone'
+import DocumentCard from './DocumentCard.vue'
+import DocumentActionsSheet from './DocumentActionsSheet.vue'
+import type { CVSummary } from '@/types/cv'
 
 const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
 
 const pendingDelete = ref<string | null>(null)
+const isPhone = useIsPhone()
+const menuDoc = ref<CVSummary | null>(null)
 
 async function open(id: string) {
   await cv.open(id)
@@ -22,6 +28,21 @@ async function open(id: string) {
 async function loadSample() {
   await cv.createNew({ seed: createSampleCV() })
   ui.goTo('personal')
+}
+
+async function createBlank() {
+  await cv.createNew()
+  ui.goTo('personal')
+}
+
+async function duplicateFromMenu(id: string) {
+  await cv.duplicate(id)
+  menuDoc.value = null
+}
+
+async function removeFromMenu(id: string) {
+  await cv.remove(id)
+  menuDoc.value = null
 }
 
 async function confirmDelete(id: string) {
@@ -34,7 +55,7 @@ async function confirmDelete(id: string) {
   <section class="documents">
     <header class="head">
       <h2 class="title">{{ t('documents.title') }}</h2>
-      <div class="head-actions">
+      <div v-if="!isPhone" class="head-actions">
         <BaseButton @click="loadSample">{{ t('actions.loadSample') }}</BaseButton>
         <BaseButton variant="primary" @click="cv.createNew().then(() => ui.goTo('personal'))">
           + {{ t('actions.newCv') }}
@@ -45,6 +66,17 @@ async function confirmDelete(id: string) {
     <NoticeBar tone="warning">{{ t('notices.localOnly') }}</NoticeBar>
 
     <p v-if="!cv.documents.length" class="empty">{{ t('documents.empty') }}</p>
+
+    <ul v-else-if="isPhone" class="list list--cards">
+      <DocumentCard
+        v-for="doc in cv.documents"
+        :key="doc.id"
+        :doc="doc"
+        :active="doc.id === cv.data.meta.id"
+        @open="open(doc.id)"
+        @menu="menuDoc = doc"
+      />
+    </ul>
 
     <ul v-else class="list">
       <li v-for="doc in cv.documents" :key="doc.id" class="item" :class="{ 'item--active': doc.id === cv.data.meta.id }">
@@ -70,6 +102,21 @@ async function confirmDelete(id: string) {
         </div>
       </li>
     </ul>
+    <div v-if="isPhone" class="bottom">
+      <BaseButton variant="primary" class="big" @click="createBlank">+ {{ t('actions.newCv') }}</BaseButton>
+      <div class="pair">
+        <BaseButton class="big" @click="loadSample">{{ t('actions.loadSample') }}</BaseButton>
+        <BaseButton class="big" @click="ui.view = 'import'">{{ t('nav.import') }}</BaseButton>
+      </div>
+    </div>
+
+    <DocumentActionsSheet
+      :open="menuDoc !== null"
+      :doc="menuDoc"
+      @close="menuDoc = null"
+      @duplicate="duplicateFromMenu"
+      @remove="removeFromMenu"
+    />
   </section>
 </template>
 
@@ -82,6 +129,7 @@ async function confirmDelete(id: string) {
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
+  min-height: 100%;
 }
 
 .head {
@@ -148,6 +196,34 @@ async function confirmDelete(id: string) {
   align-items: center;
   gap: 0.4em;
   flex-wrap: wrap;
+}
+
+.list--cards {
+  flex: 1;
+}
+
+/* Phones: the create actions stay at the bottom edge, within the thumb's reach. */
+.bottom {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  margin: 0 -1.4em;
+  padding: 0.8em 1.4em calc(1em + var(--safe-bottom));
+  background: var(--bg);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6em;
+}
+
+.big {
+  min-height: 52px;
+  justify-content: center;
+  border-radius: 14px;
 }
 
 .confirm-text {

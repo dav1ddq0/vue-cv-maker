@@ -298,6 +298,7 @@ export default {
     empty: 'Todavía no has guardado ningún CV.',
     updated: 'Modificado {date}',
     deleteConfirm: '¿Eliminar «{title}»? No se puede deshacer.',
+    more: 'Más acciones de «{title}»',
     untitled: 'Sin título',
   },
   notices: {

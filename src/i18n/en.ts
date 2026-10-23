@@ -298,6 +298,7 @@ const en: typeof es = {
     empty: 'You have no saved CVs yet.',
     updated: 'Updated {date}',
     deleteConfirm: 'Delete “{title}”? This cannot be undone.',
+    more: 'More actions for “{title}”',
     untitled: 'Untitled',
   },
   notices: {
