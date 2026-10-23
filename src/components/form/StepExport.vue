@@ -100,13 +100,29 @@ async function run(kind: 'pdf' | 'html' | 'json') {
 .option,
 .paginated-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: 0.6em 1em;
   padding: 0.8em 1em;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+.option > :first-child,
+.paginated-head > :first-child {
+  flex: 1 1 14em;
+  min-width: 0;
+}
+
+/* A wrapped action takes the full row so a long label (nowrap) cannot leave the card. */
+@media (max-width: 480px) {
+  .option > .btn,
+  .paginated-head > .btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
 }
 
 .option-title {
