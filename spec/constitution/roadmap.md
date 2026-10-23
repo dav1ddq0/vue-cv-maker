@@ -13,12 +13,13 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 
 ## Done with SDD ✅
 
-- **001** · Visual template elements: level indicator, `meridian`, `banner` (task 8 still open: photo, multi-page and PDF/HTML export not yet checked visually)
+- **001** · Visual template elements: level indicator, `meridian`, `banner`
 - **002** · Design panel: five-colour palette, curated font list, CV language selector
 - **003** · Skill levels: schema v2 (`{ name, level? }`), skills form, level indicator variants
 - **004** · Template families: `ledger`, `harbor`, `frame`
 - **005** · Readable ink on accent backgrounds, `chevron`, `facet`
 - **006** · Text-safe accent colour (`--cv-accent-text`) for light accents
+- **007** · Code review of 001–006 and its fixes
 
 ## Next 🔜
 
@@ -26,7 +27,6 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 
 - Candidate: template carousel with rendered thumbnails and preview controls (zoom, pages, full screen).
 - Candidate: web fonts via a bundled font package (needs a dependency decision).
-- Candidate: close 001 task 8 (photo, multi-page, PDF/HTML export).
 
 ## Backlog / ideas 💡
 

@@ -7,6 +7,5 @@
 - [x] 5. Template `banner` (index, Template.vue, thumbnail)
 - [x] 6. i18n descriptions in `es.ts` and `en.ts`
 - [x] 7. `npm test` (133 passing), `npm run typecheck`, `npm run build`
-- [~] 8. Visual check in the live preview: done with the sample CV, no photo.
-      NOT yet checked: with a photo, multi-page, and PDF/HTML export.
-- [ ] 9. Update spec status and roadmap (after task 8)
+- [x] 8. Visual check: photo (8 templates, real upload), multi-page (paged preview, 2 pages), HTML export printed to PDF.
+      Verified later in 007. The native print dialog path was not exercised.

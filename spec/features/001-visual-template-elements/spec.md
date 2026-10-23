@@ -1,6 +1,6 @@
 # 001 · Visual template elements and two new templates
 
-**Status:** in progress (implemented; photo, multi-page and export still to be checked)
+**Status:** implemented ✅
 
 ## What it does
 
