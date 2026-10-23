@@ -30,3 +30,43 @@ describe('StepCustom section picker', () => {
     expect(cv.data.customSections.at(-1)).toMatchObject({ title: '', entries: [] })
   })
 })
+
+describe('StepCustom section picker on phones', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    window.matchMedia = ((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia
+    const proto = HTMLDialogElement.prototype
+    proto.showModal = function (this: HTMLDialogElement) { this.setAttribute('open', '') }
+    proto.close = function (this: HTMLDialogElement) {
+      if (!this.hasAttribute('open')) return
+      this.removeAttribute('open')
+      this.dispatchEvent(new Event('close'))
+    }
+  })
+
+  it('opens a sheet, adds the chosen preset and closes it', async () => {
+    const cv = useCvStore()
+    const wrapper = mount(StepCustom, { attachTo: document.body })
+    expect(wrapper.find('.chips').exists()).toBe(false)
+
+    await wrapper.find('.add-phone').trigger('click')
+    expect(wrapper.find('dialog').attributes('open')).toBeDefined()
+    await wrapper.findAll('dialog .tile').find((b) => b.text().includes('Cursos'))!.trigger('click')
+
+    expect(cv.data.customSections.at(-1)?.title).toBe('Cursos')
+    expect(wrapper.find('dialog').attributes('open')).toBeUndefined()
+  })
+
+  it('adds a blank section from the sheet footer', async () => {
+    const cv = useCvStore()
+    const wrapper = mount(StepCustom, { attachTo: document.body })
+    await wrapper.find('.add-phone').trigger('click')
+    await wrapper.find('dialog .blank').trigger('click')
+    expect(cv.data.customSections.at(-1)).toMatchObject({ title: '', entries: [] })
+  })
+})

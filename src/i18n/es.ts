@@ -128,6 +128,7 @@ export default {
     addEntry: 'Añadir entrada',
     empty: 'Sin secciones propias.',
     pick: 'Añadir una sección',
+    pickHint: 'Los títulos usan el idioma de tu CV ({language}) y puedes cambiarlos.',
     blank: 'Sección en blanco',
     presets: {
       courses: 'Cursos',

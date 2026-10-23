@@ -128,6 +128,7 @@ const en: typeof es = {
     addEntry: 'Add entry',
     empty: 'No custom sections.',
     pick: 'Add a section',
+    pickHint: 'Titles use the language of your CV ({language}); you can change them.',
     blank: 'Blank section',
     presets: {
       courses: 'Courses',
