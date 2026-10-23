@@ -12,6 +12,7 @@ import {
   absoluteUrl,
   displayUrl,
   formatDateRange,
+  groupHasLevels,
   languageLevelScore,
   levelAccessibleLabel,
   resolveSections,
@@ -65,7 +66,17 @@ const languages = computed(() =>
         <template v-if="section.kind === 'skills'">
           <div v-for="group in data.skills" :key="group.id" class="side-group">
             <p v-if="group.category" class="side-group-title">{{ group.category }}</p>
-            <p class="side-item">{{ skillNames(group).join(', ') }}</p>
+            <template v-if="groupHasLevels(group)">
+              <div v-for="(item, i) in group.items" :key="i" class="lang">
+                <p class="side-item lang-name">{{ item.name }}</p>
+                <LevelDots
+                  v-if="item.level"
+                  :score="item.level"
+                  :label="levelAccessibleLabel(item.level, language)"
+                />
+              </div>
+            </template>
+            <p v-else class="side-item">{{ skillNames(group).join(', ') }}</p>
           </div>
         </template>
 

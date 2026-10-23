@@ -151,3 +151,8 @@ export function levelAccessibleLabel(score: number, language = 'es'): string {
 export function skillNames(group: SkillGroup): string[] {
   return group.items.map((item) => item.name)
 }
+
+/** True when at least one skill in the group carries a level (the group then renders as rows). */
+export function groupHasLevels(group: SkillGroup): boolean {
+  return group.items.some((item) => item.level !== undefined)
+}

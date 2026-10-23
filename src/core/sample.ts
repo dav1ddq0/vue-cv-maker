@@ -80,7 +80,12 @@ export function createSampleCV(): CVData {
   ]
 
   cv.skills = [
-    { ...createSkillGroup(), category: 'Lenguajes', items: ['TypeScript', 'Python', 'Go', 'SQL'].map((name) => ({ name })) },
+    { ...createSkillGroup(), category: 'Lenguajes', items: [
+        { name: 'TypeScript', level: 5 },
+        { name: 'Python', level: 4 },
+        { name: 'Go', level: 3 },
+        { name: 'SQL', level: 4 },
+      ] },
     { ...createSkillGroup(), category: 'Frontend', items: ['Vue 3', 'React', 'Vite', 'CSS moderno'].map((name) => ({ name })) },
     { ...createSkillGroup(), category: 'Backend', items: ['FastAPI', 'PostgreSQL', 'Redis', 'Docker'].map((name) => ({ name })) },
   ]
