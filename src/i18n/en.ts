@@ -102,6 +102,11 @@ const en: typeof es = {
     add: 'Add language',
     empty: 'No languages yet.',
   },
+  dock: {
+    label: 'Editor mode',
+    edit: 'Edit',
+    next: 'Next: {step}',
+  },
   stepSheet: {
     title: 'Go to a step',
     position: 'Step {n} of {total}',

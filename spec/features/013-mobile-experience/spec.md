@@ -20,7 +20,7 @@ A phone needs the reverse: actions at the bottom, fewer things per screen, big t
 
 ## Acceptance criteria
 
-- [ ] ≤ 640px: bottom dock with the Edit / Preview switch and Back / Next; above 640px nothing changes.
+- [ ] ≤ 1000px (where the preview has no column of its own): bottom dock with the Edit / Preview switch and Back / Next, outside the form so preview mode keeps a way back; above 1000px nothing changes.
 - [ ] A step header ("Step 3 of 9 · Experience") with a segmented progress bar opens the step picker sheet.
 - [ ] The picker lists all 9 steps with their state (current, complete, incomplete, optional); computed by a pure, tested function.
 - [ ] Sheets are native `<dialog>` (focus trap, Esc, backdrop), close on backdrop tap and on the close button.

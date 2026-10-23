@@ -5,6 +5,7 @@ import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import AppHeader from '@/components/AppHeader.vue'
 import CvWizard from '@/components/form/CvWizard.vue'
+import MobileDock from '@/components/form/MobileDock.vue'
 import PreviewPane from '@/components/preview/PreviewPane.vue'
 import DocumentList from '@/components/documents/DocumentList.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
@@ -78,6 +79,7 @@ function onKeydown(event: KeyboardEvent) {
       <ImportView />
     </main>
 
+    <MobileDock v-if="ui.view === 'editor'" />
   </div>
 </template>
 

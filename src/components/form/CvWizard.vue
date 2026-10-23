@@ -54,15 +54,6 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
         ← {{ t('actions.back') }}
       </BaseButton>
 
-      <!--
-        Below 1000px the preview has no column of its own, so its toggle joins
-        the footer as a third control. It used to float over this bar, where it
-        covered "Next" completely and blocked the wizard on every phone.
-      -->
-      <BaseButton class="preview-toggle" @click="ui.previewOpen = !ui.previewOpen">
-        {{ ui.previewOpen ? t('preview.hide') : t('preview.show') }}
-      </BaseButton>
-
       <BaseButton
         variant="primary"
         :disabled="ui.stepIndex === ui.steps.length - 1"
@@ -108,29 +99,11 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
   background: var(--bg);
 }
 
-/* The preview has its own column above this width; the toggle is redundant. */
-.preview-toggle {
-  display: none;
-}
-
+/* Below 1000px the preview has no column of its own and the dock (MobileDock, outside this
+   form so it survives preview mode) takes over Back / Next and the Edit / Preview switch. */
 @media (max-width: 1000px) {
-  .preview-toggle {
-    display: inline-flex;
-  }
-}
-
-/* Phones: Back and Next share a row and the preview toggle takes its own, instead of three
-   nowrap buttons pushing "Next" past the edge of a 320px screen. */
-@media (max-width: 480px) {
-  .preview-toggle {
-    order: -1;
-    flex: 1 1 100%;
-    justify-content: center;
-  }
-
-  .footer > :not(.preview-toggle) {
-    flex: 1 1 0;
-    justify-content: center;
+  .footer {
+    display: none;
   }
 }
 </style>

@@ -102,6 +102,11 @@ export default {
     add: 'Añadir idioma',
     empty: 'Sin idiomas todavía.',
   },
+  dock: {
+    label: 'Modo del editor',
+    edit: 'Editar',
+    next: 'Siguiente: {step}',
+  },
   stepSheet: {
     title: 'Ir a un paso',
     position: 'Paso {n} de {total}',
