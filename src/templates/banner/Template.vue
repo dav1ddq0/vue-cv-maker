@@ -55,80 +55,80 @@ const languages = computed(() => resolveLanguages(props.data))
     </header>
 
     <div class="main">
-        <section v-for="section in mainSections" :key="section.id" class="section">
-          <h2 class="section-title">{{ section.title }}</h2>
+      <section v-for="section in mainSections" :key="section.id" class="section">
+        <h2 class="section-title">{{ section.title }}</h2>
 
-          <template v-if="section.kind === 'experience'">
-            <div v-for="item in data.experience" :key="item.id" class="entry">
-              <h3 class="entry-title">{{ item.position }}</h3>
-              <p class="entry-meta">
-                <span v-if="item.company" class="company">{{ item.company }}</span>
-                <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
-                <span v-if="item.location">{{ item.location }}</span>
-              </p>
-              <p v-if="item.description" class="entry-text">{{ item.description }}</p>
-              <ul v-if="item.highlights.length" class="highlights">
-                <li v-for="(highlight, i) in item.highlights" :key="i">{{ highlight }}</li>
-              </ul>
-            </div>
-          </template>
+        <template v-if="section.kind === 'experience'">
+          <div v-for="item in data.experience" :key="item.id" class="entry">
+            <h3 class="entry-title">{{ item.position }}</h3>
+            <p class="entry-meta">
+              <span v-if="item.company" class="company">{{ item.company }}</span>
+              <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
+              <span v-if="item.location">{{ item.location }}</span>
+            </p>
+            <p v-if="item.description" class="entry-text">{{ item.description }}</p>
+            <ul v-if="item.highlights.length" class="highlights">
+              <li v-for="(highlight, i) in item.highlights" :key="i">{{ highlight }}</li>
+            </ul>
+          </div>
+        </template>
 
-          <template v-else-if="section.kind === 'education'">
-            <div v-for="item in data.education" :key="item.id" class="entry">
-              <h3 class="entry-title">{{ item.degree }}</h3>
-              <p class="entry-meta">
-                <span v-if="item.institution" class="company">{{ item.institution }}</span>
-                <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
-              </p>
-              <p v-if="item.description" class="entry-text">{{ item.description }}</p>
-            </div>
-          </template>
+        <template v-else-if="section.kind === 'education'">
+          <div v-for="item in data.education" :key="item.id" class="entry">
+            <h3 class="entry-title">{{ item.degree }}</h3>
+            <p class="entry-meta">
+              <span v-if="item.institution" class="company">{{ item.institution }}</span>
+              <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
+            </p>
+            <p v-if="item.description" class="entry-text">{{ item.description }}</p>
+          </div>
+        </template>
 
-          <template v-else-if="section.custom">
-            <div v-for="entry in section.custom.entries" :key="entry.id" class="entry">
-              <h3 class="entry-title">{{ entry.title }}</h3>
-              <p v-if="entry.subtitle || entry.date" class="entry-meta">
-                <span v-if="entry.subtitle" class="company">{{ entry.subtitle }}</span>
-                <span v-if="entry.date">{{ entry.date }}</span>
-              </p>
-              <p v-if="entry.description" class="entry-text">{{ entry.description }}</p>
-            </div>
-          </template>
-        </section>
+        <template v-else-if="section.custom">
+          <div v-for="entry in section.custom.entries" :key="entry.id" class="entry">
+            <h3 class="entry-title">{{ entry.title }}</h3>
+            <p v-if="entry.subtitle || entry.date" class="entry-meta">
+              <span v-if="entry.subtitle" class="company">{{ entry.subtitle }}</span>
+              <span v-if="entry.date">{{ entry.date }}</span>
+            </p>
+            <p v-if="entry.description" class="entry-text">{{ entry.description }}</p>
+          </div>
+        </template>
+      </section>
     </div>
 
     <aside class="aside">
-        <section v-for="section in asideSections" :key="section.id" class="section">
-          <h2 class="section-title">{{ section.title }}</h2>
+      <section v-for="section in asideSections" :key="section.id" class="section">
+        <h2 class="section-title">{{ section.title }}</h2>
 
-          <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>
+        <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>
 
-          <template v-else-if="section.kind === 'skills'">
-            <div v-for="group in data.skills" :key="group.id" class="skill-group">
-              <p v-if="group.category" class="skill-category">{{ group.category }}</p>
-              <template v-if="groupHasLevels(group)">
-                <div v-for="(item, i) in group.items" :key="i" class="lang">
-                  <span class="lang-name">{{ item.name }}</span>
-                  <LevelDots
-                    v-if="item.level"
-                    :score="item.level"
-                    :label="levelAccessibleLabel(item.level, language)"
-                  />
-                </div>
-              </template>
-              <p v-else class="skill-items">{{ skillNames(group).join(', ') }}</p>
-            </div>
-          </template>
+        <template v-else-if="section.kind === 'skills'">
+          <div v-for="group in data.skills" :key="group.id" class="skill-group">
+            <p v-if="group.category" class="skill-category">{{ group.category }}</p>
+            <template v-if="groupHasLevels(group)">
+              <div v-for="(item, i) in group.items" :key="i" class="lang">
+                <span class="lang-name">{{ item.name }}</span>
+                <LevelDots
+                  v-if="item.level"
+                  :score="item.level"
+                  :label="levelAccessibleLabel(item.level, language)"
+                />
+              </div>
+            </template>
+            <p v-else class="skill-items">{{ skillNames(group).join(', ') }}</p>
+          </div>
+        </template>
 
-          <template v-else>
-            <div v-for="lang in languages" :key="lang.id" class="lang">
-              <span class="lang-name">
-                {{ lang.name }}<template v-if="lang.level && lang.score === null"> — {{ lang.level }}</template>
-              </span>
-              <LevelDots v-if="lang.score !== null" :score="lang.score" :label="lang.label" />
-            </div>
-          </template>
-        </section>
+        <template v-else>
+          <div v-for="lang in languages" :key="lang.id" class="lang">
+            <span class="lang-name">
+              {{ lang.name }}<template v-if="lang.level && lang.score === null"> — {{ lang.level }}</template>
+            </span>
+            <LevelDots v-if="lang.score !== null" :score="lang.score" :label="lang.label" />
+          </div>
+        </template>
+      </section>
     </aside>
   </article>
 </template>
