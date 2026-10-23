@@ -112,6 +112,10 @@ const en: typeof es = {
     order: 'Section order',
   },
   templates: {
+    ledger: {
+      description:
+        'One column where each section is a row: title on the left, content on the right. No photo, with dash-style levels. Linear reading order, friendly to ATS.',
+    },
     meridian: {
       description:
         'Colored sidebar with photo, languages shown as level dots, and a timeline for experience and education.',

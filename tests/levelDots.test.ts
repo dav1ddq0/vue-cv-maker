@@ -11,7 +11,7 @@ function withoutSkillLevels() {
   return data
 }
 
-describe.each(['meridian', 'banner'])('%s language levels', (id) => {
+describe.each(['meridian', 'banner', 'ledger'])('%s language levels', (id) => {
   it('shows dots with an accessible label for recognised levels, in the CV language', async () => {
     const component = await getTemplate(id).component()
 
@@ -52,6 +52,7 @@ describe.each(['meridian', 'banner'])('%s language levels', (id) => {
       'Nivel 4 de 5',
     ])
     expect(wrapper.text()).toContain('TypeScript')
-    expect(wrapper.text()).toContain('Vue 3, React, Vite, CSS moderno')
+    // Unrated groups stay plain text; the separator is the template's own choice.
+    expect(wrapper.text()).toMatch(/Vue 3\s?[,·]\s?React\s?[,·]\s?Vite\s?[,·]\s?CSS moderno/)
   })
 })

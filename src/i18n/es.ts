@@ -112,6 +112,10 @@ export default {
     order: 'Orden de las secciones',
   },
   templates: {
+    ledger: {
+      description:
+        'Una columna con cada sección como una fila: el título a la izquierda y el contenido a la derecha. Sin foto, con niveles en rayas. Lectura lineal, apta para ATS.',
+    },
     meridian: {
       description:
         'Barra lateral de color con foto, idiomas con nivel en puntos y una línea de tiempo para experiencia y formación.',
