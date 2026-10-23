@@ -18,12 +18,12 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **003** · Skill levels: schema v2 (`{ name, level? }`), skills form, level indicator variants
 - **004** · Template families: `ledger`, `harbor`, `frame`
 - **005** · Readable ink on accent backgrounds, `chevron`, `facet`
+- **006** · Text-safe accent colour (`--cv-accent-text`) for light accents
 
 ## Next 🔜
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
-- Candidate: accent-for-text token so light accents stay readable on white (see 005 tasks).
 - Candidate: template carousel with rendered thumbnails and preview controls (zoom, pages, full screen).
 - Candidate: web fonts via a bundled font package (needs a dependency decision).
 - Candidate: close 001 task 8 (photo, multi-page, PDF/HTML export).
