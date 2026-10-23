@@ -112,6 +112,10 @@ export default {
     order: 'Orden de las secciones',
   },
   templates: {
+    facet: {
+      description:
+        'Formas geométricas en las esquinas (cuarto de círculo y triángulo), foto redonda junto al nombre y una columna lateral separada por una línea. Admite foto.',
+    },
     chevron: {
       description:
         'Cabecera en forma de V con la foto en la muesca, nombre centrado y dos columnas debajo. Formas geométricas en el color de acento. Admite foto.',

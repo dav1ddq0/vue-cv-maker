@@ -112,6 +112,10 @@ const en: typeof es = {
     order: 'Section order',
   },
   templates: {
+    facet: {
+      description:
+        'Geometric corner shapes (quarter circle and triangle), a round photo beside the name and a side column behind a ruled divider. Supports a photo.',
+    },
     chevron: {
       description:
         'V-shaped header band with the photo in the notch, centered name and two columns below. Geometric shapes in the accent color. Supports a photo.',
