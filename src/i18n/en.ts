@@ -112,6 +112,10 @@ const en: typeof es = {
     order: 'Section order',
   },
   templates: {
+    frame: {
+      description:
+        'Boxed header with photo, name and contact over a serif single column. Skills and languages close the page with bar-style levels. Supports a photo.',
+    },
     harbor: {
       description:
         'Dark sidebar on the right with photo, contact, skills and languages shown as star levels. The main column carries the accent color. Supports a photo.',

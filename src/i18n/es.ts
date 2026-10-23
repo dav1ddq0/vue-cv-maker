@@ -112,6 +112,10 @@ export default {
     order: 'Orden de las secciones',
   },
   templates: {
+    frame: {
+      description:
+        'Cabecera enmarcada con foto, nombre y contacto sobre una sola columna serif. Competencias e idiomas cierran la página con niveles en barras. Admite foto.',
+    },
     harbor: {
       description:
         'Barra lateral oscura a la derecha con foto, contacto, competencias e idiomas con niveles en estrellas. La columna principal lleva el color de acento. Admite foto.',
