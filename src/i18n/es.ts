@@ -112,6 +112,10 @@ export default {
     order: 'Orden de las secciones',
   },
   templates: {
+    harbor: {
+      description:
+        'Barra lateral oscura a la derecha con foto, contacto, competencias e idiomas con niveles en estrellas. La columna principal lleva el color de acento. Admite foto.',
+    },
     ledger: {
       description:
         'Una columna con cada sección como una fila: el título a la izquierda y el contenido a la derecha. Sin foto, con niveles en rayas. Lectura lineal, apta para ATS.',

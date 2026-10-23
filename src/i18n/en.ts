@@ -112,6 +112,10 @@ const en: typeof es = {
     order: 'Section order',
   },
   templates: {
+    harbor: {
+      description:
+        'Dark sidebar on the right with photo, contact, skills and languages shown as star levels. The main column carries the accent color. Supports a photo.',
+    },
     ledger: {
       description:
         'One column where each section is a row: title on the left, content on the right. No photo, with dash-style levels. Linear reading order, friendly to ATS.',
