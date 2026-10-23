@@ -94,9 +94,33 @@ function onKeydown(event: KeyboardEvent) {
 
 .row {
   display: grid;
-  grid-template-columns: 1fr 7.5em auto;
+  grid-template-columns: minmax(0, 1fr) 7.5em auto;
   gap: 0.4em;
   align-items: center;
+}
+
+.name {
+  min-width: 0;
+}
+
+/* Phones: name and remove share the first line; the level select gets its own, so the name is
+   not squeezed to a few letters next to a 7.5em select. */
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .name {
+    grid-area: 1 / 1;
+  }
+
+  .remove {
+    grid-area: 1 / 2;
+  }
+
+  .level {
+    grid-area: 2 / 1 / 3 / -1;
+  }
 }
 
 .remove {
