@@ -11,7 +11,7 @@ function withoutSkillLevels() {
   return data
 }
 
-describe.each(['meridian', 'banner', 'ledger', 'harbor', 'frame'])('%s language levels', (id) => {
+describe.each(['meridian', 'banner', 'ledger', 'harbor', 'frame', 'chevron'])('%s language levels', (id) => {
   it('shows dots with an accessible label for recognised levels, in the CV language', async () => {
     const component = await getTemplate(id).component()
 

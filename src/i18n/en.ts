@@ -112,6 +112,10 @@ const en: typeof es = {
     order: 'Section order',
   },
   templates: {
+    chevron: {
+      description:
+        'V-shaped header band with the photo in the notch, centered name and two columns below. Geometric shapes in the accent color. Supports a photo.',
+    },
     frame: {
       description:
         'Boxed header with photo, name and contact over a serif single column. Skills and languages close the page with bar-style levels. Supports a photo.',

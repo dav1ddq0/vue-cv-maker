@@ -112,6 +112,10 @@ export default {
     order: 'Orden de las secciones',
   },
   templates: {
+    chevron: {
+      description:
+        'Cabecera en forma de V con la foto en la muesca, nombre centrado y dos columnas debajo. Formas geométricas en el color de acento. Admite foto.',
+    },
     frame: {
       description:
         'Cabecera enmarcada con foto, nombre y contacto sobre una sola columna serif. Competencias e idiomas cierran la página con niveles en barras. Admite foto.',
