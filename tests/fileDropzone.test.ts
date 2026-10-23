@@ -67,6 +67,19 @@ describe('FileDropzone', () => {
     expect(wrapper.classes()).not.toContain('dropzone--over')
   })
 
+  it('keeps the highlight when the drag moves onto a child, and clears it when it leaves the control', async () => {
+    const wrapper = mount(FileDropzone, { props: { accept: 'image/*' }, attachTo: document.body })
+    await wrapper.trigger('dragover')
+    expect(wrapper.classes()).toContain('dropzone--over')
+
+    await wrapper.trigger('dragleave', { relatedTarget: wrapper.find('.icon').element })
+    expect(wrapper.classes()).toContain('dropzone--over')
+
+    await wrapper.trigger('dragleave', { relatedTarget: document.body })
+    expect(wrapper.classes()).not.toContain('dropzone--over')
+    wrapper.unmount()
+  })
+
   it('ignores drops and disables the input while busy or disabled', async () => {
     const busy = mountIt({ busy: true })
     expect(busy.find('input').attributes('disabled')).toBeDefined()
