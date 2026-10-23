@@ -3,7 +3,7 @@
 - [x] 1 · `useIsPhone` + safe-area tokens — commit: `338fa39`
 - [x] 2 · `stepStatus` + tests — commit: `080b71b`
 - [x] 3 · Step header and step sheet (`BottomSheet` is reused by 5 and 7) — commit: `cab0e3d`
-- [ ] 4 · Mobile dock
+- [x] 4 · Mobile dock, ≤ 1000px; also fixes the preview dead end (the toggle was inside the hidden form) — commit: `4d19c16`
 - [ ] 5 · Section picker sheet
 - [ ] 6 · Style step: sticky preview + carousel
 - [ ] 7 · Full-screen preview and export sheet
