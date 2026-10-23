@@ -24,6 +24,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **009** · Modern file upload (photo and import)
 - **012** · Section library (presets over custom sections)
 - **013** · Mobile experience (touch-first flow: step sheet, dock, bottom sheets, fitted preview)
+- **014** · Optional personal data (date/place of birth, nationality, licence, marital status) — in progress
 
 ## Next 🔜
 
