@@ -71,8 +71,7 @@ const languages = computed(() =>
       <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
     </div>
 
-    <div class="columns">
-      <div class="main">
+    <div class="main">
         <section v-for="section in mainSections" :key="section.id" class="section">
           <h2 class="section-title">{{ section.title }}</h2>
 
@@ -113,9 +112,9 @@ const languages = computed(() =>
             </div>
           </template>
         </section>
-      </div>
+    </div>
 
-      <aside class="aside">
+    <aside class="aside">
         <section v-for="section in asideSections" :key="section.id" class="section">
           <h2 class="section-title">{{ section.title }}</h2>
 
@@ -147,13 +146,16 @@ const languages = computed(() =>
             </div>
           </template>
         </section>
-      </aside>
-    </div>
+    </aside>
   </article>
 </template>
 
 <style scoped>
 .chevron {
+  display: grid;
+  grid-template-columns: 1fr 34%;
+  align-content: start;
+  column-gap: calc(var(--cv-page-margin) * 0.8);
   font-family: var(--cv-font);
   font-size: calc(10pt * var(--cv-font-scale));
   line-height: 1.45;
@@ -162,6 +164,7 @@ const languages = computed(() =>
 }
 
 .head {
+  grid-column: 1 / -1;
   position: relative;
   height: 13em;
   break-inside: avoid;
@@ -224,6 +227,7 @@ const languages = computed(() =>
 }
 
 .titles {
+  grid-column: 1 / -1;
   text-align: center;
   padding: var(--gap) var(--cv-page-margin) 0;
 }
@@ -241,11 +245,12 @@ const languages = computed(() =>
   color: #555;
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 34%;
-  gap: calc(var(--cv-page-margin) * 0.8);
-  padding: 0 var(--cv-page-margin) var(--cv-page-margin);
+.main {
+  padding: 0 0 var(--cv-page-margin) var(--cv-page-margin);
+}
+
+.aside {
+  padding: 0 var(--cv-page-margin) var(--cv-page-margin) 0;
 }
 
 .section {

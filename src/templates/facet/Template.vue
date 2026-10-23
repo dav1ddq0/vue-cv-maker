@@ -61,8 +61,7 @@ const languages = computed(() =>
       </div>
     </header>
 
-    <div class="columns">
-      <div class="main">
+    <div class="main">
         <section v-for="section in mainSections" :key="section.id" class="section">
           <h2 class="section-title">{{ section.title }}</h2>
 
@@ -105,9 +104,9 @@ const languages = computed(() =>
             </div>
           </template>
         </section>
-      </div>
+    </div>
 
-      <aside class="aside">
+    <aside class="aside">
         <section v-if="contactItems.length || data.personal.links.length" class="section">
           <h2 class="section-title">{{ contactTitle }}</h2>
           <p v-for="(item, i) in contactItems" :key="i" class="contact-item">{{ item }}</p>
@@ -145,13 +144,15 @@ const languages = computed(() =>
             </div>
           </template>
         </section>
-      </aside>
-    </div>
+    </aside>
   </article>
 </template>
 
 <style scoped>
 .facet {
+  display: grid;
+  grid-template-columns: 1fr 33%;
+  align-content: start;
   font-family: var(--cv-font);
   font-size: calc(10pt * var(--cv-font-scale));
   line-height: 1.45;
@@ -162,6 +163,7 @@ const languages = computed(() =>
 .head {
   position: relative;
   min-height: 11em;
+  grid-column: 1 / -1;
   padding: 6.4em var(--cv-page-margin) 0;
   break-inside: avoid;
   print-color-adjust: exact;
@@ -214,18 +216,13 @@ const languages = computed(() =>
   color: var(--cv-accent-text);
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 33%;
-  gap: 0;
-  padding: 0 var(--cv-page-margin) var(--cv-page-margin);
-}
-
 .main {
-  padding-right: calc(var(--cv-page-margin) * 0.7);
+  padding: 0 calc(var(--cv-page-margin) * 0.7) var(--cv-page-margin) var(--cv-page-margin);
 }
 
 .aside {
+  margin-right: var(--cv-page-margin);
+  margin-bottom: var(--cv-page-margin);
   padding-left: calc(var(--cv-page-margin) * 0.7);
   border-left: 2px solid var(--cv-accent);
 }

@@ -63,8 +63,7 @@ const languages = computed(() =>
       </div>
     </header>
 
-    <div class="columns">
-      <div class="main">
+    <div class="main">
         <section v-for="section in mainSections" :key="section.id" class="section">
           <h2 class="section-title">{{ section.title }}</h2>
 
@@ -105,9 +104,9 @@ const languages = computed(() =>
             </div>
           </template>
         </section>
-      </div>
+    </div>
 
-      <aside class="aside">
+    <aside class="aside">
         <section v-for="section in asideSections" :key="section.id" class="section">
           <h2 class="section-title">{{ section.title }}</h2>
 
@@ -139,13 +138,16 @@ const languages = computed(() =>
             </div>
           </template>
         </section>
-      </aside>
-    </div>
+    </aside>
   </article>
 </template>
 
 <style scoped>
 .banner {
+  display: grid;
+  grid-template-columns: 1fr 34%;
+  align-content: start;
+  column-gap: calc(var(--cv-page-margin) * 0.8);
   font-family: var(--cv-font);
   font-size: calc(10pt * var(--cv-font-scale));
   line-height: 1.45;
@@ -155,6 +157,7 @@ const languages = computed(() =>
 }
 
 .head {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 1.2em;
@@ -210,11 +213,17 @@ const languages = computed(() =>
   text-decoration: none;
 }
 
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 34%;
-  gap: calc(var(--cv-page-margin) * 0.8);
-  padding: calc(var(--cv-page-margin) * 0.5) calc(var(--cv-page-margin) * 0.4) 0;
+.main,
+.aside {
+  padding-top: calc(var(--cv-page-margin) * 0.5);
+}
+
+.main {
+  padding-left: calc(var(--cv-page-margin) * 0.4);
+}
+
+.aside {
+  padding-right: calc(var(--cv-page-margin) * 0.4);
 }
 
 .section {
