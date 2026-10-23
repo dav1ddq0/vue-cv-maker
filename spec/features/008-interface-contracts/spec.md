@@ -1,6 +1,6 @@
 # 008 · Interface contracts: skill-level capability and i18n key guard
 
-**Status:** proposed
+**Status:** implemented ✅
 
 ## What it does
 
@@ -22,14 +22,14 @@ built with string interpolation escape type checking and `t()` falls back to pri
 
 ## Acceptance criteria
 
-- [ ] `TemplateCapability` includes `skillLevels` (additive; no existing value changes).
-- [ ] A test proves the declaration is truthful for every registered template: a rated skill
+- [x] `TemplateCapability` includes `skillLevels` (additive; no existing value changes).
+- [x] A test proves the declaration is truthful for every registered template: a rated skill
       produces a level mark if and only if the template declares `skillLevels`.
-- [ ] On a template without it, the level selector is disabled and the reason is visible;
+- [x] On a template without it, the level selector is disabled and the reason is visible;
       switching back to a supporting template restores it, with the data intact.
-- [ ] The explanation is in `es` and `en` through the existing `style.capability` table.
-- [ ] A test asserts every `FONT_OPTIONS` id has a non-empty `style.fonts.<id>` in both languages.
-- [ ] No change to `src/types/cv.ts` (no migration); `npm test`, typecheck and build pass.
+- [x] The explanation is in `es` and `en` through the existing `style.capability` table.
+- [x] A test asserts every `FONT_OPTIONS` id has a non-empty `style.fonts.<id>` in both languages.
+- [x] No change to `src/types/cv.ts` (no migration); `npm test`, typecheck and build pass.
 
 ## Out of scope
 

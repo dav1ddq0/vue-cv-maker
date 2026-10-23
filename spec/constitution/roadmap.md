@@ -20,6 +20,8 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **005** · Readable ink on accent backgrounds, `chevron`, `facet`
 - **006** · Text-safe accent colour (`--cv-accent-text`) for light accents
 - **007** · Code review of 001–006 and its fixes
+- **008** · Interface contracts: `skillLevels` capability, i18n key guard
+- **009** · Modern file upload (photo and import)
 
 ## Next 🔜
 
