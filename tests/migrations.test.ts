@@ -74,7 +74,7 @@ describe('schema v1 → v2 (skill items)', () => {
       skills: [{ id: 'skg_1', category: 'Lang', items: ['TypeScript', 'Go'] }],
     })
 
-    expect(cv.schemaVersion).toBe(2)
+    expect(cv.schemaVersion).toBe(SCHEMA_VERSION)
     expect(cv.skills[0]!.items).toEqual([{ name: 'TypeScript' }, { name: 'Go' }])
   })
 
@@ -97,5 +97,52 @@ describe('schema v1 → v2 (skill items)', () => {
   it('survives garbage items without throwing', () => {
     const cv = migrate({ schemaVersion: 1, skills: [{ items: [null, 7, 'ok'] }] })
     expect(cv.skills[0]!.items.map((i) => i.name)).toEqual(['', '', 'ok'])
+  })
+})
+
+describe('schema v2 → v3 (optional personal data)', () => {
+  it('gives a v2 file empty extras and keeps what it had', () => {
+    const cv = migrate({
+      schemaVersion: 2,
+      personal: { fullName: 'Ana', email: 'ana@correo.com', phone: '', location: 'Valencia', links: [] },
+    })
+    expect(cv.schemaVersion).toBe(3)
+    expect(cv.personal).toMatchObject({
+      fullName: 'Ana',
+      location: 'Valencia',
+      birthDate: '',
+      birthPlace: '',
+      nationality: '',
+      drivingLicense: '',
+      maritalStatus: '',
+    })
+  })
+
+  it('keeps extras a v3 file already has', () => {
+    const cv = migrate({
+      schemaVersion: 3,
+      personal: { birthDate: '1992-03-12', nationality: 'Española', maritalStatus: 'single', drivingLicense: 'B' },
+    })
+    expect(cv.personal.birthDate).toBe('1992-03-12')
+    expect(cv.personal.nationality).toBe('Española')
+    expect(cv.personal.maritalStatus).toBe('single')
+    expect(cv.personal.drivingLicense).toBe('B')
+  })
+
+  it('turns an unknown marital status or a non-string into empty instead of rendering it', () => {
+    const cv = migrate({
+      schemaVersion: 3,
+      personal: { maritalStatus: 'complicated', birthPlace: 42, nationality: null },
+    })
+    expect(cv.personal.maritalStatus).toBe('')
+    expect(cv.personal.birthPlace).toBe('')
+    expect(cv.personal.nationality).toBe('')
+  })
+
+  it('walks a v1 file all the way up', () => {
+    const cv = migrate({ schemaVersion: 1, skills: [{ items: ['Go'] }] })
+    expect(cv.schemaVersion).toBe(3)
+    expect(cv.personal.maritalStatus).toBe('')
+    expect(cv.skills[0]!.items).toEqual([{ name: 'Go' }])
   })
 })

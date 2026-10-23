@@ -6,7 +6,7 @@
  * `SCHEMA_VERSION` plus a migration step in `src/core/migrations.ts`.
  */
 
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
 
 export interface CVData {
   schemaVersion: number
@@ -33,12 +33,26 @@ export interface CVMeta {
   language: string
 }
 
+/** Codes, not labels: the CV shows them in its own content language. */
+export const MARITAL_STATUSES = ['single', 'married', 'partner', 'divorced', 'widowed'] as const
+export type MaritalStatus = (typeof MARITAL_STATUSES)[number]
+
 export interface PersonalDetails {
   fullName: string
   headline: string
   email: string
   phone: string
   location: string
+  /**
+   * Optional extras, `''` when not given and then not rendered. Sensitive in several markets, so
+   * the form keeps them collapsed and never fills them by itself.
+   */
+  /** Full ISO date `YYYY-MM-DD`. */
+  birthDate: string
+  birthPlace: string
+  nationality: string
+  drivingLicense: string
+  maritalStatus: MaritalStatus | ''
   /** IndexedDB reference (`photo:{id}`), never the image bytes. See services/storage. */
   photo?: string
   links: LinkEntry[]

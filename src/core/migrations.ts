@@ -1,5 +1,5 @@
-import { SCHEMA_VERSION, SECTION_IDS } from '@/types/cv'
-import type { CVData, SkillItem } from '@/types/cv'
+import { MARITAL_STATUSES, SCHEMA_VERSION, SECTION_IDS } from '@/types/cv'
+import type { CVData, MaritalStatus, SkillItem } from '@/types/cv'
 import { createEmptyCV, DEFAULT_STYLE } from './factory'
 import { uid } from './id'
 
@@ -8,6 +8,7 @@ import { uid } from './id'
  * is run through steps N, N+1, … until it reaches `SCHEMA_VERSION`.
  *
  * v1 → v2: skill items went from plain strings to `{ name, level? }`.
+ * v2 → v3: optional personal extras (birth date and place, nationality, licence, marital status).
  */
 const steps: Record<number, (data: any) => any> = {
   1: (data) => ({
@@ -21,6 +22,18 @@ const steps: Record<number, (data: any) => any> = {
             : [],
         }))
       : data.skills,
+  }),
+  2: (data) => ({
+    ...data,
+    schemaVersion: 3,
+    personal: {
+      birthDate: '',
+      birthPlace: '',
+      nationality: '',
+      drivingLicense: '',
+      maritalStatus: '',
+      ...(data.personal && typeof data.personal === 'object' ? data.personal : {}),
+    },
   }),
 }
 
@@ -61,6 +74,11 @@ export function normalize(input: any): CVData {
     personal: {
       ...base.personal,
       ...(input.personal ?? {}),
+      birthDate: str(input.personal?.birthDate),
+      birthPlace: str(input.personal?.birthPlace),
+      nationality: str(input.personal?.nationality),
+      drivingLicense: str(input.personal?.drivingLicense),
+      maritalStatus: toMaritalStatus(input.personal?.maritalStatus),
       links: withIds(input.personal?.links, 'lnk'),
     },
     summary: str(input.summary),
@@ -104,6 +122,11 @@ export function reconcileOrder(stored: unknown, data: CVData): string[] {
   const kept = Array.isArray(stored) ? stored.filter((id) => typeof id === 'string' && valid.has(id)) : []
   const seen = new Set(kept)
   return [...kept, ...[...valid].filter((id) => !seen.has(id))]
+}
+
+/** Anything that is not one of the known codes (a typo, a label from elsewhere) becomes empty. */
+function toMaritalStatus(value: unknown): MaritalStatus | '' {
+  return (MARITAL_STATUSES as readonly unknown[]).includes(value) ? (value as MaritalStatus) : ''
 }
 
 function withIds(list: unknown, prefix: string): any[] {
