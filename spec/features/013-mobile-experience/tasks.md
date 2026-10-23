@@ -7,5 +7,5 @@
 - [x] 5 · Section picker sheet — commit: `5e2a68e`
 - [x] 6 · Style step: pinned preview + snap carousel — commit: `6dc634c`
 - [x] 7 · Fit-to-width preview and export from the dock (main action keeps the real behaviour: print dialog, not a direct download) — commit: `6dbe238`
-- [ ] 8 · My CVs cards
+- [x] 8 · My CVs cards (monogram instead of a thumbnail: the summary stores no template; no schema change) — commit: `8b859d8`
 - [ ] 9 · Sweep 320–430px and close the spec
