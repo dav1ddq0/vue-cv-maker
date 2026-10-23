@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://upload.wikimedia.org/wikipedia/commons/e/ea/Fish-shell-logo-ascii.svg\")",
+      "Bash(curl -sL \"https://commons.wikimedia.org/wiki/Special:FilePath/Fish-shell-logo-ascii.svg\" -o /tmp/fish-logo.svg)",
+      "Read(//tmp/**)",
+      "Bash(gh repo *)",
+      "Bash(gh auth *)",
+      "Bash(gh issue *)",
+      "Bash(curl -s \"https://api.github.com/repos/dav1ddq0/image-editor/issues/2\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d['title']\\); print\\(d['body']\\)\")",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git commit *)",
+      "WebSearch",
+      "Bash(npm install *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(npm run *)",
+      "Bash(pip show *)",
+      "Bash(curl -s https://api.github.com/repos/dav1ddq0/image-editor/issues/23)",
+      "Bash(gh pr *)",
+      "Bash(git log *)",
+      "Bash(read -r line)",
+      "Bash(:)"
+    ]
+  }
+}

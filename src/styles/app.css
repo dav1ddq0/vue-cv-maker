@@ -1,0 +1,106 @@
+/* Application chrome. The CV itself is styled exclusively by its template. */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f5;
+  --border: #dfe3e8;
+  --text: #17191c;
+  --text-muted: #5f6672;
+  --accent: #2563eb;
+  /* Foreground for anything painted on --accent. It travels with the accent:
+     the dark theme lightens --accent for legibility on dark surfaces, which
+     leaves white text on it at 2.4:1 — below WCAG AA. */
+  --on-accent: #ffffff;
+  --accent-soft: #e8f0fe;
+  --danger: #b42318;
+  --warning-bg: #fff7e6;
+  --warning-border: #f0c36d;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #14161a;
+  --surface: #1c1f24;
+  --surface-2: #24282e;
+  --border: #333840;
+  --text: #e8eaed;
+  --text-muted: #9aa2ad;
+  --accent: #6ea8fe;
+  --on-accent: #0f1319;
+  --accent-soft: #1e2a3d;
+  --danger: #f97066;
+  --warning-bg: #2c2413;
+  --warning-border: #6b5320;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Only ever visible inside the print layer; see print.css. */
+#print-root {
+  display: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:where(a) {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

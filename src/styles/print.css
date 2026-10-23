@@ -1,0 +1,89 @@
+/*
+ * Print rules (spec §6). One stylesheet serves three consumers:
+ *   1. `window.print()` on the live app,
+ *   2. the self-contained HTML export,
+ *   3. (Phase 5) the CSS posted to WeasyPrint,
+ * which is what keeps the browser PDF and a future server PDF from drifting.
+ */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.cv-page {
+  width: 210mm;
+  min-height: 297mm;
+  background: #fff;
+  color: #111;
+  box-sizing: border-box;
+  /* Lets a template's root fill the sheet, so sidebar bands reach the foot of
+     the page instead of ending with the text. */
+  display: flex;
+  flex-direction: column;
+}
+
+.cv-page > * {
+  flex: 1 0 auto;
+}
+
+/*
+ * Never split an entry across a page boundary.
+ *
+ * These lists are written out rather than folded into `:is(...)`: paged.js
+ * splits selectors on commas before handing them to `querySelectorAll`, so a
+ * comma inside `:is()` produces an invalid fragment and aborts pagination for
+ * the whole document. Any rule carrying a `break-*` property must stay free of
+ * comma-bearing functional selectors.
+ */
+.cv-page .entry,
+.cv-page .row,
+.cv-page .side-section,
+.cv-page li {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cv-page h1,
+.cv-page h2,
+.cv-page h3 {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.cv-page p,
+.cv-page li {
+  orphans: 2;
+  widows: 2;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  /* Hide the whole application chrome; only the print layer survives. */
+  body > #app {
+    display: none !important;
+  }
+
+  #print-root {
+    display: block !important;
+  }
+
+  .cv-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    /* Colored sidebars and accent rules must survive the browser's ink saving. */
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}

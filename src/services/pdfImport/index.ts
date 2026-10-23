@@ -1,0 +1,7 @@
+export { extractDocument, collapseLetterSpacing } from './extract'
+export type { ExtractedDocument, ExtractedLine } from './extract'
+export { analyze } from './heuristics'
+export type { ImportDraft, DetectedField, DetectedSection, TextBlock, Confidence } from './heuristics'
+export { assembleCV } from './assemble'
+export type { ReviewDecisions, BlockTarget } from './assemble'
+export type { SectionKind } from './patterns'
