@@ -66,3 +66,36 @@ describe('reconcileOrder', () => {
     expect(reconcileOrder(['summary', 'cus_gone'], cv)).not.toContain('cus_gone')
   })
 })
+
+describe('schema v1 → v2 (skill items)', () => {
+  it('turns string items into objects, keeping text and order', () => {
+    const cv = migrate({
+      schemaVersion: 1,
+      skills: [{ id: 'skg_1', category: 'Lang', items: ['TypeScript', 'Go'] }],
+    })
+
+    expect(cv.schemaVersion).toBe(2)
+    expect(cv.skills[0]!.items).toEqual([{ name: 'TypeScript' }, { name: 'Go' }])
+  })
+
+  it('leaves a v2 file untouched', () => {
+    const cv = migrate({
+      schemaVersion: 2,
+      skills: [{ id: 'skg_1', category: '', items: [{ name: 'Vue', level: 4 }] }],
+    })
+    expect(cv.skills[0]!.items).toEqual([{ name: 'Vue', level: 4 }])
+  })
+
+  it('drops an invalid level but keeps the skill', () => {
+    const cv = migrate({
+      schemaVersion: 2,
+      skills: [{ id: 's', category: '', items: [{ name: 'A', level: 9 }, { name: 'B', level: 2.5 }, { name: 'C', level: '3' }] }],
+    })
+    expect(cv.skills[0]!.items).toEqual([{ name: 'A' }, { name: 'B' }, { name: 'C' }])
+  })
+
+  it('survives garbage items without throwing', () => {
+    const cv = migrate({ schemaVersion: 1, skills: [{ items: [null, 7, 'ok'] }] })
+    expect(cv.skills[0]!.items.map((i) => i.name)).toEqual(['', '', 'ok'])
+  })
+})

@@ -17,6 +17,7 @@ import {
   displayUrl,
   formatDateRange,
   resolveSections,
+  skillNames,
   styleVars,
 } from '@/templates/shared'
 
@@ -80,7 +81,7 @@ const contactLine = computed(() =>
       <template v-else-if="section.kind === 'skills'">
         <p v-for="group in data.skills" :key="group.id" class="list-row">
           <span v-if="group.category" class="list-label">{{ group.category }}</span>
-          {{ group.items.join(', ') }}
+          {{ skillNames(group).join(', ') }}
         </p>
       </template>
 

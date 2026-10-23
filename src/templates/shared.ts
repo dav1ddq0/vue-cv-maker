@@ -1,4 +1,4 @@
-import type { CVData, StyleTokens } from '@/types/cv'
+import type { CVData, SkillGroup, StyleTokens } from '@/types/cv'
 
 /**
  * Helpers shared by every template. They are *pure functions* on purpose:
@@ -145,4 +145,9 @@ const LEVEL_LABELS: Record<string, (score: number) => string> = {
 /** Text read by assistive technology; follows the CV content language, not the UI's. */
 export function levelAccessibleLabel(score: number, language = 'es'): string {
   return (LEVEL_LABELS[language] ?? LEVEL_LABELS.es!)(score)
+}
+
+/** The skill names of a group, in order, without their levels. */
+export function skillNames(group: SkillGroup): string[] {
+  return group.items.map((item) => item.name)
 }

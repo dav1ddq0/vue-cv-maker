@@ -13,6 +13,7 @@ import {
   displayUrl,
   formatDateRange,
   resolveSections,
+  skillNames,
   styleVars,
 } from '@/templates/shared'
 
@@ -52,7 +53,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
         <template v-if="section.kind === 'skills'">
           <div v-for="group in data.skills" :key="group.id" class="side-group">
             <p v-if="group.category" class="side-group-title">{{ group.category }}</p>
-            <p class="side-item">{{ group.items.join(', ') }}</p>
+            <p class="side-item">{{ skillNames(group).join(', ') }}</p>
           </div>
         </template>
 

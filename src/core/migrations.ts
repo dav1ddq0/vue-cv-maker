@@ -1,5 +1,5 @@
 import { SCHEMA_VERSION, SECTION_IDS } from '@/types/cv'
-import type { CVData } from '@/types/cv'
+import type { CVData, SkillItem } from '@/types/cv'
 import { createEmptyCV, DEFAULT_STYLE } from './factory'
 import { uid } from './id'
 
@@ -7,10 +7,22 @@ import { uid } from './id'
  * Migration steps, keyed by the version they upgrade *from*. A file at version N
  * is run through steps N, N+1, … until it reaches `SCHEMA_VERSION`.
  *
- * There are no steps yet (v1 is the first schema); the pipeline exists so the
- * first real migration is a one-line addition instead of a refactor.
+ * v1 → v2: skill items went from plain strings to `{ name, level? }`.
  */
-const steps: Record<number, (data: any) => any> = {}
+const steps: Record<number, (data: any) => any> = {
+  1: (data) => ({
+    ...data,
+    schemaVersion: 2,
+    skills: Array.isArray(data.skills)
+      ? data.skills.map((group: any) => ({
+          ...group,
+          items: Array.isArray(group?.items)
+            ? group.items.map((item: unknown) => (typeof item === 'string' ? { name: item } : item))
+            : [],
+        }))
+      : data.skills,
+  }),
+}
 
 export class UnsupportedSchemaError extends Error {
   constructor(readonly found: number) {
@@ -64,7 +76,7 @@ export function normalize(input: any): CVData {
     })),
     skills: withIds(input.skills, 'skg').map((g: any) => ({
       ...g,
-      items: Array.isArray(g.items) ? g.items.map(str) : [],
+      items: Array.isArray(g.items) ? g.items.map(toSkillItem) : [],
     })),
     languages: withIds(input.languages, 'lng'),
     customSections: withIds(input.customSections, 'cus').map((s: any) => ({
@@ -99,6 +111,15 @@ function withIds(list: unknown, prefix: string): any[] {
   return list
     .filter((item) => item && typeof item === 'object')
     .map((item: any) => ({ ...item, id: typeof item.id === 'string' && item.id ? item.id : uid(prefix) }))
+}
+
+/** Accepts a legacy string or an object; keeps `level` only when it is an integer 1–5. */
+function toSkillItem(value: unknown): SkillItem {
+  if (typeof value === 'string') return { name: value }
+  if (!value || typeof value !== 'object') return { name: '' }
+  const { name, level } = value as { name?: unknown; level?: unknown }
+  const valid = typeof level === 'number' && Number.isInteger(level) && level >= 1 && level <= 5
+  return valid ? { name: str(name), level } : { name: str(name) }
 }
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '')

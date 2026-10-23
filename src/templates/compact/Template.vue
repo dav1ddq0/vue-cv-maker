@@ -11,6 +11,7 @@ import {
   displayUrl,
   formatDateRange,
   resolveSections,
+  skillNames,
   styleVars,
 } from '@/templates/shared'
 
@@ -76,7 +77,7 @@ const contactLine = computed(() =>
         <div v-for="group in data.skills" :key="group.id" class="row">
           <div class="rail">{{ group.category }}</div>
           <div class="body">
-            <p class="row-text">{{ group.items.join(' · ') }}</p>
+            <p class="row-text">{{ skillNames(group).join(' · ') }}</p>
           </div>
         </div>
       </template>

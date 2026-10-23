@@ -128,7 +128,7 @@ function parseSkills(section: DetectedSection) {
     if (match) {
       const group = createSkillGroup()
       group.category = match[1].trim()
-      group.items = splitItems(match[2])
+      group.items = splitItems(match[2]).map((name) => ({ name }))
       groups.push(group)
     } else if (text) {
       loose.push(...splitItems(text))
@@ -137,7 +137,7 @@ function parseSkills(section: DetectedSection) {
 
   if (loose.length) {
     const group = createSkillGroup()
-    group.items = loose
+    group.items = loose.map((name) => ({ name }))
     groups.push(group)
   }
   return groups

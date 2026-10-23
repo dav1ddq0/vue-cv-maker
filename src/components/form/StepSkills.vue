@@ -2,6 +2,7 @@
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { createSkillGroup } from '@/core/factory'
+import type { SkillGroup } from '@/types/cv'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import SortableList from '@/components/ui/SortableList.vue'
@@ -9,6 +10,12 @@ import TagInput from '@/components/ui/TagInput.vue'
 
 const cv = useCvStore()
 const { t } = useI18n()
+
+/** Edits names only; a skill that keeps its name keeps its level. */
+function setNames(group: SkillGroup, names: string[]) {
+  const byName = new Map(group.items.map((item) => [item.name, item]))
+  group.items = names.map((name) => byName.get(name) ?? { name })
+}
 </script>
 
 <template>
@@ -22,7 +29,11 @@ const { t } = useI18n()
             <input :id="id" v-model="item.category" />
           </BaseField>
           <BaseField v-slot="{ id }" :label="t('skills.items')" :hint="t('skills.itemsHint')">
-            <TagInput :id="id" v-model="item.items" />
+            <TagInput
+              :id="id"
+              :model-value="item.items.map((skill) => skill.name)"
+              @update:model-value="setNames(item, $event)"
+            />
           </BaseField>
           <div class="actions">
             <BaseButton size="sm" variant="danger" @click="cv.data.skills.splice(index, 1)">

@@ -16,6 +16,7 @@ import {
   languageLevelScore,
   levelAccessibleLabel,
   resolveSections,
+  skillNames,
   styleVars,
 } from '@/templates/shared'
 
@@ -114,7 +115,7 @@ const languages = computed(() =>
           <template v-else-if="section.kind === 'skills'">
             <div v-for="group in data.skills" :key="group.id" class="skill-group">
               <p v-if="group.category" class="skill-category">{{ group.category }}</p>
-              <p class="skill-items">{{ group.items.join(', ') }}</p>
+              <p class="skill-items">{{ skillNames(group).join(', ') }}</p>
             </div>
           </template>
 

@@ -6,7 +6,7 @@
  * `SCHEMA_VERSION` plus a migration step in `src/core/migrations.ts`.
  */
 
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 export interface CVData {
   schemaVersion: number
@@ -73,10 +73,16 @@ export interface EducationEntry {
   description?: string
 }
 
+export interface SkillItem {
+  name: string
+  /** Integer 1–5 when the user rated the skill; absent otherwise. */
+  level?: number
+}
+
 export interface SkillGroup {
   id: string
   category: string
-  items: string[]
+  items: SkillItem[]
 }
 
 export interface LanguageEntry {

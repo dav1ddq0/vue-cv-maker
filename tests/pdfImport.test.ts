@@ -120,7 +120,7 @@ describe('assembleCV', () => {
   it('reads "Category: a, b" as a skill group', () => {
     expect(cv.skills[0]).toMatchObject({
       category: 'Lenguajes',
-      items: ['TypeScript', 'Python', 'Go'],
+      items: [{ name: 'TypeScript' }, { name: 'Python' }, { name: 'Go' }],
     })
   })
 
