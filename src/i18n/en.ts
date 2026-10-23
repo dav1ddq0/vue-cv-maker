@@ -156,6 +156,7 @@ const en: typeof es = {
   style: {
     template: 'Template',
     accentColor: 'Accent color',
+    palette: 'Suggested colors',
     fontFamily: 'Typeface',
     fontScale: 'Font size',
     spacingScale: 'Spacing',

@@ -6,6 +6,7 @@ import { useI18n } from '@/i18n'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { applyTemplateDefaults, templates } from '@/templates/registry'
 import BaseField from '@/components/ui/BaseField.vue'
+import { PALETTE, isSameColor } from '@/core/stylePresets'
 
 const cv = useCvStore()
 const ui = useUiStore()
@@ -86,7 +87,22 @@ function previewAccent(id: string): string {
           :disabled="!accentSupported"
           :disabled-reason="accentReason"
         >
-          <input :id="id" v-model="style.accentColor" type="color" :disabled="!accentSupported" />
+          <div class="color-row" role="group" :aria-label="t('style.palette')">
+            <button
+              v-for="color in PALETTE"
+              :key="color"
+              type="button"
+              class="swatch"
+              :style="{ background: color }"
+              :aria-label="color"
+              :aria-pressed="isSameColor(style.accentColor, color)"
+              :disabled="!accentSupported"
+              @click="style.accentColor = color"
+            >
+              <span v-if="isSameColor(style.accentColor, color)" aria-hidden="true">✓</span>
+            </button>
+            <input :id="id" v-model="style.accentColor" type="color" :disabled="!accentSupported" />
+          </div>
         </BaseField>
 
         <BaseField
@@ -232,5 +248,32 @@ function previewAccent(id: string): string {
 input[type='color'] {
   height: 2.4em;
   padding: 0.2em;
+}
+
+.color-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.swatch {
+  width: 2.2em;
+  height: 2.2em;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: #1a1a1a;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 3px #fff;
+}
+
+.swatch[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+}
+
+.color-row input[type='color'] {
+  width: 3em;
 }
 </style>

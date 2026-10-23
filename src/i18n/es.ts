@@ -156,6 +156,7 @@ export default {
   style: {
     template: 'Plantilla',
     accentColor: 'Color de acento',
+    palette: 'Colores sugeridos',
     fontFamily: 'Tipografía',
     fontScale: 'Tamaño de letra',
     spacingScale: 'Espaciado',
