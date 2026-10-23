@@ -112,6 +112,17 @@ export default {
     add: 'Añadir sección',
     addEntry: 'Añadir entrada',
     empty: 'Sin secciones propias.',
+    pick: 'Añadir una sección',
+    blank: 'Sección en blanco',
+    presets: {
+      courses: 'Cursos',
+      certificates: 'Certificados',
+      internships: 'Prácticas',
+      projects: 'Proyectos',
+      hobbies: 'Intereses',
+      references: 'Referencias',
+      privacy: 'Protección de datos',
+    },
     order: 'Orden de las secciones',
   },
   templates: {

@@ -112,6 +112,17 @@ const en: typeof es = {
     add: 'Add section',
     addEntry: 'Add entry',
     empty: 'No custom sections.',
+    pick: 'Add a section',
+    blank: 'Blank section',
+    presets: {
+      courses: 'Courses',
+      certificates: 'Certificates',
+      internships: 'Internships',
+      projects: 'Projects',
+      hobbies: 'Interests',
+      references: 'References',
+      privacy: 'Data protection',
+    },
     order: 'Section order',
   },
   templates: {

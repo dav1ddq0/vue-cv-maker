@@ -22,6 +22,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **007** · Code review of 001–006 and its fixes
 - **008** · Interface contracts: `skillLevels` capability, i18n key guard
 - **009** · Modern file upload (photo and import)
+- **012** · Section library (presets over custom sections)
 
 ## Next 🔜
 

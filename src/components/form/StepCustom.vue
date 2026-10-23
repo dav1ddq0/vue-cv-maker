@@ -5,6 +5,8 @@ import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { createCustomEntry, createCustomSection } from '@/core/factory'
 import { reconcileOrder } from '@/core/migrations'
+import { SECTION_PRESET_IDS, createSectionFromPreset } from '@/core/sectionPresets'
+import type { CustomSection } from '@/types/cv'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import SortableList from '@/components/ui/SortableList.vue'
@@ -25,10 +27,13 @@ const orderItems = computed(() =>
 const BUILTIN = ['summary', 'experience', 'education', 'skills', 'languages']
 const isBuiltin = (id: string) => BUILTIN.includes(id)
 
-function addSection() {
-  const section = createCustomSection('')
+function addSection(section: CustomSection = createCustomSection('')) {
   cv.data.customSections.push(section)
   cv.data.sectionOrder = reconcileOrder(cv.data.sectionOrder, cv.data)
+}
+
+function addPreset(id: (typeof SECTION_PRESET_IDS)[number]) {
+  addSection(createSectionFromPreset(id, cv.data.meta.language || 'es'))
 }
 
 function removeSection(index: number) {
@@ -87,7 +92,15 @@ function removeSection(index: number) {
         </template>
       </SortableList>
 
-      <BaseButton variant="primary" @click="addSection">+ {{ t('custom.add') }}</BaseButton>
+      <div class="picker" role="group" :aria-label="t('custom.pick')">
+        <h3 class="subtitle">{{ t('custom.pick') }}</h3>
+        <div class="chips">
+          <BaseButton v-for="id in SECTION_PRESET_IDS" :key="id" size="sm" @click="addPreset(id)">
+            + {{ t(`custom.presets.${id}`) }}
+          </BaseButton>
+          <BaseButton size="sm" variant="primary" @click="addSection()">+ {{ t('custom.blank') }}</BaseButton>
+        </div>
+      </div>
     </section>
 
     <section class="block">
@@ -165,6 +178,18 @@ function removeSection(index: number) {
 .actions {
   display: flex;
   justify-content: flex-end;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
 }
 
 .order-label {
