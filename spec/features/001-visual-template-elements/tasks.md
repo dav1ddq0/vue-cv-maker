@@ -9,3 +9,4 @@
 - [x] 7. `npm test` (133 passing), `npm run typecheck`, `npm run build`
 - [x] 8. Visual check: photo (8 templates, real upload), multi-page (paged preview, 2 pages), HTML export printed to PDF.
       Verified later in 007. The native print dialog path was not exercised.
+- [x] 9. Update spec status and roadmap
