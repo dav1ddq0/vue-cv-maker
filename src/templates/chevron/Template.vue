@@ -290,7 +290,7 @@ const languages = computed(() =>
 
 .company {
   font-weight: 600;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .entry-text {

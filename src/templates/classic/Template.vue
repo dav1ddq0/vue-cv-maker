@@ -128,7 +128,7 @@ const contactLine = computed(() =>
 .headline {
   margin: 0.15em 0 0;
   font-size: 1.08em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   font-weight: 600;
 }
 
@@ -160,7 +160,7 @@ const contactLine = computed(() =>
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   margin: 0 0 0.55em;
   padding-bottom: 0.28em;
   border-bottom: 1.5px solid var(--cv-accent);

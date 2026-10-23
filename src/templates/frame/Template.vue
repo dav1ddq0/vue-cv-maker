@@ -191,7 +191,7 @@ const languages = computed(() =>
   margin: 0.15em 0 0;
   font-size: 1.05em;
   font-style: italic;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .contact {
@@ -215,7 +215,7 @@ const languages = computed(() =>
 .section-title {
   font-size: 1.05em;
   font-weight: 700;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   margin: 0 0 0.6em;
   padding-bottom: 0.25em;
   border-bottom: 1px solid var(--cv-accent);

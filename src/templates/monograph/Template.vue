@@ -158,7 +158,7 @@ const contactLine = computed(() =>
 .contact a::before {
   content: '/';
   margin: 0 0.5em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .contact a {

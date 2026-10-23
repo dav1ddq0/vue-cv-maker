@@ -198,7 +198,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
 .headline {
   margin: 0.15em 0 0;
   font-size: 1.05em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   font-weight: 600;
 }
 
@@ -211,7 +211,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: 700;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   margin: 0 0 0.6em;
 }
 

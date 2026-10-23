@@ -165,7 +165,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-weight: 600;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   margin: 0 0 0.6em;
 }
 
@@ -221,7 +221,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .section {
@@ -233,7 +233,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-weight: 600;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   margin: 0 0 0.65em;
   padding-bottom: 0.3em;
   border-bottom: 1px solid color-mix(in srgb, var(--cv-accent) 35%, #fff);

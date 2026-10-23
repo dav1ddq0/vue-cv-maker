@@ -133,7 +133,7 @@ const contactLine = computed(() =>
   font-size: 0.86em;
   font-style: italic;
   letter-spacing: 0.06em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .contact {
@@ -169,7 +169,7 @@ const contactLine = computed(() =>
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   border-bottom: 1px solid var(--cv-accent);
   line-height: 0;
 }
@@ -249,6 +249,6 @@ const contactLine = computed(() =>
 .list-label {
   font-variant: small-caps;
   letter-spacing: 0.06em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 </style>

@@ -155,7 +155,7 @@ const languages = computed(() =>
   margin: 0.1em 0 0;
   font-size: 1.1em;
   font-weight: 600;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .contact {
@@ -187,7 +187,7 @@ const languages = computed(() =>
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .summary {

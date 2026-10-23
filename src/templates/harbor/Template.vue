@@ -242,7 +242,7 @@ const languages = computed(() =>
 .headline {
   margin: 0.15em 0 0;
   font-size: 1.05em;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   font-weight: 600;
 }
 
@@ -289,7 +289,7 @@ const languages = computed(() =>
 
 .company {
   font-weight: 600;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .entry-text {

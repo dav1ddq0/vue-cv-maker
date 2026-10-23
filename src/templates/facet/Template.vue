@@ -211,7 +211,7 @@ const languages = computed(() =>
   margin: 0.2em 0 0;
   font-size: 1.1em;
   font-weight: 600;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
 }
 
 .columns {
@@ -239,7 +239,7 @@ const languages = computed(() =>
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: 700;
-  color: var(--cv-accent);
+  color: var(--cv-accent-text);
   margin: 0 0 0.55em;
 }
 
