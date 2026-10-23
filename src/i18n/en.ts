@@ -104,6 +104,7 @@ const en: typeof es = {
   },
   dock: {
     label: 'Editor mode',
+    more: 'More ways to export',
     edit: 'Edit',
     next: 'Next: {step}',
   },

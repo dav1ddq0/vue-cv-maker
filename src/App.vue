@@ -118,7 +118,8 @@ function onKeydown(event: KeyboardEvent) {
 
 @media (max-width: 1000px) {
   .editor {
-    grid-template-columns: 1fr;
+    /* `1fr` alone lets the column grow to the page's 794px, which overflowed the whole document. */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .editor-preview {

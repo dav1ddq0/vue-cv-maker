@@ -47,3 +47,14 @@ describe('MobileDock', () => {
     expect(wrapper.find('.nav').exists()).toBe(true)
   })
 })
+
+describe('MobileDock in preview mode', () => {
+  it('offers the PDF export as the main action and the other formats behind a menu', async () => {
+    const ui = useUiStore()
+    ui.previewOpen = true
+    const wrapper = mount(MobileDock)
+    expect(wrapper.find('.nav').exists()).toBe(false)
+    expect(wrapper.find('.exports .next').text()).toBe('Imprimir / Guardar como PDF')
+    expect(wrapper.find('.exports .more').attributes('aria-label')).toBe('Más formas de exportar')
+  })
+})

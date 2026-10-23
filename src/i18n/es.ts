@@ -104,6 +104,7 @@ export default {
   },
   dock: {
     label: 'Modo del editor',
+    more: 'Más formas de exportar',
     edit: 'Editar',
     next: 'Siguiente: {step}',
   },

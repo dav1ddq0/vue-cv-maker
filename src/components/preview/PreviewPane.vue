@@ -1,21 +1,46 @@
 <script setup lang="ts">
 /** Live, reactive preview. Paginated output is a separate component on purpose —
  *  paged.js must never touch a Vue-managed subtree (spec §6). */
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
+import { useIsPhone } from '@/composables/useIsPhone'
 import CvRenderer from './CvRenderer.vue'
 
 const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
 
+const isPhone = useIsPhone()
 const zoom = ref(0.72)
+
+/** A4 width in CSS px (210mm at 96dpi). */
+const PAGE_PX = 793.7
+const scroller = ref<HTMLElement | null>(null)
+const available = ref(0)
+let observer: ResizeObserver | undefined
+
+onMounted(() => {
+  const el = scroller.value
+  if (!el || typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver(([entry]) => {
+    if (entry) available.value = entry.contentRect.width
+  })
+  observer.observe(el)
+})
+onBeforeUnmount(() => observer?.disconnect())
+
+/** On phones the page is fitted to the screen width instead of using the slider (spec 013). */
+const effectiveZoom = computed(() => {
+  if (!isPhone.value || available.value <= 0) return zoom.value
+  return Math.min(1, available.value / PAGE_PX)
+})
+
 const scaleStyle = computed(() => ({
-  transform: `scale(${zoom.value})`,
+  transform: `scale(${effectiveZoom.value})`,
   // A scaled element keeps its layout box, which would leave a large gap below.
-  marginBottom: `${(zoom.value - 1) * 297}mm`,
+  marginBottom: `${(effectiveZoom.value - 1) * 297}mm`,
 }))
 </script>
 
@@ -23,14 +48,14 @@ const scaleStyle = computed(() => ({
   <section class="pane" :aria-label="t('preview.title')">
     <header class="bar">
       <h2 class="title">{{ t('preview.title') }}</h2>
-      <label class="zoom">
+      <label v-if="!isPhone" class="zoom">
         <span class="sr-only">Zoom</span>
         <input v-model.number="zoom" type="range" min="0.4" max="1" step="0.02" />
         <output>{{ Math.round(zoom * 100) }}%</output>
       </label>
     </header>
 
-    <div class="scroll">
+    <div ref="scroller" class="scroll">
       <div class="page-wrap" :style="scaleStyle">
         <div class="cv-page">
           <CvRenderer :data="cv.data" :template-id="ui.templateId" />
@@ -87,6 +112,15 @@ const scaleStyle = computed(() => ({
   display: flex;
   justify-content: center;
   align-items: flex-start;
+}
+
+/* Phones: a slimmer margin so the page uses the width it is fitted to. */
+@media (max-width: 640px) {
+  .scroll {
+    padding: 0.8em;
+    /* The scaled page keeps its 794px layout box; nothing useful is out there to scroll to. */
+    overflow-x: hidden;
+  }
 }
 
 .page-wrap {

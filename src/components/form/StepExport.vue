@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
-import { exportHtml, exportJson, printCv } from '@/services/export'
+import { useCvExport } from '@/composables/useCvExport'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
 import PaginatedPreview from '@/components/preview/PaginatedPreview.vue'
@@ -12,21 +12,8 @@ const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
 
-const busy = ref<'pdf' | 'html' | 'json' | null>(null)
 const showPaginated = ref(false)
-
-async function run(kind: 'pdf' | 'html' | 'json') {
-  busy.value = kind
-  try {
-    // Autosave is debounced; flushing first means the file matches what is stored.
-    await cv.flush()
-    if (kind === 'pdf') await printCv(cv.data, ui.templateId, { paginate: true })
-    else if (kind === 'html') await exportHtml(cv.data, ui.templateId)
-    else await exportJson(cv.data)
-  } finally {
-    busy.value = null
-  }
-}
+const { busy, run } = useCvExport()
 </script>
 
 <template>

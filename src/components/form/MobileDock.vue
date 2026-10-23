@@ -4,12 +4,16 @@
  * thumb is. It lives outside the form on purpose: in preview mode the form is hidden, and a
  * toggle inside it left no way back.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
+import { useCvExport } from '@/composables/useCvExport'
+import ExportSheet from './ExportSheet.vue'
 
 const ui = useUiStore()
 const { t } = useI18n()
+const { busy, run } = useCvExport()
+const moreOpen = ref(false)
 
 const isLast = computed(() => ui.stepIndex === ui.steps.length - 1)
 const nextLabel = computed(() =>
@@ -30,7 +34,17 @@ const nextLabel = computed(() =>
       </button>
     </div>
 
-    <div v-if="!ui.previewOpen" class="nav">
+    <div v-if="ui.previewOpen" class="exports">
+      <button type="button" class="next" :disabled="busy !== null" @click="run('pdf')">
+        {{ busy === 'pdf' ? t('exportView.preparing') : t('exportView.print') }}
+      </button>
+      <button type="button" class="more" :aria-label="t('dock.more')" aria-haspopup="dialog" @click="moreOpen = true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
+      </button>
+      <ExportSheet :open="moreOpen" @close="moreOpen = false" />
+    </div>
+
+    <div v-else class="nav">
       <button type="button" class="back" :disabled="ui.stepIndex === 0" @click="ui.prevStep()">
         {{ t('actions.back') }}
       </button>
@@ -92,6 +106,24 @@ const nextLabel = computed(() =>
   display: grid;
   grid-template-columns: minmax(84px, 112px) minmax(0, 1fr);
   gap: 0.6em;
+}
+
+.exports {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  gap: 0.6em;
+}
+
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
 }
 
 .back,
