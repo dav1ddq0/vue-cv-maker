@@ -19,6 +19,7 @@ import {
   resolveSections,
   skillNames,
   styleVars,
+  contactLines,
 } from '@/templates/shared'
 
 const props = defineProps<{ data: CVData }>()
@@ -32,7 +33,7 @@ const mainSections = computed(() => sections.value.filter((s) => !BLOCK_KINDS.ha
 const blockSections = computed(() => sections.value.filter((s) => BLOCK_KINDS.has(s.kind)))
 
 const contactItems = computed(() =>
-  [props.data.personal.email, props.data.personal.phone, props.data.personal.location].filter(Boolean),
+  contactLines(props.data),
 )
 
 const languages = computed(() => resolveLanguages(props.data))

@@ -37,4 +37,25 @@ describe.each(templates)('$name renders', (definition) => {
 
     expect(wrapper.attributes('style')).toContain('--cv-accent: #ff0000')
   })
+
+  it('prints the optional personal data only when it is filled', async () => {
+    const component = await definition.component()
+    const empty = createSampleCV()
+    const bare = mount(component as any, { props: { data: empty } }).text()
+    expect(bare).not.toMatch(/Nacimiento|Nacionalidad|Carné de conducir|Estado civil/)
+
+    const filled = createSampleCV()
+    Object.assign(filled.personal, {
+      birthDate: '1992-03-12',
+      birthPlace: 'Valencia',
+      nationality: 'Española',
+      drivingLicense: 'B',
+      maritalStatus: 'single',
+    })
+    const text = mount(component as any, { props: { data: filled } }).text()
+    expect(text).toContain('Nacimiento: 12 mar 1992, Valencia')
+    expect(text).toContain('Nacionalidad: Española')
+    expect(text).toContain('Carné de conducir: B')
+    expect(text).toContain('Estado civil: Soltero/a')
+  })
 })

@@ -17,6 +17,7 @@ import {
   resolveSections,
   skillNames,
   styleVars,
+  contactLines,
 } from '@/templates/shared'
 
 const props = defineProps<{ data: CVData }>()
@@ -26,7 +27,7 @@ const language = computed(() => props.data.meta.language || 'es')
 const sections = computed(() => resolveSections(props.data))
 
 const contactItems = computed(() =>
-  [props.data.personal.email, props.data.personal.phone, props.data.personal.location].filter(Boolean),
+  contactLines(props.data),
 )
 
 const languages = computed(() => resolveLanguages(props.data))

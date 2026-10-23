@@ -15,6 +15,7 @@ import {
   resolveSections,
   skillNames,
   styleVars,
+  contactLines,
 } from '@/templates/shared'
 
 const props = defineProps<{ data: CVData }>()
@@ -29,7 +30,7 @@ const sidebarSections = computed(() => sections.value.filter((s) => SIDEBAR_KIND
 const mainSections = computed(() => sections.value.filter((s) => !SIDEBAR_KINDS.has(s.kind)))
 
 const contactItems = computed(() =>
-  [props.data.personal.email, props.data.personal.phone, props.data.personal.location].filter(Boolean),
+  contactLines(props.data),
 )
 const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Contacto'))
 </script>

@@ -1,4 +1,4 @@
-import type { CVData, LanguageEntry, SkillGroup, StyleTokens } from '@/types/cv'
+import type { CVData, LanguageEntry, MaritalStatus, PersonalDetails, SkillGroup, StyleTokens } from '@/types/cv'
 
 /**
  * Helpers shared by every template. They are *pure functions* on purpose:
@@ -22,6 +22,53 @@ export function formatPartialDate(value: string, language = 'es'): string {
   const index = Number(month) - 1
   const name = months[index]
   return name ? `${name} ${year}` : value
+}
+
+/** "1992-03-12" → "12 mar 1992". Anything else (partial, typed by hand) is shown as written. */
+export function formatBirthDate(value: string, language = 'es'): string {
+  const text = value.trim()
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text)
+  if (!match) return text
+  const [, year, month, day] = match
+  const name = (MONTHS[language] ?? MONTHS.es)![Number(month) - 1]
+  if (!name || Number(day) < 1 || Number(day) > 31) return text
+  return `${Number(day)} ${name} ${year}`
+}
+
+const EXTRA_LABELS: Record<string, { birth: string; nationality: string; licence: string; status: string }> = {
+  es: { birth: 'Nacimiento', nationality: 'Nacionalidad', licence: 'Carné de conducir', status: 'Estado civil' },
+  en: { birth: 'Born', nationality: 'Nationality', licence: 'Driving licence', status: 'Marital status' },
+}
+
+const MARITAL_LABELS: Record<string, Record<MaritalStatus, string>> = {
+  es: { single: 'Soltero/a', married: 'Casado/a', partner: 'Pareja de hecho', divorced: 'Divorciado/a', widowed: 'Viudo/a' },
+  en: { single: 'Single', married: 'Married', partner: 'Domestic partnership', divorced: 'Divorced', widowed: 'Widowed' },
+}
+
+/** Label of a marital-status code in the CV's content language. */
+export function maritalLabel(status: MaritalStatus, language = 'es'): string {
+  return (MARITAL_LABELS[language] ?? MARITAL_LABELS.es)![status]
+}
+
+/**
+ * The lines of a CV's contact block, in order: email, phone, location, then whichever optional
+ * extras were filled, each labelled in the content language. Empty fields contribute nothing.
+ * Every template calls this instead of listing the fields itself, so a new field shows up in all.
+ */
+export function contactLines(data: CVData): string[] {
+  const language = data.meta.language || 'es'
+  const personal: PersonalDetails = data.personal
+  const labels = EXTRA_LABELS[language] ?? EXTRA_LABELS.es!
+  const born = [formatBirthDate(personal.birthDate, language), personal.birthPlace.trim()].filter(Boolean).join(', ')
+  return [
+    personal.email,
+    personal.phone,
+    personal.location,
+    born && `${labels.birth}: ${born}`,
+    personal.nationality.trim() && `${labels.nationality}: ${personal.nationality.trim()}`,
+    personal.drivingLicense.trim() && `${labels.licence}: ${personal.drivingLicense.trim()}`,
+    personal.maritalStatus && `${labels.status}: ${maritalLabel(personal.maritalStatus, language)}`,
+  ].filter((line): line is string => Boolean(line))
 }
 
 export function formatDateRange(start: string, end: string | null, language = 'es'): string {
