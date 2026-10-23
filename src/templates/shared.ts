@@ -1,4 +1,4 @@
-import type { CVData, SkillGroup, StyleTokens } from '@/types/cv'
+import type { CVData, LanguageEntry, SkillGroup, StyleTokens } from '@/types/cv'
 
 /**
  * Helpers shared by every template. They are *pure functions* on purpose:
@@ -212,4 +212,20 @@ export function skillNames(group: SkillGroup): string[] {
 /** True when at least one skill in the group carries a level (the group then renders as rows). */
 export function groupHasLevels(group: SkillGroup): boolean {
   return group.items.some((item) => item.level !== undefined)
+}
+
+export interface ResolvedLanguage extends LanguageEntry {
+  /** 1–5, or `null` when the typed level is not recognised (the text is printed instead). */
+  score: number | null
+  /** Accessible label in the CV content language; empty when there is no score. */
+  label: string
+}
+
+/** The CV's languages with the level mark data every level-drawing template needs. */
+export function resolveLanguages(data: CVData): ResolvedLanguage[] {
+  const language = data.meta.language || 'es'
+  return data.languages.map((lang) => {
+    const score = languageLevelScore(lang.level)
+    return { ...lang, score, label: score === null ? '' : levelAccessibleLabel(score, language) }
+  })
 }

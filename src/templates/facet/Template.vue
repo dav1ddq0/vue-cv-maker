@@ -15,8 +15,8 @@ import {
   displayUrl,
   formatDateRange,
   groupHasLevels,
-  languageLevelScore,
   levelAccessibleLabel,
+  resolveLanguages,
   resolveSections,
   skillNames,
   styleVars,
@@ -37,16 +37,7 @@ const contactItems = computed(() =>
   [props.data.personal.email, props.data.personal.phone, props.data.personal.location].filter(Boolean),
 )
 
-const languages = computed(() =>
-  props.data.languages.map((lang) => {
-    const score = languageLevelScore(lang.level)
-    return {
-      ...lang,
-      score,
-      label: score === null ? '' : levelAccessibleLabel(score, language.value),
-    }
-  }),
-)
+const languages = computed(() => resolveLanguages(props.data))
 </script>
 
 <template>

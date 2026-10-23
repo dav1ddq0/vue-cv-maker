@@ -41,3 +41,23 @@ describe('levelAccessibleLabel', () => {
     expect(levelAccessibleLabel(4, 'fr')).toBe('Nivel 4 de 5')
   })
 })
+
+describe('resolveLanguages', () => {
+  it('attaches a score and an accessible label in the CV language, or neither', async () => {
+    const { resolveLanguages } = await import('@/templates/shared')
+    const { createEmptyCV } = await import('@/core/factory')
+    const cv = createEmptyCV()
+    cv.meta.language = 'en'
+    cv.languages = [
+      { id: 'a', name: 'Spanish', level: 'Native' },
+      { id: 'b', name: 'Catalan', level: 'Very good' },
+      { id: 'c', name: 'French', level: '' },
+    ]
+
+    expect(resolveLanguages(cv)).toEqual([
+      { id: 'a', name: 'Spanish', level: 'Native', score: 5, label: 'Level 5 of 5' },
+      { id: 'b', name: 'Catalan', level: 'Very good', score: null, label: '' },
+      { id: 'c', name: 'French', level: '', score: null, label: '' },
+    ])
+  })
+})
