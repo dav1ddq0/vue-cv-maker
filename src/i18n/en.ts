@@ -52,6 +52,9 @@ const en: typeof es = {
     photo: 'Photo',
     photoAdd: 'Upload photo',
     photoRemove: 'Remove photo',
+    photoDrop: 'Drag an image or click',
+    photoReplace: 'Change image',
+    photoHint: 'JPG, PNG, WebP',
     links: 'Links',
     linkLabel: 'Label',
     linkUrl: 'URL',
@@ -227,6 +230,9 @@ const en: typeof es = {
     download: 'Download',
     print: 'Print / Save as PDF',
     preparing: 'Preparing…',
+  },
+  upload: {
+    rejected: 'That file type is not supported here.',
   },
   importView: {
     title: 'Import',

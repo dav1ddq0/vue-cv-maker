@@ -52,6 +52,9 @@ export default {
     photo: 'Foto',
     photoAdd: 'Subir foto',
     photoRemove: 'Quitar foto',
+    photoDrop: 'Arrastra una imagen o haz clic',
+    photoReplace: 'Cambiar imagen',
+    photoHint: 'JPG, PNG, WebP',
     links: 'Enlaces',
     linkLabel: 'Etiqueta',
     linkUrl: 'URL',
@@ -227,6 +230,9 @@ export default {
     download: 'Descargar',
     print: 'Imprimir / Guardar como PDF',
     preparing: 'Preparando…',
+  },
+  upload: {
+    rejected: 'Ese tipo de archivo no es válido aquí.',
   },
   importView: {
     title: 'Importar',

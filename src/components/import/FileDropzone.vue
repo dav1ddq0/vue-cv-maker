@@ -1,81 +1,226 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+/**
+ * File picker and drop target in one control. The whole surface is a `<label>` around a
+ * visually hidden native `<input type="file">`, so click, keyboard (Tab, Enter, Space) and
+ * assistive technology work without any scripted role; drag and drop is layered on top.
+ *
+ * `compact` lays it out as a single row (used next to the profile photo).
+ */
+import { ref, useId } from 'vue'
 import { useI18n } from '@/i18n'
+import { matchesAccept } from '@/core/fileAccept'
 
-const props = defineProps<{ accept: string; busy?: boolean }>()
+const props = defineProps<{
+  accept: string
+  busy?: boolean
+  disabled?: boolean
+  compact?: boolean
+  /** Short note under the title, e.g. the accepted formats. */
+  hint?: string
+  /** Lets an outer `<label for>` (e.g. a form field's) name the native input. */
+  inputId?: string
+}>()
 const emit = defineEmits<{ file: [file: File] }>()
 const { t } = useI18n()
 
+const hintId = useId()
 const over = ref(false)
+const rejected = ref(false)
+const root = ref<HTMLElement | null>(null)
 const input = ref<HTMLInputElement | null>(null)
+
+function handle(file: File | undefined) {
+  if (!file) return
+  rejected.value = !matchesAccept(file, props.accept)
+  if (!rejected.value) emit('file', file)
+}
 
 function onDrop(event: DragEvent) {
   over.value = false
-  const file = event.dataTransfer?.files?.[0]
-  if (file && matchesAccept(file)) emit('file', file)
+  if (props.disabled || props.busy) return
+  handle(event.dataTransfer?.files?.[0])
 }
 
 function onPick(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) emit('file', file)
+  handle((event.target as HTMLInputElement).files?.[0])
   // Allow re-picking the same file after a failed attempt.
   if (input.value) input.value.value = ''
 }
 
-function matchesAccept(file: File): boolean {
-  return props.accept
-    .split(',')
-    .map((part) => part.trim().toLowerCase())
-    .some((part) =>
-      part.startsWith('.') ? file.name.toLowerCase().endsWith(part) : file.type === part,
-    )
+/** Leaving to a child of the control is not leaving the control. */
+function onDragLeave(event: DragEvent) {
+  if (!root.value?.contains(event.relatedTarget as Node | null)) over.value = false
 }
 </script>
 
 <template>
-  <div
+  <label
+    ref="root"
     class="dropzone"
-    :class="{ 'dropzone--over': over, 'dropzone--busy': busy }"
-    @dragover.prevent="over = true"
-    @dragleave="over = false"
+    :class="{ 'dropzone--over': over, 'dropzone--busy': busy, 'dropzone--compact': compact }"
+    :aria-busy="busy || undefined"
+    @dragenter.prevent="over = !disabled && !busy"
+    @dragover.prevent="over = !disabled && !busy"
+    @dragleave="onDragLeave"
     @drop.prevent="onDrop"
-    @click="input?.click()"
-    @keydown.enter="input?.click()"
-    @keydown.space.prevent="input?.click()"
-    tabindex="0"
-    role="button"
   >
-    <input ref="input" type="file" class="sr-only" :accept="accept" @change="onPick" />
-    <p class="text">
-      <slot>{{ t('importView.dropzone') }}</slot>
-    </p>
-  </div>
+    <input
+      :id="inputId"
+      ref="input"
+      type="file"
+      class="sr-only"
+      :accept="accept"
+      :disabled="disabled || busy"
+      :aria-describedby="hint || rejected ? hintId : undefined"
+      @change="onPick"
+    />
+
+    <span class="icon" aria-hidden="true">
+      <span v-if="busy" class="spinner" />
+      <svg v-else viewBox="0 0 24 24" width="1.25em" height="1.25em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 16V4m0 0L8 8m4-4 4 4" />
+        <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+      </svg>
+    </span>
+
+    <span class="copy">
+      <span class="title" aria-live="polite"><slot>{{ t('importView.dropzone') }}</slot></span>
+      <span v-if="rejected" :id="hintId" class="note note--error" role="alert">{{ t('upload.rejected') }}</span>
+      <span v-else-if="hint" :id="hintId" class="note">{{ hint }}</span>
+    </span>
+  </label>
 </template>
 
 <style scoped>
 .dropzone {
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 1.6em 1em;
+  --dz-border: var(--border);
+  --dz-bg: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  padding: 1.5em 1em;
   text-align: center;
-  background: var(--surface);
+  color: var(--text);
+  border: 1.5px dashed var(--dz-border);
+  border-radius: var(--radius);
+  background: var(--dz-bg);
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.dropzone:hover {
+  --dz-border: var(--accent);
+  --dz-bg: var(--surface-2);
 }
 
 .dropzone--over {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  --dz-border: var(--accent);
+  --dz-bg: var(--accent-soft);
+}
+
+/* The native input holds focus; the visible control shows the ring. */
+.dropzone:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@supports not selector(:has(*)) {
+  .dropzone:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.dropzone:has(input:disabled) {
+  cursor: not-allowed;
 }
 
 .dropzone--busy {
-  pointer-events: none;
-  opacity: 0.6;
+  cursor: progress;
 }
 
-.text {
-  margin: 0;
+.dropzone:has(input:disabled):not(.dropzone--busy) {
+  opacity: 0.55;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.6em;
+  height: 2.6em;
+  border-radius: 50%;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dropzone--over .icon {
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  min-width: 0;
+}
+
+.title {
+  font-size: 0.92em;
+  font-weight: 600;
+}
+
+.note {
+  font-size: 0.8em;
   color: var(--text-muted);
-  font-size: 0.9em;
+}
+
+.note--error {
+  color: var(--danger);
+}
+
+.dropzone--compact {
+  flex-direction: row;
+  gap: 0.8em;
+  padding: 0.65em 0.9em;
+  text-align: left;
+}
+
+.dropzone--compact .icon {
+  width: 2.2em;
+  height: 2.2em;
+}
+
+.spinner {
+  width: 1.15em;
+  height: 1.15em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dropzone {
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .icon {
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  }
+
+  .dropzone--over .icon {
+    transform: scale(1.1);
+  }
+
+  .spinner {
+    animation: dropzone-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes dropzone-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

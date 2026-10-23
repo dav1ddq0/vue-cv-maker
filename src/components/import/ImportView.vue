@@ -66,13 +66,13 @@ async function apply(data: CVData, mode: 'new' | 'current') {
       <article class="card">
         <h3 class="card-title">{{ t('importView.json') }}</h3>
         <p class="card-hint">{{ t('importView.jsonHint') }}</p>
-        <FileDropzone accept=".json,application/json" @file="onJson" />
+        <FileDropzone accept=".json,application/json" hint="JSON" @file="onJson" />
       </article>
 
       <article class="card">
         <h3 class="card-title">{{ t('importView.pdf') }}</h3>
         <p class="card-hint">{{ t('importView.pdfHint') }}</p>
-        <FileDropzone accept=".pdf,application/pdf" :busy="busy" @file="onPdf">
+        <FileDropzone accept=".pdf,application/pdf" hint="PDF" :busy="busy" @file="onPdf">
           {{ busy ? t('importView.analyzing') : t('importView.dropzone') }}
         </FileDropzone>
       </article>

@@ -8,6 +8,7 @@ import { createLink } from '@/core/factory'
 import { deletePhoto, loadPhoto, savePhoto, StorageQuotaError } from '@/services/storage'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import FileDropzone from '@/components/import/FileDropzone.vue'
 import SortableList from '@/components/ui/SortableList.vue'
 
 const cv = useCvStore()
@@ -18,7 +19,6 @@ const { supports, reasonFor } = useCapabilities()
 const photoSupported = supports('photo')
 const photoReason = reasonFor('photo')
 const photoError = ref<string | null>(null)
-const fileInput = ref<HTMLInputElement | null>(null)
 const thumbUrl = ref<string | null>(null)
 
 let thumbRequest = 0
@@ -53,9 +53,7 @@ function revokeThumb() {
 watch(() => cv.data.personal.photo, refreshThumb, { immediate: true })
 onUnmounted(revokeThumb)
 
-async function onPhotoPicked(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
+async function onPhoto(file: File) {
   photoError.value = null
   try {
     cv.data.personal.photo = await savePhoto(cv.data.meta.id, file)
@@ -68,7 +66,6 @@ async function onPhotoPicked(event: Event) {
 async function removePhoto() {
   const reference = cv.data.personal.photo
   cv.data.personal.photo = undefined
-  if (fileInput.value) fileInput.value.value = ''
   if (reference) await deletePhoto(reference)
 }
 </script>
@@ -109,14 +106,23 @@ async function removePhoto() {
       >
         <div class="photo-row">
           <img v-if="thumbUrl" class="thumb" :src="thumbUrl" alt="" />
-          <input
-            :id="id"
-            ref="fileInput"
-            type="file"
+          <span v-else class="thumb thumb--empty" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="55%" height="55%" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.6" />
+              <path d="M5 20c.6-3.6 3.4-5.6 7-5.6s6.4 2 7 5.6" />
+            </svg>
+          </span>
+          <FileDropzone
+            class="photo-drop"
+            :input-id="id"
+            compact
             accept="image/*"
             :disabled="!photoSupported"
-            @change="onPhotoPicked"
-          />
+            :hint="t('personal.photoHint')"
+            @file="onPhoto"
+          >
+            {{ cv.data.personal.photo ? t('personal.photoReplace') : t('personal.photoDrop') }}
+          </FileDropzone>
           <BaseButton
             v-if="cv.data.personal.photo"
             size="sm"
@@ -177,21 +183,28 @@ async function removePhoto() {
 .photo-row {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.7em;
   flex-wrap: wrap;
 }
 
 .thumb {
-  width: 3.2em;
-  height: 3.2em;
+  flex: none;
+  width: 3.6em;
+  height: 3.6em;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--border);
 }
-.photo-row input[type='file'] {
-  border: 0 !important;
-  padding: 0 !important;
-  font-size: 0.85em;
+
+.thumb--empty {
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+
+.photo-drop {
+  flex: 1 1 14em;
 }
 
 .links {
