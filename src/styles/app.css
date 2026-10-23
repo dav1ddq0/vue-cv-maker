@@ -104,3 +104,28 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Touch input: the app's own controls get 44px targets (Apple HIG; WCAG 2.5.5 AAA) instead of
+ * the 27-30px they have under a mouse. Keyed on the pointer, not the width, so a touch laptop
+ * or an iPad in landscape gets them too and a narrow desktop window does not.
+ */
+@media (pointer: coarse) {
+  .btn,
+  .view-btn,
+  .select {
+    min-height: 44px;
+  }
+
+  .btn {
+    min-width: 44px;
+    justify-content: center;
+  }
+
+  /* Text-like form controls; range, checkbox, radio and the hidden file input keep their own size. */
+  select,
+  textarea,
+  input:not([type='range'], [type='checkbox'], [type='radio'], [type='file'], [type='color']) {
+    min-height: 44px;
+  }
+}

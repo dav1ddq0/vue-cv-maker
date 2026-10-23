@@ -142,4 +142,10 @@ onMounted(revealActive)
   font-size: 0.78em;
   color: var(--text-muted);
 }
+
+@media (pointer: coarse) {
+  .step {
+    min-height: 44px;
+  }
+}
 </style>

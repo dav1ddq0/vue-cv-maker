@@ -103,6 +103,18 @@ function onKeydown(event: KeyboardEvent) {
   min-width: 0;
 }
 
+@media (pointer: coarse) {
+  .remove,
+  .level,
+  .name {
+    min-height: 44px;
+  }
+
+  .remove {
+    min-width: 44px;
+  }
+}
+
 /* Phones: name and remove share the first line; the level select gets its own, so the name is
    not squeezed to a few letters next to a 7.5em select. */
 @media (max-width: 480px) {

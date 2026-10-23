@@ -276,4 +276,16 @@ input[type='color'] {
 .color-row input[type='color'] {
   width: 3em;
 }
+
+/* After the base rules, which would otherwise win on source order. */
+@media (pointer: coarse) {
+  .swatch {
+    width: 44px;
+    height: 44px;
+  }
+
+  .color-row input[type='color'] {
+    height: 44px;
+  }
+}
 </style>

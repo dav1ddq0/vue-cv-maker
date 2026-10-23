@@ -145,6 +145,13 @@ function move(from: number, to: number) {
   padding: 0;
 }
 
+@media (pointer: coarse) {
+  .move-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
 .move-btn:hover:not(:disabled) {
   background: var(--surface-2);
   color: var(--text);
