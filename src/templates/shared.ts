@@ -68,10 +68,35 @@ export function onAccent(accent: string): string {
   return ink > white ? INK : WHITE
 }
 
+const MIN_TEXT_CONTRAST = 4.5
+
+/**
+ * The accent to use for *text* on a light surface: unchanged when it already reaches
+ * 4.5:1 against white, otherwise the same hue mixed with black until it does.
+ * Fills, borders and shapes should keep using the accent itself.
+ */
+export function accentText(accent: string): string {
+  const match = accent.trim().match(/^#([0-9a-f]{6})$/i)
+  if (!match) return accent
+  const base = parseInt(match[1]!, 16)
+  const rgb = [(base >> 16) & 255, (base >> 8) & 255, base & 255]
+  for (let step = 0; step <= 20; step += 1) {
+    const keep = 1 - step * 0.05
+    const hex =
+      '#' +
+      rgb
+        .map((c) => Math.round(c * keep).toString(16).padStart(2, '0'))
+        .join('')
+    if ((contrastRatio(hex, WHITE) ?? 0) >= MIN_TEXT_CONTRAST) return hex
+  }
+  return '#000000'
+}
+
 export function styleVars(style: StyleTokens): Record<string, string> {
   return {
     '--cv-accent': style.accentColor,
     '--cv-on-accent': onAccent(style.accentColor),
+    '--cv-accent-text': accentText(style.accentColor),
     '--cv-font': style.fontFamily,
     '--cv-font-scale': String(style.fontScale),
     '--cv-spacing-scale': String(style.spacingScale),

@@ -91,3 +91,39 @@ describe('readable ink on accent', () => {
     expect(styleVars(createEmptyCV().style)['--cv-on-accent']).toMatch(/^#/)
   })
 })
+
+describe('accent for text on light surfaces', () => {
+  it('leaves an accent that already reads well untouched', async () => {
+    const { accentText } = await import('@/templates/shared')
+    expect(accentText('#1f3a63')).toBe('#1f3a63')
+    expect(accentText('#334fdc')).toBe('#334fdc')
+  })
+
+  it('darkens light accents until they reach 4.5:1 on white, keeping the hue', async () => {
+    const { accentText, contrastRatio } = await import('@/templates/shared')
+    for (const color of ['#ffd86f', '#10cf65', '#f2614c']) {
+      const text = accentText(color)
+      expect(text).not.toBe(color)
+      expect(contrastRatio(text, '#ffffff')!).toBeGreaterThanOrEqual(4.5)
+    }
+    // Same hue: the channel that dominated still dominates after darkening.
+    const yellow = accentText('#ffd86f')
+    expect(parseInt(yellow.slice(1, 3), 16)).toBeGreaterThan(parseInt(yellow.slice(5, 7), 16))
+  })
+
+  it('holds for every palette colour and every template default', async () => {
+    const { accentText, contrastRatio } = await import('@/templates/shared')
+    const { templates } = await import('@/templates/registry')
+    const accents = [...PALETTE, ...templates.map((t) => t.defaults!.accentColor)]
+    for (const accent of accents) {
+      expect(contrastRatio(accentText(accent), '#ffffff')!).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('returns input it cannot parse unchanged, and exposes the variable', async () => {
+    const { accentText, styleVars } = await import('@/templates/shared')
+    const { createEmptyCV } = await import('@/core/factory')
+    expect(accentText('red')).toBe('red')
+    expect(styleVars(createEmptyCV().style)['--cv-accent-text']).toMatch(/^#[0-9a-f]{6}$/)
+  })
+})
