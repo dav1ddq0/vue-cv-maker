@@ -86,6 +86,11 @@ export default {
     items: 'Elementos',
     itemsHint: 'Separa con Enter o coma',
     add: 'Añadir grupo',
+    itemName: 'Nombre de la habilidad',
+    level: 'Nivel',
+    noLevel: 'Sin nivel',
+    addItem: 'Añadir habilidad (Enter o coma)',
+    removeItem: 'Quitar {name}',
     empty: 'Sin competencias todavía.',
   },
   languages: {

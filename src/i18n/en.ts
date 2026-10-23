@@ -86,6 +86,11 @@ const en: typeof es = {
     items: 'Items',
     itemsHint: 'Separate with Enter or a comma',
     add: 'Add group',
+    itemName: 'Skill name',
+    level: 'Level',
+    noLevel: 'No level',
+    addItem: 'Add a skill (Enter or comma)',
+    removeItem: 'Remove {name}',
     empty: 'No skills yet.',
   },
   languages: {
