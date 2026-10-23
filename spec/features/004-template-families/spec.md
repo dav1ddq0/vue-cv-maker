@@ -1,6 +1,6 @@
 # 004 · Three new template families
 
-**Status:** proposed
+**Status:** implemented ✅ (photo checked by test only)
 
 ## What it does
 
@@ -23,20 +23,20 @@ unused. These three cover those gaps with the fewest moving parts.
 
 ## Acceptance criteria
 
-- [ ] Each template lives entirely under `src/templates/<name>/` (`index.ts`,
+- [x] Each template lives entirely under `src/templates/<name>/` (`index.ts`,
       `Template.vue`, `thumbnail.ts`) and self-registers; no change to consuming code.
-- [ ] Each passes the template contract tests (one `data` prop, no stores, tokens
+- [x] Each passes the template contract tests (one `data` prop, no stores, tokens
       for colour and font, entries protected from page breaks).
-- [ ] Each has a unique default accent, a default font that exists in `FONT_OPTIONS`,
+- [x] Each has a unique default accent, a default font that exists in `FONT_OPTIONS`,
       and truthful `supports` (`ledger` has no photo).
-- [ ] Each renders the sample CV and an empty CV without stray headings, and reacts to
+- [x] Each renders the sample CV and an empty CV without stray headings, and reacts to
       accent, font and scale changes.
-- [ ] Languages and rated skills show level marks with the accessible label in the CV
+- [x] Languages and rated skills show level marks with the accessible label in the CV
       language; unrated or unrecognised levels show text only.
-- [ ] `harbor` and `frame` render correctly with and without a photo.
-- [ ] Descriptions in `es.ts` and `en.ts`; existing tags reused.
-- [ ] Checked in the browser (preview) for each template.
-- [ ] `npm test`, `npm run typecheck`, `npm run build` pass.
+- [x] `harbor` and `frame` render correctly with and without a photo.
+- [x] Descriptions in `es.ts` and `en.ts`; existing tags reused.
+- [x] Checked in the browser (preview) for each template.
+- [x] `npm test`, `npm run typecheck`, `npm run build` pass.
 
 ## Out of scope
 
