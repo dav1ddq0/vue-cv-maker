@@ -127,3 +127,20 @@ describe('accent for text on light surfaces', () => {
     expect(styleVars(createEmptyCV().style)['--cv-accent-text']).toMatch(/^#[0-9a-f]{6}$/)
   })
 })
+
+describe('i18n keys built from ids', () => {
+  it('has a description for every font option in both languages', async () => {
+    const { FONT_OPTIONS } = await import('@/core/stylePresets')
+    const es = (await import('@/i18n/es')).default
+    const en = (await import('@/i18n/en')).default
+
+    for (const [name, dictionary] of [['es', es], ['en', en]] as const) {
+      const fonts = dictionary.style.fonts as Record<string, string>
+      for (const font of FONT_OPTIONS) {
+        expect(fonts[font.id], `${name}.style.fonts.${font.id}`).toBeTruthy()
+      }
+      // And nothing is described that no longer exists.
+      expect(Object.keys(fonts).sort()).toEqual(FONT_OPTIONS.map((f) => f.id).sort())
+    }
+  })
+})
