@@ -1,6 +1,6 @@
 # 003 · Skill levels and level indicator variants
 
-**Status:** proposed
+**Status:** implemented ✅
 
 ## What it does
 
@@ -20,36 +20,36 @@ so a per-skill level needs a model change; it is done once, with a migration.
 
 ### Model and migration
 
-- [ ] `SkillGroup.items` becomes `SkillItem[]` where `SkillItem = { name: string; level?: number }`
+- [x] `SkillGroup.items` becomes `SkillItem[]` where `SkillItem = { name: string; level?: number }`
       (`level` is an integer 1–5 when present).
-- [ ] `SCHEMA_VERSION` goes 1 → 2 with a migration step that turns every string item
+- [x] `SCHEMA_VERSION` goes 1 → 2 with a migration step that turns every string item
       into `{ name }`. No skill text is lost or reordered.
-- [ ] Importing a v1 JSON file, loading a v1 document from storage and migrating a
+- [x] Importing a v1 JSON file, loading a v1 document from storage and migrating a
       v2 file all produce a valid v2 `CVData` (`migrations.test.ts`).
-- [ ] `normalize` drops an out-of-range or non-integer `level` instead of keeping it,
+- [x] `normalize` drops an out-of-range or non-integer `level` instead of keeping it,
       and keeps the item.
-- [ ] A file newer than v2 is still rejected.
-- [ ] PDF import still produces skill groups (as items without level).
+- [x] A file newer than v2 is still rejected.
+- [x] PDF import still produces skill groups (as items without level).
 
 ### Form
 
-- [ ] Each skill shows its name and a level selector (none, 1–5); items can be added
+- [x] Each skill shows its name and a level selector (none, 1–5); items can be added
       (Enter or comma), renamed and removed.
-- [ ] Undo/redo and autosave treat these edits like any other.
-- [ ] Strings in `es.ts` and `en.ts`.
+- [x] Undo/redo and autosave treat these edits like any other.
+- [x] Strings in `es.ts` and `en.ts`.
 
 ### Templates
 
-- [ ] All eight existing templates keep printing skill names exactly as before.
-- [ ] `meridian` and `banner` show the level of a skill that has one, with the
+- [x] All eight existing templates keep printing skill names exactly as before.
+- [x] `meridian` and `banner` show the level of a skill that has one, with the
       accessible label from `levelAccessibleLabel`; a skill without level shows no
       indicator.
-- [ ] The level indicator supports `dots`, `stars`, `bars` and `dashes`; the filled
+- [x] The level indicator supports `dots`, `stars`, `bars` and `dashes`; the filled
       amount is not conveyed by colour alone.
 
 ### Quality
 
-- [ ] `npm test`, `npm run typecheck` and `npm run build` pass.
+- [x] `npm test`, `npm run typecheck` and `npm run build` pass.
 
 ## Out of scope
 
