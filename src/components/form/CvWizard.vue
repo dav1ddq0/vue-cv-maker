@@ -93,6 +93,7 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 
 .footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.6em;
   padding: 0.8em 0;
@@ -110,6 +111,21 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 @media (max-width: 1000px) {
   .preview-toggle {
     display: inline-flex;
+  }
+}
+
+/* Phones: Back and Next share a row and the preview toggle takes its own, instead of three
+   nowrap buttons pushing "Next" past the edge of a 320px screen. */
+@media (max-width: 480px) {
+  .preview-toggle {
+    order: -1;
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .footer > :not(.preview-toggle) {
+    flex: 1 1 0;
+    justify-content: center;
   }
 }
 </style>
