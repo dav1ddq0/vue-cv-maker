@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Facet',
   descriptionKey: 'templates.facet.description',
   thumbnail,
-  supports: ['photo', 'accentColor', 'customFont', 'multiPage'],
+  supports: ['photo', 'accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#4338ca',
     fontFamily: "'Source Sans 3', 'Segoe UI', system-ui, sans-serif",

@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Chevron',
   descriptionKey: 'templates.chevron.description',
   thumbnail,
-  supports: ['photo', 'accentColor', 'customFont', 'multiPage'],
+  supports: ['photo', 'accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#7e22ce',
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",

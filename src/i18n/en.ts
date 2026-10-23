@@ -214,6 +214,7 @@ const en: typeof es = {
       accentColor: 'an accent color',
       customFont: 'a custom typeface',
       multiPage: 'multiple pages',
+      skillLevels: 'skill levels',
     },
   },
   exportView: {

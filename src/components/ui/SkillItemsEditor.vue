@@ -7,7 +7,7 @@ import { ref } from 'vue'
 import type { SkillItem } from '@/types/cv'
 import { useI18n } from '@/i18n'
 
-const props = defineProps<{ modelValue: SkillItem[]; id?: string }>()
+const props = defineProps<{ modelValue: SkillItem[]; id?: string; levelsDisabled?: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: SkillItem[]] }>()
 const { t } = useI18n()
 
@@ -62,6 +62,7 @@ function onKeydown(event: KeyboardEvent) {
       <select
         class="level"
         :value="item.level ?? ''"
+        :disabled="levelsDisabled"
         :aria-label="`${t('skills.level')}: ${item.name}`"
         @change="setLevel(index, ($event.target as HTMLSelectElement).value)"
       >

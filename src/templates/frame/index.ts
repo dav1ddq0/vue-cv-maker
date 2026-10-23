@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Frame',
   descriptionKey: 'templates.frame.description',
   thumbnail,
-  supports: ['photo', 'accentColor', 'customFont', 'multiPage'],
+  supports: ['photo', 'accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#b45309',
     fontFamily: "Georgia, 'Times New Roman', serif",

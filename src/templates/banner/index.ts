@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Banner',
   descriptionKey: 'templates.banner.description',
   thumbnail,
-  supports: ['photo', 'accentColor', 'customFont', 'multiPage'],
+  supports: ['photo', 'accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#047857',
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",

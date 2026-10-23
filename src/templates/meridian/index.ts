@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Meridian',
   descriptionKey: 'templates.meridian.description',
   thumbnail,
-  supports: ['photo', 'sidebar', 'accentColor', 'customFont', 'multiPage'],
+  supports: ['photo', 'sidebar', 'accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#be123c',
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",

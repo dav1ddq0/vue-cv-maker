@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Ledger',
   descriptionKey: 'templates.ledger.description',
   thumbnail,
-  supports: ['accentColor', 'customFont', 'multiPage'],
+  supports: ['accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#0e7490',
     fontFamily: "'Source Sans 3', 'Segoe UI', system-ui, sans-serif",

@@ -214,6 +214,7 @@ export default {
       accentColor: 'color de acento',
       customFont: 'tipografía personalizada',
       multiPage: 'varias páginas',
+      skillLevels: 'niveles de habilidad',
     },
   },
   exportView: {

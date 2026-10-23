@@ -7,6 +7,7 @@ export type TemplateCapability =
   | 'accentColor'
   | 'customFont'
   | 'multiPage'
+  | 'skillLevels'
 
 export interface TemplateDefinition {
   id: string

@@ -6,7 +6,7 @@ const definition: TemplateDefinition = {
   name: 'Harbor',
   descriptionKey: 'templates.harbor.description',
   thumbnail,
-  supports: ['photo', 'sidebar', 'accentColor', 'customFont', 'multiPage'],
+  supports: ['photo', 'sidebar', 'accentColor', 'customFont', 'multiPage', 'skillLevels'],
   defaults: {
     accentColor: '#0369a1',
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",

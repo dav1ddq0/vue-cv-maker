@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
+import { useCapabilities } from '@/composables/useCapabilities'
 import { createSkillGroup } from '@/core/factory'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -9,6 +10,9 @@ import SkillItemsEditor from '@/components/ui/SkillItemsEditor.vue'
 
 const cv = useCvStore()
 const { t } = useI18n()
+const { supports, reasonFor } = useCapabilities()
+const levelsSupported = supports('skillLevels')
+const levelsReason = reasonFor('skillLevels')
 </script>
 
 <template>
@@ -21,8 +25,12 @@ const { t } = useI18n()
           <BaseField v-slot="{ id }" :label="t('skills.category')" :hint="t('skills.categoryHint')">
             <input :id="id" v-model="item.category" />
           </BaseField>
-          <BaseField v-slot="{ id }" :label="t('skills.items')" :hint="t('skills.itemsHint')">
-            <SkillItemsEditor :id="id" v-model="item.items" />
+          <BaseField
+            v-slot="{ id }"
+            :label="t('skills.items')"
+            :hint="levelsSupported ? t('skills.itemsHint') : levelsReason"
+          >
+            <SkillItemsEditor :id="id" v-model="item.items" :levels-disabled="!levelsSupported" />
           </BaseField>
           <div class="actions">
             <BaseButton size="sm" variant="danger" @click="cv.data.skills.splice(index, 1)">
