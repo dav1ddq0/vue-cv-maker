@@ -6,6 +6,6 @@
 - [x] 4 · Mobile dock, ≤ 1000px; also fixes the preview dead end (the toggle was inside the hidden form) — commit: `4d19c16`
 - [x] 5 · Section picker sheet — commit: `5e2a68e`
 - [x] 6 · Style step: pinned preview + snap carousel — commit: `6dc634c`
-- [ ] 7 · Full-screen preview and export sheet
+- [x] 7 · Fit-to-width preview and export from the dock (main action keeps the real behaviour: print dialog, not a direct download) — commit: `6dbe238`
 - [ ] 8 · My CVs cards
 - [ ] 9 · Sweep 320–430px and close the spec

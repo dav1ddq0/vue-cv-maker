@@ -26,7 +26,7 @@ A phone needs the reverse: actions at the bottom, fewer things per screen, big t
 - [ ] Sheets are native `<dialog>` (focus trap, Esc, backdrop), close on backdrop tap and on the close button.
 - [ ] "Add section" opens the preset sheet (012) on phones.
 - [ ] Template and style: the preview stays visible while scrolling the controls; templates in a snap carousel.
-- [ ] Full-screen preview shows the page fitted to width with "Download PDF" as the primary action.
+- [ ] Full-screen preview shows the page fitted to width with the PDF export (print dialog) as the primary action.
 - [ ] Every target ≥ 44px; no horizontal overflow at 320/360/390/430px; respects safe-area insets.
 - [ ] No new dependencies; existing keyboard and screen-reader behaviour is kept.
 
