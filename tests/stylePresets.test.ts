@@ -14,3 +14,23 @@ describe('palette', () => {
     expect(isSameColor('#ffd86e', '#ffd86f')).toBe(false)
   })
 })
+
+describe('font options', () => {
+  it('has unique ids and values, each ending in a generic family', async () => {
+    const { FONT_OPTIONS } = await import('@/core/stylePresets')
+    expect(new Set(FONT_OPTIONS.map((f) => f.id)).size).toBe(FONT_OPTIONS.length)
+    expect(new Set(FONT_OPTIONS.map((f) => f.value)).size).toBe(FONT_OPTIONS.length)
+    for (const font of FONT_OPTIONS) expect(font.value).toMatch(/(sans-serif|serif|monospace)$/)
+  })
+
+  it('lists every template default and the global default, so the select is never blank', async () => {
+    const { FONT_OPTIONS } = await import('@/core/stylePresets')
+    const { templates } = await import('@/templates/registry')
+    const { DEFAULT_STYLE } = await import('@/core/factory')
+    const values = FONT_OPTIONS.map((f) => f.value)
+    expect(values).toContain(DEFAULT_STYLE.fontFamily)
+    for (const template of templates) {
+      if (template.defaults) expect(values).toContain(template.defaults.fontFamily)
+    }
+  })
+})

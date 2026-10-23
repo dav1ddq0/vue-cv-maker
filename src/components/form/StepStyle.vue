@@ -6,20 +6,12 @@ import { useI18n } from '@/i18n'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { applyTemplateDefaults, templates } from '@/templates/registry'
 import BaseField from '@/components/ui/BaseField.vue'
-import { PALETTE, isSameColor } from '@/core/stylePresets'
+import { FONT_OPTIONS, PALETTE, isSameColor } from '@/core/stylePresets'
 
 const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
 const { supports, reasonFor } = useCapabilities()
-
-const FONT_STACKS = [
-  { label: 'Sans (Source Sans)', value: "'Source Sans 3', 'Segoe UI', system-ui, sans-serif" },
-  { label: 'Sans (Inter)', value: "'Inter', system-ui, -apple-system, sans-serif" },
-  { label: 'Serif (Georgia)', value: "Georgia, 'Times New Roman', serif" },
-  { label: 'Mono (JetBrains)', value: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace" },
-]
-
 const accentSupported = supports('accentColor')
 const fontSupported = supports('customFont')
 const accentReason = reasonFor('accentColor')
@@ -112,8 +104,8 @@ function previewAccent(id: string): string {
           :disabled-reason="fontReason"
         >
           <select :id="id" v-model="style.fontFamily" :disabled="!fontSupported">
-            <option v-for="font in FONT_STACKS" :key="font.value" :value="font.value">
-              {{ font.label }}
+            <option v-for="font in FONT_OPTIONS" :key="font.id" :value="font.value">
+              {{ font.label }} · {{ t(`style.fonts.${font.id}`) }}
             </option>
           </select>
         </BaseField>
