@@ -3,3 +3,7 @@ dist
 .DS_Store
 *.local
 .qa/
+
+# Claude Code local-only files
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
