@@ -1,6 +1,6 @@
 # 005 · Readable ink on accent backgrounds and two geometric templates
 
-**Status:** proposed
+**Status:** implemented ✅
 
 ## What it does
 
@@ -22,17 +22,17 @@ shapes are the last visual family seen across the reference designs not covered 
 
 ## Acceptance criteria
 
-- [ ] `onAccent(hex)` returns `#ffffff` or `#1a1a1a`, whichever has the higher WCAG contrast
+- [x] `onAccent(hex)` returns `#ffffff` or `#1a1a1a`, whichever has the higher WCAG contrast
       with the accent; invalid input falls back to `#ffffff`. Pure function with tests.
-- [ ] `styleVars` exposes `--cv-on-accent`.
-- [ ] `meridian` and `banner` use it for text and level marks on accent areas; every
+- [x] `styleVars` exposes `--cv-on-accent`.
+- [x] `meridian` and `banner` use it for text and level marks on accent areas; every
       palette colour gives at least 4.5:1 for normal text on those areas (test).
-- [ ] `chevron` and `facet` live under `src/templates/<name>/`, self-register, pass the
+- [x] `chevron` and `facet` live under `src/templates/<name>/`, self-register, pass the
       template contract tests, have unique default accents and a font from `FONT_OPTIONS`.
-- [ ] Shapes are `aria-hidden`, print with `print-color-adjust: exact`, and follow the
+- [x] Shapes are `aria-hidden`, print with `print-color-adjust: exact`, and follow the
       accent; text on them uses `--cv-on-accent`.
-- [ ] Both render with and without a photo and with an empty CV (no stray headings).
-- [ ] Checked in the browser; es/en descriptions; `npm test`, typecheck and build pass.
+- [x] Both render with and without a photo and with an empty CV (no stray headings).
+- [x] Checked in the browser; es/en descriptions; `npm test`, typecheck and build pass.
 
 ## Out of scope
 
