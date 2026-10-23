@@ -93,6 +93,7 @@ function onDragLeave(event: DragEvent) {
 
 <style scoped>
 .dropzone {
+  position: relative;
   --dz-border: var(--border);
   --dz-bg: var(--surface);
   display: flex;
@@ -141,6 +142,25 @@ function onDragLeave(event: DragEvent) {
 
 .dropzone:has(input:disabled):not(.dropzone--busy) {
   opacity: 0.55;
+}
+
+/*
+ * The hidden native input must stay 1px wherever the dropzone is placed: a form field wrapper
+ * (BaseField) styles every descendant input with width: 100%, which out-specifies the global
+ * .sr-only and used to stretch it across the page, adding horizontal scroll.
+ */
+.dropzone > input[type='file'] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .icon {
