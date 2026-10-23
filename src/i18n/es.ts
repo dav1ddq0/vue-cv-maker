@@ -185,6 +185,13 @@ export default {
     template: 'Plantilla',
     accentColor: 'Color de acento',
     palette: 'Colores sugeridos',
+    colorNames: {
+      'ffd86f': 'Amarillo',
+      '7c55e4': 'Violeta',
+      'f2614c': 'Coral',
+      '10cf65': 'Verde',
+      '334fdc': 'Azul',
+    },
     cvLanguage: 'Idioma del CV',
     cvLanguageHint: 'Fechas y títulos de sección del documento. No cambia el idioma de la aplicación.',
     fonts: {

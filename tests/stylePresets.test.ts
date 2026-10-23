@@ -144,3 +144,15 @@ describe('i18n keys built from ids', () => {
     }
   })
 })
+
+describe('palette names', () => {
+  it('names every palette colour in both languages, since swatches are announced by name', async () => {
+    const es = (await import('@/i18n/es')).default
+    const en = (await import('@/i18n/en')).default
+    for (const [name, dictionary] of [['es', es], ['en', en]] as const) {
+      const names = dictionary.style.colorNames as Record<string, string>
+      for (const color of PALETTE) expect(names[color.slice(1)], `${name}.style.colorNames.${color.slice(1)}`).toBeTruthy()
+      expect(Object.keys(names).sort()).toEqual(PALETTE.map((c) => c.slice(1)).sort())
+    }
+  })
+})

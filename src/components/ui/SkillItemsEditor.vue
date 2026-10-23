@@ -144,6 +144,6 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 .remove:hover {
-  color: var(--danger, currentColor);
+  color: var(--danger);
 }
 </style>

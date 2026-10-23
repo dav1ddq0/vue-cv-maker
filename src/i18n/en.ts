@@ -185,6 +185,13 @@ const en: typeof es = {
     template: 'Template',
     accentColor: 'Accent color',
     palette: 'Suggested colors',
+    colorNames: {
+      'ffd86f': 'Yellow',
+      '7c55e4': 'Violet',
+      'f2614c': 'Coral',
+      '10cf65': 'Green',
+      '334fdc': 'Blue',
+    },
     cvLanguage: 'CV language',
     cvLanguageHint: 'Dates and section titles in the document. Does not change the app language.',
     fonts: {
