@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { useValidation } from '@/composables/useValidation'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { usePhotoThumb } from '@/composables/usePhotoThumb'
 import { createLink } from '@/core/factory'
+import { MARITAL_STATUSES } from '@/types/cv'
 import { deletePhoto, savePhoto, StorageQuotaError } from '@/services/storage'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -21,6 +22,16 @@ const photoSupported = supports('photo')
 const photoReason = reasonFor('photo')
 const photoError = ref<string | null>(null)
 const { thumbUrl, refresh: refreshThumb } = usePhotoThumb(() => cv.data.personal.photo)
+
+/**
+ * The extras are opt-in: collapsed unless the CV already has one. The initial state is read once,
+ * so clearing the last field while typing does not fold the block under the cursor.
+ */
+const hasExtras = computed(() => {
+  const p = cv.data.personal
+  return [p.birthDate, p.birthPlace, p.nationality, p.drivingLicense, p.maritalStatus].some((v) => v.trim())
+})
+const extrasOpen = ref(hasExtras.value)
 
 async function onPhoto(file: File) {
   photoError.value = null
@@ -104,6 +115,33 @@ async function removePhoto() {
       </BaseField>
     </div>
 
+    <details class="extras" :open="extrasOpen" @toggle="extrasOpen = ($event.target as HTMLDetailsElement).open">
+      <summary class="extras-summary">{{ t('personal.extras') }}</summary>
+      <p class="extras-note">{{ t('personal.extrasNote') }}</p>
+      <div class="grid">
+        <BaseField v-slot="{ id }" :label="t('personal.birthDate')">
+          <input :id="id" v-model="cv.data.personal.birthDate" type="date" autocomplete="bday" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.birthPlace')">
+          <input :id="id" v-model="cv.data.personal.birthPlace" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.nationality')">
+          <input :id="id" v-model="cv.data.personal.nationality" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.drivingLicense')" :hint="t('personal.drivingLicenseHint')">
+          <input :id="id" v-model="cv.data.personal.drivingLicense" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.maritalStatus')">
+          <select :id="id" v-model="cv.data.personal.maritalStatus">
+            <option value="">{{ t('personal.maritalNone') }}</option>
+            <option v-for="status in MARITAL_STATUSES" :key="status" :value="status">
+              {{ t(`personal.marital.${status}`) }}
+            </option>
+          </select>
+        </BaseField>
+      </div>
+    </details>
+
     <section class="links">
       <h3 class="subtitle">{{ t('personal.links') }}</h3>
       <SortableList
@@ -137,6 +175,31 @@ async function removePhoto() {
 </template>
 
 <style scoped>
+.extras {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0 1em;
+}
+
+.extras[open] {
+  padding-bottom: 1em;
+}
+
+.extras-summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.extras-note {
+  margin: 0 0 0.8em;
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
 .step {
   display: flex;
   flex-direction: column;
