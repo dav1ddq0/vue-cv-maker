@@ -1,6 +1,6 @@
 # 013 · Tasks
 
-- [ ] 1 · `useIsPhone` + safe-area tokens
+- [x] 1 · `useIsPhone` + safe-area tokens — commit: `338fa39`
 - [ ] 2 · `stepStatus` + tests
 - [ ] 3 · Step header and step sheet
 - [ ] 4 · Mobile dock
