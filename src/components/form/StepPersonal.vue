@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { useValidation } from '@/composables/useValidation'
 import { useCapabilities } from '@/composables/useCapabilities'
+import { usePhotoThumb } from '@/composables/usePhotoThumb'
 import { createLink } from '@/core/factory'
-import { deletePhoto, loadPhoto, savePhoto, StorageQuotaError } from '@/services/storage'
+import { deletePhoto, savePhoto, StorageQuotaError } from '@/services/storage'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import FileDropzone from '@/components/import/FileDropzone.vue'
@@ -19,39 +20,7 @@ const { supports, reasonFor } = useCapabilities()
 const photoSupported = supports('photo')
 const photoReason = reasonFor('photo')
 const photoError = ref<string | null>(null)
-const thumbUrl = ref<string | null>(null)
-
-let thumbRequest = 0
-
-/** The stored reference is stable per CV, so the thumbnail is also refreshed by hand after an upload. */
-async function refreshThumb() {
-  const request = ++thumbRequest
-  const reference = cv.data.personal.photo
-  let url: string | null = null
-  if (reference?.startsWith('photo:')) {
-    try {
-      const blob = await loadPhoto(reference)
-      if (blob) url = URL.createObjectURL(blob)
-    } catch {
-      // The thumbnail is only a convenience; a failed read must not look like a failed upload.
-    }
-  }
-  if (request !== thumbRequest) {
-    if (url) URL.revokeObjectURL(url)
-    return
-  }
-  if (thumbUrl.value) URL.revokeObjectURL(thumbUrl.value)
-  thumbUrl.value = url
-}
-
-function revokeThumb() {
-  thumbRequest++
-  if (thumbUrl.value) URL.revokeObjectURL(thumbUrl.value)
-  thumbUrl.value = null
-}
-
-watch(() => cv.data.personal.photo, refreshThumb, { immediate: true })
-onUnmounted(revokeThumb)
+const { thumbUrl, refresh: refreshThumb } = usePhotoThumb(() => cv.data.personal.photo)
 
 async function onPhoto(file: File) {
   photoError.value = null
