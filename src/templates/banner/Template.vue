@@ -161,7 +161,7 @@ const languages = computed(() =>
   padding: calc(var(--cv-page-margin) * 0.7) var(--cv-page-margin);
   border-radius: 1.4em;
   background: var(--cv-accent);
-  color: #fff;
+  color: var(--cv-on-accent);
   break-inside: avoid;
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;

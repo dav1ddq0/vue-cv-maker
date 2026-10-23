@@ -56,3 +56,38 @@ describe('CV languages', () => {
     }
   })
 })
+
+describe('readable ink on accent', () => {
+  it('picks near-black on light accents and white on dark ones', async () => {
+    const { onAccent } = await import('@/templates/shared')
+    expect(onAccent('#ffd86f')).toBe('#1a1a1a')
+    expect(onAccent('#10cf65')).toBe('#1a1a1a')
+    expect(onAccent('#f2614c')).toBe('#1a1a1a')
+    expect(onAccent('#7c55e4')).toBe('#ffffff')
+    expect(onAccent('#334fdc')).toBe('#ffffff')
+  })
+
+  it('gives every palette colour at least 4.5:1 for its ink', async () => {
+    const { onAccent, contrastRatio } = await import('@/templates/shared')
+    for (const color of PALETTE) {
+      expect(contrastRatio(color, onAccent(color))!).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('also holds for every template default accent', async () => {
+    const { onAccent, contrastRatio } = await import('@/templates/shared')
+    const { templates } = await import('@/templates/registry')
+    for (const template of templates) {
+      const accent = template.defaults!.accentColor
+      expect(contrastRatio(accent, onAccent(accent))!).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('falls back to white for input it cannot parse, and exposes the variable', async () => {
+    const { onAccent, styleVars } = await import('@/templates/shared')
+    const { createEmptyCV } = await import('@/core/factory')
+    expect(onAccent('red')).toBe('#ffffff')
+    expect(onAccent('')).toBe('#ffffff')
+    expect(styleVars(createEmptyCV().style)['--cv-on-accent']).toMatch(/^#/)
+  })
+})

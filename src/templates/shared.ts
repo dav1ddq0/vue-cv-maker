@@ -37,9 +37,41 @@ export function formatDateRange(start: string, end: string | null, language = 'e
  * `StyleTokens` reach templates only as CSS custom properties, so a template can
  * never hardcode a color or a font and still look right (spec §4).
  */
+const WHITE = '#ffffff'
+const INK = '#1a1a1a'
+
+function luminance(hex: string): number | null {
+  const match = hex.trim().match(/^#([0-9a-f]{6})$/i)
+  if (!match) return null
+  const value = parseInt(match[1]!, 16)
+  const channels = [(value >> 16) & 255, (value >> 8) & 255, value & 255].map((c) => {
+    const s = c / 255
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * channels[0]! + 0.7152 * channels[1]! + 0.0722 * channels[2]!
+}
+
+/** WCAG contrast ratio between two `#rrggbb` colours, or `null` when either is not one. */
+export function contrastRatio(a: string, b: string): number | null {
+  const la = luminance(a)
+  const lb = luminance(b)
+  if (la === null || lb === null) return null
+  const [hi, lo] = la >= lb ? [la, lb] : [lb, la]
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+/** Text colour to print on an accent-filled area: white or near-black, whichever reads better. */
+export function onAccent(accent: string): string {
+  const white = contrastRatio(accent, WHITE)
+  const ink = contrastRatio(accent, INK)
+  if (white === null || ink === null) return WHITE
+  return ink > white ? INK : WHITE
+}
+
 export function styleVars(style: StyleTokens): Record<string, string> {
   return {
     '--cv-accent': style.accentColor,
+    '--cv-on-accent': onAccent(style.accentColor),
     '--cv-font': style.fontFamily,
     '--cv-font-scale': String(style.fontScale),
     '--cv-spacing-scale': String(style.spacingScale),

@@ -157,9 +157,9 @@ const languages = computed(() =>
 
 .sidebar {
   background: var(--cv-accent);
-  color: #fff;
+  color: var(--cv-on-accent);
   padding: var(--cv-page-margin) calc(var(--cv-page-margin) * 0.7);
-  --dots-color: #fff;
+  --dots-color: var(--cv-on-accent);
   /* The band must reach the paper edge on every printed page. */
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
