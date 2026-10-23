@@ -102,6 +102,16 @@ const en: typeof es = {
     add: 'Add language',
     empty: 'No languages yet.',
   },
+  stepSheet: {
+    title: 'Go to a step',
+    position: 'Step {n} of {total}',
+    open: 'Change step',
+    here: 'You are here',
+    complete: 'Complete',
+    completeCount: 'Complete · {n}',
+    incomplete: 'Needs content',
+    optional: 'Optional',
+  },
   custom: {
     title: 'Section title',
     titleHint: 'e.g. Publications, Volunteering',

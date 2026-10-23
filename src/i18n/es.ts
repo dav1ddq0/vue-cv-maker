@@ -102,6 +102,16 @@ export default {
     add: 'Añadir idioma',
     empty: 'Sin idiomas todavía.',
   },
+  stepSheet: {
+    title: 'Ir a un paso',
+    position: 'Paso {n} de {total}',
+    open: 'Cambiar de paso',
+    here: 'Estás aquí',
+    complete: 'Completo',
+    completeCount: 'Completo · {n}',
+    incomplete: 'Falta contenido',
+    optional: 'Opcional',
+  },
   custom: {
     title: 'Título de la sección',
     titleHint: 'Ej.: Publicaciones, Voluntariado',

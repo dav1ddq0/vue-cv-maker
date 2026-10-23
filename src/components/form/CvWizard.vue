@@ -3,7 +3,9 @@ import { computed } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useIsPhone } from '@/composables/useIsPhone'
 import WizardNav from './WizardNav.vue'
+import StepHeader from './StepHeader.vue'
 import StepPersonal from './StepPersonal.vue'
 import StepSummary from './StepSummary.vue'
 import StepExperience from './StepExperience.vue'
@@ -16,6 +18,7 @@ import StepExport from './StepExport.vue'
 
 const ui = useUiStore()
 const { t } = useI18n()
+const isPhone = useIsPhone()
 
 /** Statically mapped rather than dynamically imported: nine small steps, and the
  *  user navigates freely between them, so lazy loading would only add flicker. */
@@ -36,9 +39,11 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 
 <template>
   <div class="wizard">
-    <WizardNav />
-
-    <h2 class="heading">{{ t(`steps.${ui.step}`) }}</h2>
+    <StepHeader v-if="isPhone" />
+    <template v-else>
+      <WizardNav />
+      <h2 class="heading">{{ t(`steps.${ui.step}`) }}</h2>
+    </template>
 
     <div class="body">
       <component :is="current" :key="ui.step" />

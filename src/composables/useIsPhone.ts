@@ -10,18 +10,15 @@ export const PHONE_QUERY = `(max-width: ${PHONE_MAX_WIDTH}px)`
  * Falls back to `false` where `matchMedia` does not exist (tests, old browsers).
  */
 export function useIsPhone() {
-  const isPhone = ref(false)
-  let query: MediaQueryList | undefined
+  const supported = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+  const query = supported ? window.matchMedia(PHONE_QUERY) : undefined
+  // Read synchronously so a phone never paints the desktop layout first.
+  const isPhone = ref(query?.matches ?? false)
   const update = (event: { matches: boolean }) => {
     isPhone.value = event.matches
   }
 
-  onMounted(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    query = window.matchMedia(PHONE_QUERY)
-    isPhone.value = query.matches
-    query.addEventListener('change', update)
-  })
+  onMounted(() => query?.addEventListener('change', update))
   onBeforeUnmount(() => query?.removeEventListener('change', update))
 
   return isPhone
