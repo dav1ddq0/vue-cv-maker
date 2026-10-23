@@ -7,11 +7,14 @@ import { useCapabilities } from '@/composables/useCapabilities'
 import { applyTemplateDefaults, templates } from '@/templates/registry'
 import BaseField from '@/components/ui/BaseField.vue'
 import TemplateGallery from './TemplateGallery.vue'
+import StylePreviewStrip from './StylePreviewStrip.vue'
+import { useIsPhone } from '@/composables/useIsPhone'
 import { CV_LANGUAGES, FONT_OPTIONS, PALETTE, isSameColor } from '@/core/stylePresets'
 
 const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
+const isPhone = useIsPhone()
 const { supports, reasonFor } = useCapabilities()
 const accentSupported = supports('accentColor')
 const fontSupported = supports('customFont')
@@ -43,6 +46,8 @@ function previewAccent(id: string): string {
 
 <template>
   <div class="step">
+    <StylePreviewStrip v-if="isPhone" />
+
     <TemplateGallery
       :templates="templates"
       :active-id="ui.templateId"

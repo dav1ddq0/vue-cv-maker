@@ -132,4 +132,31 @@ const { t } = useI18n()
   color: var(--text-muted);
   line-height: 1.35;
 }
+
+/* Phones: one swipeable row that snaps card by card, instead of a tall grid to scroll past. The
+   page above it keeps the preview in view, so a short card is enough to choose by. */
+@media (max-width: 640px) {
+  .templates {
+    display: flex;
+    gap: 0.7em;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0.2em;
+    overscroll-behavior-x: contain;
+    padding: 0.2em 0.2em 0.6em;
+  }
+
+  .templates > li {
+    flex: 0 0 148px;
+    scroll-snap-align: start;
+  }
+
+  .card-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
 </style>
