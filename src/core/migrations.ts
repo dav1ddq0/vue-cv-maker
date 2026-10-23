@@ -113,9 +113,11 @@ function withIds(list: unknown, prefix: string): any[] {
     .map((item: any) => ({ ...item, id: typeof item.id === 'string' && item.id ? item.id : uid(prefix) }))
 }
 
-/** Accepts a legacy string or an object; keeps `level` only when it is an integer 1–5. */
+/**
+ * Normalizes a v2 skill item; keeps `level` only when it is an integer 1–5. The legacy
+ * string form is converted by the v1 → v2 step, not here, so that step owns that format.
+ */
 function toSkillItem(value: unknown): SkillItem {
-  if (typeof value === 'string') return { name: value }
   if (!value || typeof value !== 'object') return { name: '' }
   const { name, level } = value as { name?: unknown; level?: unknown }
   const valid = typeof level === 'number' && Number.isInteger(level) && level >= 1 && level <= 5

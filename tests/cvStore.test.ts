@@ -62,6 +62,23 @@ describe('cv store history', () => {
     expect(cv.data.personal.fullName).toBe('Ada')
   })
 
+  it('undoes a change of the CV language like any other edit', async () => {
+    const cv = useCvStore()
+    expect(cv.data.meta.language).toBe('es')
+
+    cv.data.meta.language = 'en'
+    await idle(1500)
+    expect(cv.canUndo).toBe(true)
+
+    cv.undo()
+    await settle()
+    expect(cv.data.meta.language).toBe('es')
+
+    cv.redo()
+    await settle()
+    expect(cv.data.meta.language).toBe('en')
+  })
+
   it('enables the undo button as soon as a step is recorded', async () => {
     const cv = useCvStore()
     expect(cv.canUndo).toBe(false)
