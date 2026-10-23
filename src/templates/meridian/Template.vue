@@ -69,7 +69,7 @@ const languages = computed(() =>
             <template v-if="groupHasLevels(group)">
               <div v-for="(item, i) in group.items" :key="i" class="lang">
                 <p class="side-item lang-name">{{ item.name }}</p>
-                <LevelDots
+                <LevelDots variant="bars"
                   v-if="item.level"
                   :score="item.level"
                   :label="levelAccessibleLabel(item.level, language)"
@@ -85,7 +85,7 @@ const languages = computed(() =>
             <p class="side-item lang-name">
               {{ lang.name }}<template v-if="lang.level && lang.score === null"> — {{ lang.level }}</template>
             </p>
-            <LevelDots v-if="lang.score !== null" :score="lang.score" :label="lang.label" />
+            <LevelDots variant="bars" v-if="lang.score !== null" :score="lang.score" :label="lang.label" />
           </div>
         </template>
       </section>

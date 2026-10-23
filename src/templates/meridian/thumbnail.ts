@@ -9,11 +9,11 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
   </g>
   <g fill="#fff">
     <rect x="7" y="76" width="18" height="3" rx="1.5" opacity="0.75"/>
-    <circle cx="9" cy="86" r="1.8"/><circle cx="14" cy="86" r="1.8"/><circle cx="19" cy="86" r="1.8"/>
-    <circle cx="24" cy="86" r="1.8" opacity="0.35"/><circle cx="29" cy="86" r="1.8" opacity="0.35"/>
+    <rect x="7" y="84.5" width="4" height="3" rx="0.8"/><rect x="12" y="84.5" width="4" height="3" rx="0.8"/><rect x="17" y="84.5" width="4" height="3" rx="0.8"/>
+    <rect x="22" y="84.5" width="4" height="3" rx="0.8" opacity="0.35"/><rect x="27" y="84.5" width="4" height="3" rx="0.8" opacity="0.35"/>
     <rect x="7" y="94" width="18" height="3" rx="1.5" opacity="0.75"/>
-    <circle cx="9" cy="104" r="1.8"/><circle cx="14" cy="104" r="1.8"/>
-    <circle cx="19" cy="104" r="1.8" opacity="0.35"/><circle cx="24" cy="104" r="1.8" opacity="0.35"/><circle cx="29" cy="104" r="1.8" opacity="0.35"/>
+    <rect x="7" y="102.5" width="4" height="3" rx="0.8"/><rect x="12" y="102.5" width="4" height="3" rx="0.8"/>
+    <rect x="17" y="102.5" width="4" height="3" rx="0.8" opacity="0.35"/><rect x="22" y="102.5" width="4" height="3" rx="0.8" opacity="0.35"/><rect x="27" y="102.5" width="4" height="3" rx="0.8" opacity="0.35"/>
   </g>
   <rect x="50" y="18" width="54" height="7" rx="2" fill="#1f2937"/>
   <rect x="50" y="30" width="34" height="4" rx="2" fill="currentColor"/>
