@@ -35,12 +35,12 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **022** · PDF page breaks (blank first page fixed, print rules applied when paginating, per-section "New page", schema v5)
 - **023** · CV suggestions (score and concrete advice in the Export step, from a pure function over `CVData`)
 - **024** · PDF file name and print guidance (`<name> – CV.pdf` suggested by the print dialog)
+- **025** · Photo crop and zoom (frame before storing: drag, zoom, rotate; 800 px JPEG; preview refreshes on replace)
 
 ## Next 🔜
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
-- Candidate: photo crop / zoom (P2 in 011).
 - Candidate: web fonts via a bundled font package (needs a dependency decision).
 
 ## Backlog / ideas 💡

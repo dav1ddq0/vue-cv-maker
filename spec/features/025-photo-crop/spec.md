@@ -1,6 +1,6 @@
 # 025 · Photo crop and zoom
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -18,17 +18,24 @@ same dialog opens for the current photo from an "Adjust photo" button. P2 in the
 
 ## Acceptance criteria
 
-- [ ] Picking a photo opens the crop dialog; "Use photo" stores the cropped square, "Cancel" stores
+- [x] Picking a photo opens the crop dialog; "Use photo" stores the cropped square, "Cancel" stores
       nothing and keeps the previous photo.
-- [ ] The image always covers the square: zoom goes from "fits the short side" (1×) to 4×, moving
+- [x] The image always covers the square: zoom goes from "fits the short side" (1×) to 4×, moving
       stops at the edges.
-- [ ] Drag with mouse, finger or pen; arrow keys move it when the frame has focus, `+`/`-` zoom; the
+- [x] Drag with mouse, finger or pen; arrow keys move it when the frame has focus, `+`/`-` zoom; the
       slider has a label; rotate turns 90° clockwise.
-- [ ] A round guide shows what the round templates keep.
-- [ ] The result is a JPEG of at most 800 × 800 px (never upscaled), on white, so a transparent PNG does
+- [x] A round guide shows what the round templates keep.
+- [x] The result is a JPEG of at most 800 × 800 px (never upscaled), on white, so a transparent PNG does
       not turn black.
-- [ ] "Adjust photo" on an existing photo opens the dialog with it; the result replaces it.
-- [ ] No data model change: the photo reference stays `photo:{id}`.
+- [x] "Adjust photo" on an existing photo opens the dialog with it; the result replaces it.
+- [x] No data model change: the photo reference stays `photo:{id}`.
+
+### Found while checking
+- [x] A replaced photo kept showing the old picture in the preview until a reload: it was saved under
+      the same `photo:{cvId}` key, so the CV's reference never changed. Each version now has its own key
+      (`photo:{cvId}:{version}`) and the replaced blob is deleted. Older `photo:{cvId}` references
+      still load.
+- [x] The button is "Adjust photo": a bare "Adjust" clashed with the preview's fit button.
 
 ## Out of scope
 
@@ -37,8 +44,12 @@ same dialog opens for the current photo from an "Adjust photo" button. P2 in the
 
 ## Verification
 
-- Unit tests: the crop geometry (cover scale, clamping, source rectangle, rotation, output size).
-- Component tests: the dialog's controls, cancel and confirm, the field opening it (canvas mocked:
-  jsdom has none).
-- Playwright: a portrait test image cropped off-centre, the stored blob's size and dimensions, and the
-  preview showing it; desktop and phone screenshots.
+- 443 unit tests (new: crop geometry; the dialog's starting crop, slider and keys zoom, arrow keys
+  stopping at the edge, the quarter turn, cancel; the photo field storing only the confirmed crop and
+  nothing on cancel). jsdom has no canvas, so drawing and encoding are mocked there.
+- Playwright, Chromium, 1440×900 and 390×844: a 1200×1600 PNG zoomed to 1.6× and moved (mouse drag on
+  desktop, arrow keys on the phone) was stored as a 750×750 JPEG of 12 KB; "Adjust photo" + rotate
+  stored a new key, deleted the old blob and refreshed the preview at once. No horizontal overflow, no
+  console errors.
+- Not checked: real touch drag on a device, Safari and Firefox (`createImageBitmap` with
+  `imageOrientation` is supported in both, but untested here), EXIF-rotated phone photos.
