@@ -7,13 +7,18 @@ import { NotFoundError, StorageQuotaError, type StorageAdapter } from './adapter
 const store = createStore('cv-maker', 'kv')
 
 const cvKey = (id: string) => `cv:${id}`
-export const photoKey = (id: string) => `photo:${id}`
+/**
+ * One key per stored version (`photo:{cvId}:{version}`; older CVs keep `photo:{cvId}`). A new photo
+ * changes the CV's reference, so every view showing it reloads; with a fixed key a replaced or
+ * re-cropped photo kept showing the old picture until a reload (spec 025).
+ */
+export const photoKey = (cvId: string, version = Date.now().toString(36)) => `photo:${cvId}:${version}`
 const INDEX_KEY = 'index'
 
 /**
  * Key scheme (spec §8.1):
  *   `cv:{id}`    full CVData (photos excluded — only the reference is stored)
- *   `photo:{id}` the image as a Blob (~33% smaller than a base64 dataURL)
+ *   `photo:{id}:{version}` the image as a Blob (~33% smaller than a base64 dataURL); see `photoKey`
  *   `index`      CVSummary[] so the CV list renders without loading every document
  */
 export class IndexedDBAdapter implements StorageAdapter {
@@ -65,13 +70,15 @@ export class IndexedDBAdapter implements StorageAdapter {
 
 /* ---- photo blobs ------------------------------------------------------- */
 
-export async function savePhoto(cvId: string, blob: Blob): Promise<string> {
+/** Stores `blob` under a new key and drops `previous`, the version it replaces. */
+export async function savePhoto(cvId: string, blob: Blob, previous?: string): Promise<string> {
   const key = photoKey(cvId)
   try {
     await set(key, blob, store)
   } catch (error) {
     throw isQuotaError(error) ? new StorageQuotaError(error) : error
   }
+  if (previous?.startsWith('photo:') && previous !== key) await del(previous, store).catch(() => {})
   return key
 }
 

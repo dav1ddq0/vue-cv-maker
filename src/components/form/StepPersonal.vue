@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { useValidation } from '@/composables/useValidation'
@@ -8,11 +8,12 @@ import { usePhotoThumb } from '@/composables/usePhotoThumb'
 import { createLink } from '@/core/factory'
 import { PHOTO_ACCEPT, PHOTO_MAX_MB, checkPhoto } from '@/core/photo'
 import { MARITAL_STATUSES } from '@/types/cv'
-import { deletePhoto, savePhoto, StorageQuotaError } from '@/services/storage'
+import { deletePhoto, loadPhoto, savePhoto, StorageQuotaError } from '@/services/storage'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import FileDropzone from '@/components/import/FileDropzone.vue'
 import SortableList from '@/components/ui/SortableList.vue'
+import PhotoCropDialog from './PhotoCropDialog.vue'
 
 const cv = useCvStore()
 const { t } = useI18n()
@@ -34,15 +35,30 @@ const hasExtras = computed(() => {
 })
 const extrasOpen = ref(hasExtras.value)
 
-async function onPhoto(file: File) {
+/** The photo being framed (spec 025); nothing is stored until the crop is confirmed. */
+const cropping = shallowRef<Blob | null>(null)
+
+function onPhoto(file: File) {
   photoError.value = null
   const check = checkPhoto(file)
   if (!check.ok) {
     photoError.value = t('personal.photoTooLarge', { size: check.sizeMb, max: PHOTO_MAX_MB })
     return
   }
+  cropping.value = file
+}
+
+/** Re-frames the stored photo; it is already a crop, so this can only zoom further in. */
+async function adjustPhoto() {
+  const reference = cv.data.personal.photo
+  const blob = reference ? await loadPhoto(reference) : undefined
+  if (blob) cropping.value = blob
+}
+
+async function onCropped(blob: Blob) {
+  cropping.value = null
   try {
-    cv.data.personal.photo = await savePhoto(cv.data.meta.id, file)
+    cv.data.personal.photo = await savePhoto(cv.data.meta.id, blob, cv.data.personal.photo)
     await refreshThumb()
   } catch (error) {
     photoError.value = error instanceof StorageQuotaError ? t('notices.quota') : t('importView.parseError')
@@ -109,6 +125,9 @@ async function removePhoto() {
           >
             {{ cv.data.personal.photo ? t('personal.photoReplace') : t('personal.photoDrop') }}
           </FileDropzone>
+          <BaseButton v-if="cv.data.personal.photo" size="sm" :disabled="!photoSupported" @click="adjustPhoto">
+            {{ t('personal.photoAdjust') }}
+          </BaseButton>
           <BaseButton
             v-if="cv.data.personal.photo"
             size="sm"
@@ -119,6 +138,7 @@ async function removePhoto() {
           </BaseButton>
         </div>
       </BaseField>
+      <PhotoCropDialog :photo="cropping" @confirm="onCropped" @cancel="cropping = null" />
     </div>
 
     <details class="extras" :open="extrasOpen" @toggle="extrasOpen = ($event.target as HTMLDetailsElement).open">

@@ -6,7 +6,7 @@
 
 After picking a photo, a dialog lets the user frame it: drag to move it, a slider (and the mouse wheel)
 to zoom, a button to rotate it a quarter turn. The square they see is what every template shows. The
-same dialog opens for the current photo from an "Adjust" button. P2 in the 011 gap analysis
+same dialog opens for the current photo from an "Adjust photo" button. P2 in the 011 gap analysis
 ("crop/zoom/rotate").
 
 ## Why
@@ -27,7 +27,7 @@ same dialog opens for the current photo from an "Adjust" button. P2 in the 011 g
 - [ ] A round guide shows what the round templates keep.
 - [ ] The result is a JPEG of at most 800 × 800 px (never upscaled), on white, so a transparent PNG does
       not turn black.
-- [ ] "Adjust" on an existing photo opens the dialog with it; the result replaces it.
+- [ ] "Adjust photo" on an existing photo opens the dialog with it; the result replaces it.
 - [ ] No data model change: the photo reference stays `photo:{id}`.
 
 ## Out of scope
