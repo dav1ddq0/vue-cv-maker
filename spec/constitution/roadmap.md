@@ -34,6 +34,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **021** · Per-CV template (`meta.templateId`, schema v4; My CVs shows each CV's template and accent)
 - **022** · PDF page breaks (blank first page fixed, print rules applied when paginating, per-section "New page", schema v5)
 - **023** · CV suggestions (score and concrete advice in the Export step, from a pure function over `CVData`)
+- **024** · PDF file name and print guidance (`<name> – CV.pdf` suggested by the print dialog)
 
 ## Next 🔜
 

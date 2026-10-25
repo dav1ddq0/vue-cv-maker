@@ -1,6 +1,6 @@
 # 024 · PDF file name and print guidance
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -19,10 +19,10 @@ which file name to expect and that the browser remembers "Save as PDF" as the de
 
 ## Acceptance criteria
 
-- [ ] While printing, `document.title` is `"<full name> – CV"`; with no name, the document title; with
+- [x] While printing, `document.title` is `"<full name> – CV"`; with no name, the document title; with
       neither, `"CV"`. Characters not allowed in file names (`/ \ : * ? " < > |`) are dropped. The
       original title is restored afterwards, also when printing fails.
-- [ ] The export dialog (desktop), the Export step and the phone export sheet say the file name and
+- [x] The export dialog (desktop), the Export step and the phone export sheet say the file name and
       that the browser remembers "Save as PDF".
 
 ## Out of scope
@@ -31,5 +31,9 @@ which file name to expect and that the browser remembers "Save as PDF" as the de
 
 ## Verification
 
-- Unit tests: the title rules, restoring the title after printing and after a failure.
-- Playwright: `document.title` at the moment `window.print()` runs, and after.
+- 431 unit tests (new: the title rules and dropped characters; the title during and after printing,
+  and after `window.print()` throws).
+- Dev server, sample CV, Exportar → Imprimir: `document.title` was "Nadia Martín Reyes – CV" when
+  `window.print()` ran and "CV Maker" afterwards; the dialog note names "Nadia Martín Reyes – CV.pdf".
+  No console errors.
+- Not checked: the name each browser's own save dialog actually shows (headless Chromium has none).
