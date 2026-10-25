@@ -1,6 +1,6 @@
 # 017 · Security hardening
 
-**Status:** in progress
+**Status:** implemented ✅ (one dev-only advisory open, see Verification)
 
 ## What it does
 
@@ -18,17 +18,34 @@ so the build job — which runs `npm ci` and every dependency's install scripts 
 
 ## Acceptance criteria
 
-- [ ] `normalize()` keeps `accentColor` only as `#rgb` / `#rrggbb`, `fontFamily` only from `FONT_OPTIONS`, `pageMargin` only from the margin list; anything else falls back to the default. Tests cover each.
-- [ ] `personal.photo` is kept only as a `photo:` reference or a `data:image/(png|jpeg|webp|gif)` URL.
-- [ ] The personal text fields and link label / url are coerced to strings.
-- [ ] Every template's default style passes the same validation (test), so no legitimate value is reset.
-- [ ] `index.html` carries a CSP meta tag; the app, the PDF import (pdf.js worker) and the paginated preview / print (paged.js) still work.
-- [ ] The crafted JSON from the review no longer triggers any request.
-- [ ] The workflow grants `contents: read` by default and `pages` / `id-token` only to `deploy`; third-party actions are pinned by commit SHA.
-- [ ] `npm audit` reports no high-severity advisory.
+- [x] `normalize()` keeps `accentColor` only as `#rgb` / `#rrggbb`, `fontFamily` only from `FONT_OPTIONS`, `pageMargin` only from the margin list; anything else falls back to the default. Tests cover each.
+- [x] `personal.photo` is kept only as a `photo:` reference or a `data:image/(png|jpeg|webp|gif)` URL.
+- [x] The personal text fields and link label / url are coerced to strings.
+- [x] Every template's default style passes the same validation (test), so no legitimate value is reset.
+- [x] `index.html` carries a CSP meta tag; the app, the PDF import (pdf.js worker) and the paginated preview / print (paged.js) still work.
+- [x] The crafted JSON from the review no longer triggers any request.
+- [x] The workflow grants `contents: read` by default and `pages` / `id-token` only to `deploy`; third-party actions are pinned by commit SHA.
+- [x] `npm audit --omit=dev` reports no advisory (what ships to the browser and to the build).
 
 ## Out of scope
 
 - The shared `dav1ddq0.github.io` origin (needs a custom domain or a dedicated account: the owner's call).
 - `frame-ancestors` / clickjacking: not settable from a meta tag on GitHub Pages.
 - Size limits for imported files and fuzzing the PDF import.
+
+## Verification
+
+- Unit tests: 336 pass, including the crafted style values, photo forms, non-string personal fields and a
+  check that every template default passes the same validation.
+- Built site (`vite preview`, Chromium): the crafted JSON from the review imports, the template renders
+  with the default accent and no request reaches the fake third-party host. With the CSP in place the
+  sample CV, the paginated preview (paged.js), the PDF import (pdf.js worker, a PDF made by Chromium:
+  name detected) and a photo upload all work with no CSP violation; an injected inline `<script>` and an
+  external `<img>` are both blocked.
+- `npm audit --omit=dev`: 0. `npm audit fix` changed only the lockfile (source-map-js 1.2.1 → 1.2.2,
+  vite 6.4.3 → 6.4.5, undici, brace-expansion); `package.json` untouched; tests and build pass.
+
+Open: the full `npm audit` still lists vitest 3 (`@vitest/mocker`, `tinypool`), dev-only — it runs on the
+developer machine and in CI, never in the site. The fix is vitest 5, a major upgrade that changes
+`package.json`; left for an explicit decision. The workflow change is only verifiable on the next push
+to `main`.
