@@ -1,6 +1,6 @@
 # 016 · Mobile polish
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -18,19 +18,30 @@ Design reference: artifact "CV Maker responsive" (8 artboards: phone, small phon
 
 ## Acceptance criteria
 
-- [ ] ≤ 640px: the header is one row (brand, save state, undo, redo, menu); language, theme, My CVs and Import live in a menu sheet. All targets are ≥ 44px.
-- [ ] ≤ 640px: the "may be erased by the browser" notice is not shown in the editor; the same text is in the menu sheet. The private-mode warning still shows.
-- [ ] ≤ 640px: the step bar is ≤ 64px, has previous / next arrows and opens the step sheet from its centre.
-- [ ] ≤ 640px: the dock is one row: Edit/Preview switch plus Next (Export in preview).
-- [ ] ≤ 640px, 390×664: the form area is at least 440px tall in the personal step.
-- [ ] ≤ 640px: the preview has no title row and its page is not covered by the dock.
-- [ ] 641–1000px: form and preview are both visible (preview fitted to its column), the dock is hidden and Back / Next are in the form footer.
-- [ ] Phone in landscape (≥ 641px wide, ≤ 500px tall): the editor is usable without the form shrinking below ~200px.
-- [ ] No horizontal overflow at 320, 360, 390, 430, 768, 844, 1024px.
-- [ ] ≥ 1001px is unchanged.
+- [x] ≤ 640px: the header is one row (brand, save state, undo, redo, menu); language, theme, My CVs and Import live in a menu sheet. All targets are ≥ 44px.
+- [x] ≤ 640px: the "may be erased by the browser" notice is not shown in the editor; the same text is in the menu sheet. The private-mode warning still shows.
+- [x] ≤ 640px: the step bar is ≤ 64px, has previous / next arrows and opens the step sheet from its centre.
+- [x] ≤ 640px: the dock is one row: Edit/Preview switch plus Next (Export in preview).
+- [x] ≤ 640px, 390×664: the form area is at least 440px tall in the personal step.
+- [x] ≤ 640px: the preview has no title row and its page is not covered by the dock.
+- [x] 641–1000px: form and preview are both visible (preview fitted to its column), the dock is hidden and Back / Next are in the form footer.
+- [x] Phone in landscape (≥ 641px wide, ≤ 500px tall): the editor is usable without the form shrinking below ~200px.
+- [x] No horizontal overflow at 320, 360, 390, 430, 768, 844, 1024px.
+- [x] ≥ 1001px is unchanged.
 
 ## Out of scope
 
 - Style step and step sheet redesign beyond what 013 delivered.
 - Field error states and the open on-screen keyboard (not designed yet).
 - Real-device testing.
+
+## Verification
+
+Chromium at 320×568, 360×640, 390×664, 430×740, 768×1024, 844×390, 1024×768 and 1280×800: no horizontal
+overflow at any of them. At 390×664 the header is 52px, the dock 70px and the wizard (step bar plus form)
+542px, against ~270px for the form before. At 844×390 both panes show and the wizard is 332px tall. The
+phone flow (preview, export sheet, menu sheet, My CVs) was walked at 390 and 320 without errors; the
+dock label no longer wraps at 320. The ≥ 1001px layout is unchanged.
+
+Not covered: real devices, the on-screen keyboard, field error states, a form step with many fields in
+landscape (the fields are still one column there), and My CVs dates, which still truncate at 320px.

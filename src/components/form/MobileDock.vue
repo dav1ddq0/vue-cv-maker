@@ -46,7 +46,7 @@ const isLast = computed(() => ui.stepIndex === ui.steps.length - 1)
 <style scoped>
 .dock {
   display: none;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0.6em;
   padding: 0.5em 0.75em calc(0.75em + var(--safe-bottom));
   border-top: 1px solid var(--border);
@@ -60,8 +60,7 @@ const isLast = computed(() => ui.stepIndex === ui.steps.length - 1)
 }
 
 .switch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 3px;
   padding: 3px;
   border-radius: 14px;
@@ -73,10 +72,12 @@ const isLast = computed(() => ui.stepIndex === ui.steps.length - 1)
   align-items: center;
   justify-content: center;
   gap: 0.4em;
-  min-width: 0;
+  flex: 0 0 44px;
   min-height: 44px;
+  padding: 0 0.7em;
   border: 0;
   border-radius: 11px;
+  white-space: nowrap;
   background: transparent;
   color: var(--text-muted);
   font: inherit;
@@ -91,6 +92,7 @@ const isLast = computed(() => ui.stepIndex === ui.steps.length - 1)
 }
 
 .mode[aria-pressed='true'] {
+  flex: 0 0 auto;
   background: var(--surface);
   color: var(--text);
   box-shadow: var(--shadow);
