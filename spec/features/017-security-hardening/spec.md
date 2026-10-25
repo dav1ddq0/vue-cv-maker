@@ -1,6 +1,6 @@
 # 017 · Security hardening
 
-**Status:** implemented ✅ (one dev-only advisory open, see Verification)
+**Status:** implemented ✅
 
 ## What it does
 
@@ -45,7 +45,7 @@ so the build job — which runs `npm ci` and every dependency's install scripts 
 - `npm audit --omit=dev`: 0. `npm audit fix` changed only the lockfile (source-map-js 1.2.1 → 1.2.2,
   vite 6.4.3 → 6.4.5, undici, brace-expansion); `package.json` untouched; tests and build pass.
 
-Open: the full `npm audit` still lists vitest 3 (`@vitest/mocker`, `tinypool`), dev-only — it runs on the
-developer machine and in CI, never in the site. The fix is vitest 5, a major upgrade that changes
-`package.json`; left for an explicit decision. The workflow change is only verifiable on the next push
-to `main`.
+Follow-up: vitest 3 → 5.0.5 (installed by the owner) cleared the dev-only advisories (`@vitest/mocker`,
+`tinypool`); full `npm audit`: 0, 336 tests, typecheck and build pass. The first deploy with the new
+workflow (run 40205148648, `ffbdef9`) succeeded, and the live site carries the CSP: sample, paginated
+preview, PDF import and the crafted JSON checked there with no violation and no third-party request.
