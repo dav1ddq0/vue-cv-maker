@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import { PHONE_QUERY, useIsPhone } from '@/composables/useIsPhone'
+import { COMPACT_QUERY, PHONE_QUERY, useIsCompact, useIsPhone } from '@/composables/useIsPhone'
 
 type Listener = (event: { matches: boolean }) => void
 
@@ -53,5 +53,19 @@ describe('useIsPhone', () => {
     const { isPhone } = mountProbe()
     await nextTick()
     expect(isPhone.value).toBe(false)
+  })
+})
+
+describe('useIsCompact', () => {
+  it('watches the 1000px query, not the phone one', async () => {
+    const media = fakeMatchMedia(true)
+    let compact!: ReturnType<typeof useIsCompact>
+    mount(defineComponent({ setup() { compact = useIsCompact(); return () => null } }))
+    await nextTick()
+    expect(media.spy).toHaveBeenCalledWith(COMPACT_QUERY)
+    expect(COMPACT_QUERY).not.toBe(PHONE_QUERY)
+    expect(compact.value).toBe(true)
+    media.set(false)
+    expect(compact.value).toBe(false)
   })
 })

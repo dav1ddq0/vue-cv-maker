@@ -5,7 +5,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
-import { useIsPhone } from '@/composables/useIsPhone'
+import { useIsCompact, useIsPhone } from '@/composables/useIsPhone'
 import CvRenderer from './CvRenderer.vue'
 
 const cv = useCvStore()
@@ -13,6 +13,7 @@ const ui = useUiStore()
 const { t } = useI18n()
 
 const isPhone = useIsPhone()
+const isCompact = useIsCompact()
 const zoom = ref(0.72)
 
 /** A4 width in CSS px (210mm at 96dpi). */
@@ -31,9 +32,9 @@ onMounted(() => {
 })
 onBeforeUnmount(() => observer?.disconnect())
 
-/** On phones the page is fitted to the screen width instead of using the slider (spec 013). */
+/** On phones and tablets the page is fitted to its column instead of using the slider (specs 013, 016). */
 const effectiveZoom = computed(() => {
-  if (!isPhone.value || available.value <= 0) return zoom.value
+  if (!isCompact.value || available.value <= 0) return zoom.value
   return Math.min(1, available.value / PAGE_PX)
 })
 
@@ -46,9 +47,9 @@ const scaleStyle = computed(() => ({
 
 <template>
   <section class="pane" :aria-label="t('preview.title')">
-    <header class="bar">
+    <header v-if="!isPhone" class="bar">
       <h2 class="title">{{ t('preview.title') }}</h2>
-      <label v-if="!isPhone" class="zoom">
+      <label v-if="!isCompact" class="zoom">
         <span class="sr-only">Zoom</span>
         <input v-model.number="zoom" type="range" min="0.4" max="1" step="0.02" />
         <output>{{ Math.round(zoom * 100) }}%</output>

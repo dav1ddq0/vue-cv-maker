@@ -61,6 +61,7 @@ function onKeydown(event: KeyboardEvent) {
       </NoticeBar>
       <NoticeBar
         v-else-if="!ui.isDismissed('persistence')"
+        class="notice--soft"
         tone="warning"
         dismissible
         @dismiss="ui.dismissNotice('persistence')"
@@ -101,6 +102,13 @@ function onKeydown(event: KeyboardEvent) {
   gap: 0.4em;
 }
 
+/* A phone held sideways has ~390px of height: the dismissible notice is not worth 70px of it. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .notice--soft {
+    display: none;
+  }
+}
+
 .editor {
   flex: 1;
   display: grid;
@@ -119,9 +127,17 @@ function onKeydown(event: KeyboardEvent) {
   display: flex;
 }
 
+/* Tablets and a phone held sideways: both panes stay, the preview is a fixed column fitted to its width. */
 @media (max-width: 1000px) {
   .editor {
-    /* `1fr` alone lets the column grow to the page's 794px, which overflowed the whole document. */
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  }
+}
+
+/* Phones: one pane at a time, switched from the dock. `1fr` alone lets the column grow to the page's
+   794px, which overflowed the whole document. */
+@media (max-width: 640px) {
+  .editor {
     grid-template-columns: minmax(0, 1fr);
   }
 

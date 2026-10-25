@@ -217,6 +217,13 @@ const phoneState = computed(() => {
   cursor: default;
 }
 
+@media (max-height: 500px) and (orientation: landscape) {
+  .header {
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
+  }
+}
+
 @media (max-width: 900px) {
   .tagline,
   .tool-label {

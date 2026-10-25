@@ -99,11 +99,32 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
   background: var(--bg);
 }
 
-/* Below 1000px the preview has no column of its own and the dock (MobileDock, outside this
-   form so it survives preview mode) takes over Back / Next and the Edit / Preview switch. */
-@media (max-width: 1000px) {
+/* On phones the dock (MobileDock, outside this form so it survives preview mode) takes over
+   Next and the Edit / Preview switch, and the step bar has the arrows. */
+@media (max-width: 640px) {
   .footer {
     display: none;
+  }
+}
+
+/* A phone held sideways has ~390px of height: give it to the fields. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .wizard {
+    gap: 0.5em;
+    padding-top: 0.5em;
+  }
+
+  /* The active tab already names the step; keep the heading for screen readers only. */
+  .heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .footer {
+    padding: 0.4em 0;
   }
 }
 </style>

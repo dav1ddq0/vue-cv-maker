@@ -143,6 +143,12 @@ onMounted(revealActive)
   color: var(--text-muted);
 }
 
+@media (max-height: 500px) and (orientation: landscape) {
+  .progress {
+    display: none;
+  }
+}
+
 @media (pointer: coarse) {
   .step {
     min-height: 44px;
