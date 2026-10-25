@@ -32,6 +32,17 @@ export interface PrintOptions {
   paginate?: boolean
 }
 
+/**
+ * What the browser proposes as the PDF's file name: it uses `document.title` (spec 024).
+ * "Nadia Martín Reyes – CV"; the document title when there is no name; "CV" when there is neither.
+ */
+export function printTitle(data: CVData): string {
+  const clean = (value: string) => value.replace(/[/\\:*?"<>|]/g, '').replace(/\s+/g, ' ').trim()
+  const name = clean(data.personal.fullName)
+  if (name) return `${name} – CV`
+  return clean(data.meta.title) || 'CV'
+}
+
 export async function printCv(
   data: CVData,
   templateId: string,
@@ -40,6 +51,7 @@ export async function printCv(
   const { data: rendered, revoke } = await resolvePhoto(data, 'objectUrl')
   const root = ensurePrintRoot()
   root.innerHTML = ''
+  const appTitle = document.title
 
   try {
     const html = await renderTemplateHtml(rendered, templateId)
@@ -62,9 +74,11 @@ export async function printCv(
       // Some Safari versions never fire `afterprint`; don't leak the promise.
       const timer = setTimeout(done, 60_000)
       window.addEventListener('afterprint', done)
+      document.title = printTitle(data)
       window.print()
     })
   } finally {
+    document.title = appTitle
     root.innerHTML = ''
     releasePagination(root)
     revoke()

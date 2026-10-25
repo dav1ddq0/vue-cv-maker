@@ -341,7 +341,7 @@ export default {
   },
   exportDialog: {
     recommended: 'Recomendado',
-    printNote: 'Se abre el diálogo de impresión: elige «Guardar como PDF».',
+    printNote: 'Se abre el diálogo de impresión: elige «Guardar como PDF». El archivo se propone como «{file}.pdf» y el navegador recuerda el destino para la próxima vez.',
     checkTitle: 'Antes de exportar',
     allGood: 'Todas las secciones tienen contenido.',
     missing: '{step}: falta contenido',

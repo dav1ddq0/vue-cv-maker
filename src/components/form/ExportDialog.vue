@@ -9,6 +9,7 @@ import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { stepStatus } from '@/core/stepStatus'
 import { useCvExport, type ExportKind } from '@/composables/useCvExport'
+import { printTitle } from '@/services/export'
 
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: [] }>()
@@ -83,7 +84,7 @@ async function confirm() {
         </span>
       </label>
     </div>
-    <p v-if="kind === 'pdf'" class="note">{{ t('exportDialog.printNote') }}</p>
+    <p v-if="kind === 'pdf'" class="note">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</p>
 
     <section class="check" :aria-label="t('exportDialog.checkTitle')">
       <h3 class="check-title">{{ t('exportDialog.checkTitle') }}</h3>

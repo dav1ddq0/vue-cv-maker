@@ -7,6 +7,7 @@ vi.mock('@/services/export', () => ({
   exportHtml: vi.fn(async () => {}),
   exportJson: vi.fn(async () => {}),
   printCv: vi.fn(async () => {}),
+  printTitle: () => 'Ana – CV',
 }))
 
 import * as exporters from '@/services/export'

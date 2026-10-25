@@ -3,11 +3,14 @@
 import { useI18n } from '@/i18n'
 import { useCvExport, type ExportKind } from '@/composables/useCvExport'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
+import { useCvStore } from '@/stores/cv'
+import { printTitle } from '@/services/export'
 
 defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 
 const { t } = useI18n()
+const cv = useCvStore()
 const { busy, run } = useCvExport()
 
 const OPTIONS: { kind: ExportKind; title: string; hint: string }[] = [
@@ -30,6 +33,7 @@ async function pick(kind: ExportKind) {
           <span class="text">
             <span class="name">{{ t(option.title) }}</span>
             <span class="hint">{{ t(option.hint) }}</span>
+            <span v-if="option.kind === 'pdf'" class="hint">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</span>
           </span>
           <span class="action">{{ busy === option.kind ? t('exportView.preparing') : t(option.kind === 'pdf' ? 'exportView.printShort' : 'exportView.download') }}</span>
         </button>

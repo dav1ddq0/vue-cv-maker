@@ -341,7 +341,7 @@ const en: typeof es = {
   },
   exportDialog: {
     recommended: 'Recommended',
-    printNote: 'The print dialog opens: choose “Save as PDF”.',
+    printNote: 'The print dialog opens: choose “Save as PDF”. The file is suggested as “{file}.pdf” and the browser remembers the destination next time.',
     checkTitle: 'Before exporting',
     allGood: 'Every section has content.',
     missing: '{step}: missing content',

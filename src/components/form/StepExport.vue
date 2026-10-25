@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { useCvExport } from '@/composables/useCvExport'
+import { printTitle } from '@/services/export'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
 import PaginatedPreview from '@/components/preview/PaginatedPreview.vue'
@@ -26,6 +27,7 @@ const { busy, run } = useCvExport()
         <div>
           <h3 class="option-title">{{ t('exportView.pdf') }}</h3>
           <p class="option-hint">{{ t('exportView.pdfHint') }}</p>
+          <p class="option-hint">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</p>
         </div>
         <BaseButton variant="primary" :disabled="busy !== null" @click="run('pdf')">
           {{ busy === 'pdf' ? t('exportView.preparing') : t('exportView.print') }}
