@@ -1,12 +1,41 @@
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type Plugin } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
+
+/**
+ * Content-Security-Policy for the built site (spec 017). A meta tag because GitHub Pages cannot send
+ * headers; build-only because the dev server needs inline scripts and a websocket for HMR.
+ * `style-src 'unsafe-inline'` is required by Vue style bindings and paged.js; what it would let a
+ * hostile file do with CSS is closed by the validation in `core/migrations.ts`.
+ */
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "worker-src 'self' blob:",
+  "connect-src 'self' blob: data:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ')
+
+function contentSecurityPolicy(): Plugin {
+  return {
+    name: 'cv-maker:csp',
+    apply: 'build',
+    transformIndexHtml: () => [
+      { tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP }, injectTo: 'head-prepend' },
+    ],
+  }
+}
 
 // `base` targets GitHub Pages project sites (/<repo>/). Override with BASE_PATH
 // when deploying to a user site or another host.
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/cv-maker/',
-  plugins: [vue()],
+  plugins: [vue(), contentSecurityPolicy()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
