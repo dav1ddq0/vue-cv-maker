@@ -13,6 +13,7 @@ import { useI18n } from '@/i18n'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
+import { useIsDesktop } from '@/composables/useIsPhone'
 
 const props = defineProps<{ draft: ImportDraft }>()
 const emit = defineEmits<{ apply: [cv: CVData, mode: 'new' | 'current'] }>()
@@ -34,6 +35,8 @@ const blocks = reactive<Record<string, BlockTarget>>(
 )
 
 const showRaw = ref(false)
+/** Wide screens show the extracted text beside the review, always (spec 019). */
+const isDesktop = useIsDesktop()
 
 const decisions = computed<ReviewDecisions>(() => ({
   personal: {
@@ -61,82 +64,119 @@ function apply(mode: 'new' | 'current') {
 </script>
 
 <template>
-  <div class="review">
-    <header>
-      <h3 class="title">{{ t('importView.reviewTitle') }}</h3>
-      <p class="hint">{{ t('importView.reviewHint') }}</p>
-    </header>
+  <div class="review" :class="{ 'review--split': isDesktop }">
+    <div class="review-main">
+      <header>
+        <h3 class="title">{{ t('importView.reviewTitle') }}</h3>
+        <p class="hint">{{ t('importView.reviewHint') }}</p>
+      </header>
 
-    <NoticeBar tone="warning">{{ t('notices.importIsAnAid') }}</NoticeBar>
-    <NoticeBar v-if="draft.warnings.includes('multiColumn')" tone="warning">
-      {{ t('importView.pdfHint') }}
-    </NoticeBar>
+      <NoticeBar tone="warning">{{ t('notices.importIsAnAid') }}</NoticeBar>
+      <NoticeBar v-if="draft.warnings.includes('multiColumn')" tone="warning">
+        {{ t('importView.pdfHint') }}
+      </NoticeBar>
 
-    <section class="fields">
-      <BaseField v-slot="{ id }" :label="t('personal.fullName')" :warning="lowConfidence('fullName')">
-        <input :id="id" v-model="fields.fullName" />
-      </BaseField>
-      <BaseField v-slot="{ id }" :label="t('personal.headline')" :warning="lowConfidence('headline')">
-        <input :id="id" v-model="fields.headline" />
-      </BaseField>
-      <BaseField v-slot="{ id }" :label="t('personal.email')" :warning="lowConfidence('email')">
-        <input :id="id" v-model="fields.email" />
-      </BaseField>
-      <BaseField v-slot="{ id }" :label="t('personal.phone')" :warning="lowConfidence('phone')">
-        <input :id="id" v-model="fields.phone" />
-      </BaseField>
-      <BaseField v-slot="{ id }" :label="t('personal.location')" :warning="lowConfidence('location')">
-        <input :id="id" v-model="fields.location" />
-      </BaseField>
-    </section>
+      <section class="fields">
+        <BaseField v-slot="{ id }" :label="t('personal.fullName')" :warning="lowConfidence('fullName')">
+          <input :id="id" v-model="fields.fullName" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.headline')" :warning="lowConfidence('headline')">
+          <input :id="id" v-model="fields.headline" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.email')" :warning="lowConfidence('email')">
+          <input :id="id" v-model="fields.email" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.phone')" :warning="lowConfidence('phone')">
+          <input :id="id" v-model="fields.phone" />
+        </BaseField>
+        <BaseField v-slot="{ id }" :label="t('personal.location')" :warning="lowConfidence('location')">
+          <input :id="id" v-model="fields.location" />
+        </BaseField>
+      </section>
 
-    <p class="detected">
-      {{ t('steps.experience') }}: {{ counts.experience }} ·
-      {{ t('steps.education') }}: {{ counts.education }} ·
-      {{ t('steps.skills') }}: {{ counts.skills }} ·
-      {{ t('personal.links') }}: {{ draft.links.length }}
-    </p>
+      <p class="detected">
+        {{ t('steps.experience') }}: {{ counts.experience }} ·
+        {{ t('steps.education') }}: {{ counts.education }} ·
+        {{ t('steps.skills') }}: {{ counts.skills }} ·
+        {{ t('personal.links') }}: {{ draft.links.length }}
+      </p>
 
-    <section v-if="draft.unclassified.length" class="blocks">
-      <h4 class="subtitle">{{ t('importView.unclassified') }}</h4>
-      <p class="hint">{{ t('importView.unclassifiedHint') }}</p>
+      <section v-if="draft.unclassified.length" class="blocks">
+        <h4 class="subtitle">{{ t('importView.unclassified') }}</h4>
+        <p class="hint">{{ t('importView.unclassifiedHint') }}</p>
 
-      <article v-for="block in draft.unclassified" :key="block.id" class="block">
-        <div class="block-body">
-          <p v-if="block.heading" class="block-heading">{{ block.heading }}</p>
-          <p v-for="(line, index) in block.lines.slice(0, 6)" :key="index" class="block-line">
-            {{ line }}
-          </p>
-          <p v-if="block.lines.length > 6" class="block-more">+{{ block.lines.length - 6 }}</p>
-        </div>
-        <label class="assign">
-          <span class="assign-label">{{ t('importView.assignTo') }}</span>
-          <select v-model="blocks[block.id]">
-            <option v-for="target in TARGETS" :key="target" :value="target">
-              {{ target === 'discard' ? t('importView.discard') : target === 'custom' ? t('custom.add') : t(`steps.${target}`) }}
-            </option>
-          </select>
-        </label>
-      </article>
-    </section>
+        <article v-for="block in draft.unclassified" :key="block.id" class="block">
+          <div class="block-body">
+            <p v-if="block.heading" class="block-heading">{{ block.heading }}</p>
+            <p v-for="(line, index) in block.lines.slice(0, 6)" :key="index" class="block-line">
+              {{ line }}
+            </p>
+            <p v-if="block.lines.length > 6" class="block-more">+{{ block.lines.length - 6 }}</p>
+          </div>
+          <label class="assign">
+            <span class="assign-label">{{ t('importView.assignTo') }}</span>
+            <select v-model="blocks[block.id]">
+              <option v-for="target in TARGETS" :key="target" :value="target">
+                {{ target === 'discard' ? t('importView.discard') : target === 'custom' ? t('custom.add') : t(`steps.${target}`) }}
+              </option>
+            </select>
+          </label>
+        </article>
+      </section>
 
-    <section class="raw">
-      <BaseButton size="sm" @click="showRaw = !showRaw">{{ t('importView.rawText') }}</BaseButton>
-      <pre v-if="showRaw" class="raw-text">{{ draft.rawText }}</pre>
-    </section>
+      <section v-if="!isDesktop" class="raw">
+        <BaseButton size="sm" @click="showRaw = !showRaw">{{ t('importView.rawText') }}</BaseButton>
+        <pre v-if="showRaw" class="raw-text">{{ draft.rawText }}</pre>
+      </section>
 
-    <footer class="footer">
-      <BaseButton @click="apply('current')">{{ t('importView.applyToCurrent') }}</BaseButton>
-      <BaseButton variant="primary" @click="apply('new')">{{ t('importView.apply') }}</BaseButton>
-    </footer>
+      <footer class="footer">
+        <BaseButton @click="apply('current')">{{ t('importView.applyToCurrent') }}</BaseButton>
+        <BaseButton variant="primary" @click="apply('new')">{{ t('importView.apply') }}</BaseButton>
+      </footer>
+    </div>
+
+    <aside v-if="isDesktop" class="source" :aria-label="t('importView.rawText')">
+      <h4 class="subtitle">{{ t('importView.rawText') }}</h4>
+      <pre class="source-text">{{ draft.rawText }}</pre>
+    </aside>
   </div>
 </template>
 
 <style scoped>
-.review {
+.review,
+.review-main {
   display: flex;
   flex-direction: column;
   gap: 1em;
+}
+
+/* Desktop: review on the left, the text it came from on the right, scrolling on its own. */
+.review--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1.5em;
+  align-items: start;
+}
+
+.source {
+  position: sticky;
+  top: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.source-text {
+  max-height: calc(100vh - 10em);
+  overflow: auto;
+  margin: 0;
+  padding: 1em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 0.8em;
+  line-height: 1.55;
+  white-space: pre-wrap;
 }
 
 .title {

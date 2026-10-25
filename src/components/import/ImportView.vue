@@ -98,6 +98,13 @@ async function apply(data: CVData, mode: 'new' | 'current') {
   width: 100%;
 }
 
+/* The PDF review puts the source text beside it on wide screens (spec 019). */
+@media (min-width: 1001px) {
+  .import {
+    max-width: 1280px;
+  }
+}
+
 .title {
   margin: 0;
   font-size: 1.3em;
