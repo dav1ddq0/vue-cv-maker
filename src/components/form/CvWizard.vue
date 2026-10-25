@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import BaseButton from '@/components/ui/BaseButton.vue'
-import { useIsPhone } from '@/composables/useIsPhone'
+import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import WizardNav from './WizardNav.vue'
 import StepHeader from './StepHeader.vue'
 import StepPersonal from './StepPersonal.vue'
@@ -19,6 +19,17 @@ import StepExport from './StepExport.vue'
 const ui = useUiStore()
 const { t } = useI18n()
 const isPhone = useIsPhone()
+const isDesktop = useIsDesktop()
+
+/** Desktop footer names the neighbouring steps (spec 018); elsewhere the short labels stay. */
+const prevLabel = computed(() => {
+  const id = ui.steps[ui.stepIndex - 1]
+  return isDesktop.value && id ? t(`steps.${id}`) : t('actions.back')
+})
+const nextLabel = computed(() => {
+  const id = ui.steps[ui.stepIndex + 1]
+  return isDesktop.value && id ? t('dock.next', { step: t(`steps.${id}`) }) : t('actions.next')
+})
 
 /** Statically mapped rather than dynamically imported: nine small steps, and the
  *  user navigates freely between them, so lazy loading would only add flicker. */
@@ -40,6 +51,12 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 <template>
   <div class="wizard">
     <StepHeader v-if="isPhone" />
+    <!-- Desktop: the rail (StepRail, beside this form) replaces the tab strip. -->
+    <div v-else-if="isDesktop" class="intro">
+      <span class="position">{{ t('stepSheet.position', { n: ui.stepIndex + 1, total: ui.steps.length }) }}</span>
+      <h2 class="heading heading--large">{{ t(`steps.${ui.step}`) }}</h2>
+      <p class="lead">{{ t(`stepIntro.${ui.step}`) }}</p>
+    </div>
     <template v-else>
       <WizardNav />
       <h2 class="heading">{{ t(`steps.${ui.step}`) }}</h2>
@@ -51,7 +68,7 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 
     <footer class="footer">
       <BaseButton :disabled="ui.stepIndex === 0" @click="ui.prevStep()">
-        ← {{ t('actions.back') }}
+        ← {{ prevLabel }}
       </BaseButton>
 
       <BaseButton
@@ -59,7 +76,7 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
         :disabled="ui.stepIndex === ui.steps.length - 1"
         @click="ui.nextStep()"
       >
-        {{ t('actions.next') }} →
+        {{ nextLabel }} →
       </BaseButton>
     </footer>
   </div>
@@ -85,6 +102,36 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 
 .body {
   flex: 1;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.position {
+  font-size: 0.82em;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.heading--large {
+  font-size: 1.6em;
+  font-weight: 700;
+}
+
+.lead {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--text-muted);
+}
+
+@media (min-width: 1001px) {
+  .wizard {
+    padding: 1.75em 2.5em 0;
+    gap: 1.25em;
+  }
 }
 
 .footer {

@@ -1,31 +1,16 @@
 <script setup lang="ts">
 /** Jump to any step from a bottom sheet, with the state of each (phones, spec 013). */
 import { useUiStore, type StepId } from '@/stores/ui'
-import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
-import { stepStatus } from '@/core/stepStatus'
+import { useStepDetail } from '@/composables/useStepDetail'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
 
 defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 
 const ui = useUiStore()
-const cv = useCvStore()
 const { t } = useI18n()
-
-/** Steps whose count says something useful ("3"); for the others it would be noise. */
-const COUNTED: StepId[] = ['experience', 'education', 'skills', 'languages', 'custom']
-
-function detail(id: StepId): string {
-  if (id === ui.step) return t('stepSheet.here')
-  const { state, count } = stepStatus(cv.data, id)
-  if (state === 'complete') {
-    return count > 0 && COUNTED.includes(id) ? t('stepSheet.completeCount', { n: count }) : t('stepSheet.complete')
-  }
-  if (state === 'incomplete') return t('stepSheet.incomplete')
-  if (state === 'optional') return t('stepSheet.optional')
-  return ''
-}
+const { detail, badge } = useStepDetail()
 
 function go(id: StepId) {
   ui.goTo(id)
@@ -44,8 +29,8 @@ function go(id: StepId) {
           :aria-current="id === ui.step ? 'step' : undefined"
           @click="go(id)"
         >
-          <span class="badge" :class="`badge--${id === ui.step ? 'current' : stepStatus(cv.data, id).state}`">
-            <svg v-if="id !== ui.step && stepStatus(cv.data, id).state === 'complete'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>
+          <span class="badge" :class="`badge--${badge(id)}`">
+            <svg v-if="badge(id) === 'complete'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>
             <template v-else>{{ index + 1 }}</template>
           </span>
           <span class="text">

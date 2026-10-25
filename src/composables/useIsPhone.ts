@@ -8,6 +8,9 @@ export const PHONE_QUERY = `(max-width: ${PHONE_MAX_WIDTH}px)`
 export const COMPACT_MAX_WIDTH = 1000
 export const COMPACT_QUERY = `(max-width: ${COMPACT_MAX_WIDTH}px)`
 
+/** Above the compact range: the three-column desktop editor (spec 018). */
+export const DESKTOP_QUERY = `(min-width: ${COMPACT_MAX_WIDTH + 1}px)`
+
 /**
  * Reactive "is this a phone-sized viewport". Only for places that must branch in script (which
  * component to mount); anything that is just layout belongs in CSS with `PHONE_QUERY`.
@@ -20,6 +23,11 @@ export function useIsPhone() {
 /** Phones, tablets and a phone held sideways: anywhere the preview is a narrow column or a page of its own. */
 export function useIsCompact() {
   return useMediaQuery(COMPACT_QUERY)
+}
+
+/** Wide screens: step rail, form and preview side by side. */
+export function useIsDesktop() {
+  return useMediaQuery(DESKTOP_QUERY)
 }
 
 function useMediaQuery(source: string) {

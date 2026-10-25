@@ -9,12 +9,14 @@ import MobileDock from '@/components/form/MobileDock.vue'
 import PreviewPane from '@/components/preview/PreviewPane.vue'
 import DocumentList from '@/components/documents/DocumentList.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
-import { useIsPhone } from '@/composables/useIsPhone'
+import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
+import StepRail from '@/components/form/StepRail.vue'
 
 const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
 const isPhone = useIsPhone()
+const isDesktop = useIsDesktop()
 
 // pdf.js is ~500 kB: the import view — and the parser behind it — load only when
 // someone actually opens it, so the editor's first paint never pays for it.
@@ -54,8 +56,9 @@ function onKeydown(event: KeyboardEvent) {
   <div class="app">
     <AppHeader />
 
-    <!-- Phones: the eviction notice lives in the menu sheet; it cost 56px of every screen (spec 016). -->
-    <div v-if="!ui.storageAvailable || (!isPhone && !ui.storagePersisted)" class="notices">
+    <!-- The eviction notice lives in the phone menu (016) and in the desktop rail and preferences (018);
+         only tablets keep the bar. -->
+    <div v-if="!ui.storageAvailable || (!isPhone && !isDesktop && !ui.storagePersisted)" class="notices">
       <NoticeBar v-if="!ui.storageAvailable" tone="warning">
         {{ t('notices.privateMode') }}
       </NoticeBar>
@@ -70,7 +73,12 @@ function onKeydown(event: KeyboardEvent) {
       </NoticeBar>
     </div>
 
-    <main v-if="ui.view === 'editor'" class="editor" :class="{ 'editor--preview-open': ui.previewOpen }">
+    <main
+      v-if="ui.view === 'editor'"
+      class="editor"
+      :class="{ 'editor--preview-open': ui.previewOpen, 'editor--rail': isDesktop }"
+    >
+      <StepRail v-if="isDesktop" class="editor-rail" />
       <CvWizard class="editor-form" />
       <PreviewPane class="editor-preview" />
     </main>
@@ -117,8 +125,14 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 .editor-form,
-.editor-preview {
+.editor-preview,
+.editor-rail {
   min-height: 0;
+}
+
+/* Desktop (spec 018): step rail · form · preview. */
+.editor--rail {
+  grid-template-columns: 248px minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .scroll-view {
