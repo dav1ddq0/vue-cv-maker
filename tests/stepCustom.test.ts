@@ -70,3 +70,28 @@ describe('StepCustom section picker on phones', () => {
     expect(cv.data.customSections.at(-1)).toMatchObject({ title: '', entries: [] })
   })
 })
+
+describe('StepCustom page breaks (spec 022)', () => {
+  beforeEach(() => setActivePinia(createPinia()))
+
+  const breakBox = (wrapper: ReturnType<typeof mount>, section: string) =>
+    wrapper.find(`input[aria-label="Página nueva antes de ${section}"]`)
+
+  it('offers a switch on every section but the first', () => {
+    const wrapper = mount(StepCustom)
+    expect(wrapper.findAll('.page-break')).toHaveLength(useCvStore().data.sectionOrder.length - 1)
+    expect(breakBox(wrapper, 'Resumen').exists()).toBe(false)
+  })
+
+  it('records the break in section order, and removes it again', async () => {
+    const cv = useCvStore()
+    const wrapper = mount(StepCustom)
+
+    await breakBox(wrapper, 'Idiomas').setValue(true)
+    await breakBox(wrapper, 'Formación').setValue(true)
+    expect(cv.data.pageBreaks).toEqual(['education', 'languages'])
+
+    await breakBox(wrapper, 'Idiomas').setValue(false)
+    expect(cv.data.pageBreaks).toEqual(['education'])
+  })
+})

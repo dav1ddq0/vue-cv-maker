@@ -223,6 +223,9 @@ const en: typeof es = {
       privacy: 'Data protection',
     },
     order: 'Section order',
+    newPage: 'New page',
+    newPageFor: 'New page before {section}',
+    newPageHint: 'PDF only. In two-column templates it applies to sections in the main column.',
   },
   templates: {
     facet: {

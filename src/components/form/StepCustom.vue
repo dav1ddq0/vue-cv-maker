@@ -57,9 +57,18 @@ function addBlank() {
   pickerOpen.value = false
 }
 
+/** Kept in section order, like `sectionOrder` itself (spec 022). */
+function setPageBreak(id: string, on: boolean) {
+  const breaks = new Set(cv.data.pageBreaks)
+  if (on) breaks.add(id)
+  else breaks.delete(id)
+  cv.data.pageBreaks = cv.data.sectionOrder.filter((sectionId) => breaks.has(sectionId))
+}
+
 function removeSection(index: number) {
   const [removed] = cv.data.customSections.splice(index, 1)
   cv.data.sectionOrder = cv.data.sectionOrder.filter((id) => id !== removed.id)
+  cv.data.pageBreaks = cv.data.pageBreaks.filter((id) => id !== removed.id)
 }
 </script>
 
@@ -148,10 +157,23 @@ function removeSection(index: number) {
         :items="orderItems"
         @reorder="cv.data.sectionOrder = $event.map((entry) => entry.id)"
       >
-        <template #default="{ item }">
-          <span class="order-label">{{ item.label }}</span>
+        <template #default="{ item, index }">
+          <span class="order-row">
+            <span class="order-label">{{ item.label }}</span>
+            <!-- A break before the first section would only leave the header alone on page one. -->
+            <label v-if="index > 0" class="page-break">
+              <input
+                type="checkbox"
+                :checked="cv.data.pageBreaks.includes(item.id)"
+                :aria-label="t('custom.newPageFor', { section: item.label })"
+                @change="setPageBreak(item.id, ($event.target as HTMLInputElement).checked)"
+              />
+              {{ t('custom.newPage') }}
+            </label>
+          </span>
         </template>
       </SortableList>
+      <p class="hint">{{ t('custom.newPageHint') }}</p>
     </section>
   </div>
 </template>
@@ -178,6 +200,29 @@ function removeSection(index: number) {
   margin: 0;
   font-size: 0.95em;
   font-weight: 600;
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+  flex-wrap: wrap;
+}
+
+.page-break {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.82em;
+  color: var(--text-muted);
 }
 
 .empty {

@@ -223,6 +223,9 @@ export default {
       privacy: 'Protección de datos',
     },
     order: 'Orden de las secciones',
+    newPage: 'Página nueva',
+    newPageFor: 'Página nueva antes de {section}',
+    newPageHint: 'Solo en el PDF. En las plantillas de dos columnas afecta a las secciones de la columna principal.',
   },
   templates: {
     facet: {
