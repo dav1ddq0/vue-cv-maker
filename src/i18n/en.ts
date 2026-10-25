@@ -129,6 +129,8 @@ const en: typeof es = {
     level: 'Level',
     add: 'Add language',
     empty: 'No languages yet.',
+    quickLevel: 'Level of {name}',
+    levelHelp: 'A1–A2 basic · B1–B2 independent · C1–C2 proficient. Or type your own level.',
   },
   header: {
     breadcrumb: 'Location',

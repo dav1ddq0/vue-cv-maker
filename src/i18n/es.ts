@@ -129,6 +129,8 @@ export default {
     level: 'Nivel',
     add: 'Añadir idioma',
     empty: 'Sin idiomas todavía.',
+    quickLevel: 'Nivel de {name}',
+    levelHelp: 'A1–A2 básico · B1–B2 independiente · C1–C2 competente. O escribe tu propio nivel.',
   },
   header: {
     breadcrumb: 'Ubicación',

@@ -5,6 +5,7 @@ import { createLanguage } from '@/core/factory'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import SortableList from '@/components/ui/SortableList.vue'
+import LanguageLevelPicker from './LanguageLevelPicker.vue'
 
 const cv = useCvStore()
 const { t } = useI18n()
@@ -26,9 +27,17 @@ const { t } = useI18n()
           <BaseButton size="sm" variant="danger" @click="cv.data.languages.splice(index, 1)">
             {{ t('actions.remove') }}
           </BaseButton>
+          <LanguageLevelPicker
+            v-model="item.level"
+            class="levels"
+            :cv-language="cv.data.meta.language"
+            :label="t('languages.quickLevel', { name: item.name || t('languages.name') })"
+          />
         </div>
       </template>
     </SortableList>
+
+    <p v-if="cv.data.languages.length" class="help">{{ t('languages.levelHelp') }}</p>
 
     <datalist id="cv-language-levels">
       <option v-for="level in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']" :key="level" :value="level" />
@@ -63,6 +72,16 @@ const { t } = useI18n()
   grid-template-columns: 1fr 1fr auto;
   gap: 0.6em;
   align-items: end;
+}
+
+.levels {
+  grid-column: 1 / -1;
+}
+
+.help {
+  margin: 0;
+  font-size: 0.82em;
+  color: var(--text-muted);
 }
 
 @media (max-width: 640px) {
