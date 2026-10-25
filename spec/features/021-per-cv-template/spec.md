@@ -1,6 +1,6 @@
 # 021 · Per-CV template
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -17,18 +17,18 @@ picking a template changes only the open CV. My CVs shows each CV's template and
 
 ## Acceptance criteria
 
-- [ ] `CVMeta.templateId` is part of the model; `SCHEMA_VERSION` 4 with a v3 → v4 step.
-- [ ] A stored or imported v3 CV gets the template the user had last picked (what it looked like
+- [x] `CVMeta.templateId` is part of the model; `SCHEMA_VERSION` 4 with a v3 → v4 step.
+- [x] A stored or imported v3 CV gets the template the user had last picked (what it looked like
       before); a missing or non-string value falls back the same way. Unknown ids are kept as is and
       render with the default template (the registry already falls back), so a file from a newer
       version with more templates does not lose its choice.
-- [ ] Picking a template in the Style step changes `cv.data.meta.templateId`: it autosaves, is
+- [x] Picking a template in the Style step changes `cv.data.meta.templateId`: it autosaves, is
       undoable, and the preview, PDF, HTML and paginated preview all use it.
-- [ ] Opening another CV switches the preview to that CV's template.
-- [ ] A new blank CV starts with the last template picked; the sample CV too. A duplicate keeps the
+- [x] Opening another CV switches the preview to that CV's template.
+- [x] A new blank CV starts with the last template picked; the sample CV too. A duplicate keeps the
       source's template.
-- [ ] The JSON export includes the template and the import restores it.
-- [ ] My CVs (desktop tiles and phone cards) shows the template name and an accent swatch for each CV;
+- [x] The JSON export includes the template and the import restores it.
+- [x] My CVs (desktop tiles and phone cards) shows the template name and an accent swatch for each CV;
       entries saved before this feature show neither until the CV is saved again.
 
 ## Out of scope
@@ -38,6 +38,11 @@ picking a template changes only the open CV. My CVs shows each CV's template and
 
 ## Verification
 
-- Unit tests: migration v3 → v4 with and without a fallback, invalid values, factory default, store
-  (open switches template, pick is undoable, new CV uses the last pick, duplicate keeps it), index summary.
-- Manual on the dev server: two CVs with different templates, switch between them, export PDF.
+- 388 unit tests (new: v3 → v4 with and without fallback, invalid and unknown ids, factory default;
+  store: the pick autosaves and undoes, opening a CV switches template, a new CV takes the last pick,
+  a duplicate keeps its source's; My CVs tag with and without template).
+- Dev server (Playwright, 1440×900): sample CV → Meridian; a new CV starts in Meridian and is set to
+  Aurora; My CVs shows "Plantilla Aurora" and "Plantilla Meridian" with their swatches; reopening the
+  sample and reloading keep Meridian. A v3 CV written straight into IndexedDB with the last pick set
+  to Harbor opens in Harbor and shows no tag until saved. No console errors.
+- PDF export with each template was not re-run by hand; it takes the same `templateId` as the preview.

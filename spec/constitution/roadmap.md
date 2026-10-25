@@ -31,12 +31,12 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **018** · Desktop redesign (step rail, header with Export, export dialog, collapsible entries, preview toolbar, My CVs grid)
 - **019** · Desktop redesign, second part (template filters, CEFR picker, System theme, first-run chooser, preview section outline, side-by-side PDF review)
 - **020** · Housekeeping (favicon, base path, README deployment, CI Node 24, photo type and size checks)
+- **021** · Per-CV template (`meta.templateId`, schema v4; My CVs shows each CV's template and accent)
 
 ## Next 🔜
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
-- Candidate: per-CV template (today the template is a global preference), which would also allow colour thumbnails in My CVs.
 - Candidate: per-section page-break toggle (P2 in 011).
 - Candidate: photo crop / zoom (P2 in 011).
 - Candidate: actionable strength suggestions from a pure function over `CVData` (P2 in 011).
