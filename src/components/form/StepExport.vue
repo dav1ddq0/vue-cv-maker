@@ -6,6 +6,7 @@ import { useCvExport } from '@/composables/useCvExport'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
 import PaginatedPreview from '@/components/preview/PaginatedPreview.vue'
+import ReviewCard from './ReviewCard.vue'
 
 const cv = useCvStore()
 const { t } = useI18n()
@@ -17,6 +18,8 @@ const { busy, run } = useCvExport()
 <template>
   <div class="step">
     <NoticeBar tone="warning">{{ t('notices.localOnly') }}</NoticeBar>
+
+    <ReviewCard />
 
     <ul class="options">
       <li class="option">

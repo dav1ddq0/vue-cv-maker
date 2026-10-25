@@ -50,3 +50,17 @@ describe('CvWizard scroll (spec 019)', () => {
     expect(el.scrollTop).toBe(0)
   })
 })
+
+describe('StepRail export line (spec 023)', () => {
+  it('says how many suggestions the review has, and nothing once there are none', async () => {
+    const cv = useCvStore()
+    const wrapper = mount(StepRail)
+    const exportRow = () => wrapper.findAll('button.row')[8]!
+    expect(exportRow().text()).toContain('9 sugerencias')
+
+    const { createSampleCV } = await import('@/core/sample')
+    cv.data = createSampleCV()
+    await wrapper.vm.$nextTick()
+    expect(exportRow().text()).not.toContain('sugerencia')
+  })
+})
