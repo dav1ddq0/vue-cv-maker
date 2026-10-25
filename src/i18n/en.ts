@@ -319,6 +319,15 @@ const en: typeof es = {
       skillLevels: 'skill levels',
     },
   },
+  exportDialog: {
+    recommended: 'Recommended',
+    printNote: 'The print dialog opens: choose “Save as PDF”.',
+    checkTitle: 'Before exporting',
+    allGood: 'Every section has content.',
+    missing: '{step}: missing content',
+    downloadHtml: 'Download HTML',
+    downloadJson: 'Download JSON',
+  },
   exportView: {
     title: 'Export',
     pdf: 'PDF (print)',

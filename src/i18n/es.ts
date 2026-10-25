@@ -319,6 +319,15 @@ export default {
       skillLevels: 'niveles de habilidad',
     },
   },
+  exportDialog: {
+    recommended: 'Recomendado',
+    printNote: 'Se abre el diálogo de impresión: elige «Guardar como PDF».',
+    checkTitle: 'Antes de exportar',
+    allGood: 'Todas las secciones tienen contenido.',
+    missing: '{step}: falta contenido',
+    downloadHtml: 'Descargar HTML',
+    downloadJson: 'Descargar JSON',
+  },
   exportView: {
     title: 'Exportar',
     pdf: 'PDF (imprimir)',

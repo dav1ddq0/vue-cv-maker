@@ -7,6 +7,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import AppMenuSheet from './AppMenuSheet.vue'
 import DesktopHeader from './DesktopHeader.vue'
+import ExportDialog from './form/ExportDialog.vue'
 
 const cv = useCvStore()
 const ui = useUiStore()
@@ -14,6 +15,7 @@ const { t, locale, availableLocales } = useI18n()
 const isPhone = useIsPhone()
 const isDesktop = useIsDesktop()
 const menuOpen = ref(false)
+const exportOpen = ref(false)
 
 const saveLabel = computed(() => {
   switch (cv.saveState) {
@@ -64,7 +66,10 @@ const phoneState = computed(() => {
     <AppMenuSheet :open="menuOpen" @close="menuOpen = false" />
   </header>
 
-  <DesktopHeader v-else-if="isDesktop" @export="ui.goTo('export')" />
+  <template v-else-if="isDesktop">
+    <DesktopHeader @export="exportOpen = true" />
+    <ExportDialog :open="exportOpen" @close="exportOpen = false" />
+  </template>
 
   <header v-else class="header">
     <div class="brand">
