@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import type { TemplateCapability } from '@/types/template'
 import { getTemplate } from '@/templates/registry'
-import { useUiStore } from '@/stores/ui'
+import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 
 /**
@@ -10,10 +10,10 @@ import { useI18n } from '@/i18n'
  * with a quiet explanation, and switching back restores everything.
  */
 export function useCapabilities() {
-  const ui = useUiStore()
+  const cv = useCvStore()
   const { t } = useI18n()
 
-  const template = computed(() => getTemplate(ui.templateId))
+  const template = computed(() => getTemplate(cv.templateId))
 
   const supports = (capability: TemplateCapability) =>
     computed(() => template.value.supports.includes(capability))

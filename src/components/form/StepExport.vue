@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
-import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import { useCvExport } from '@/composables/useCvExport'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -9,7 +8,6 @@ import NoticeBar from '@/components/ui/NoticeBar.vue'
 import PaginatedPreview from '@/components/preview/PaginatedPreview.vue'
 
 const cv = useCvStore()
-const ui = useUiStore()
 const { t } = useI18n()
 
 const showPaginated = ref(false)
@@ -63,7 +61,7 @@ const { busy, run } = useCvExport()
         </BaseButton>
       </div>
       <!-- Mounted on demand: paged.js is a lazy chunk and a full re-render. -->
-      <PaginatedPreview v-if="showPaginated" :data="cv.data" :template-id="ui.templateId" />
+      <PaginatedPreview v-if="showPaginated" :data="cv.data" :template-id="cv.templateId" />
     </section>
   </div>
 </template>

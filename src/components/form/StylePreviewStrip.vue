@@ -18,7 +18,7 @@ const { t } = useI18n()
   <div class="strip">
     <div class="page" aria-hidden="true" inert>
       <div class="scaled">
-        <CvRenderer :data="cv.data" :template-id="ui.templateId" />
+        <CvRenderer :data="cv.data" :template-id="cv.templateId" />
       </div>
     </div>
     <button type="button" class="expand" :aria-label="t('preview.show')" @click="ui.previewOpen = true">

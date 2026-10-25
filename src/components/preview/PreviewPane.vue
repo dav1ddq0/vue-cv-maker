@@ -71,7 +71,7 @@ function fitToPanel() {
   fit()
 }
 
-const templateName = computed(() => getTemplate(ui.templateId).name)
+const templateName = computed(() => getTemplate(cv.templateId).name)
 
 const scaleStyle = computed(() => ({
   transform: `scale(${effectiveZoom.value})`,
@@ -105,7 +105,7 @@ const scaleStyle = computed(() => ({
     <div ref="scroller" class="scroll">
       <div class="page-wrap" :style="scaleStyle" :data-highlight="highlight">
         <div class="cv-page">
-          <CvRenderer :data="cv.data" :template-id="ui.templateId" />
+          <CvRenderer :data="cv.data" :template-id="cv.templateId" />
         </div>
       </div>
     </div>

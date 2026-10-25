@@ -6,6 +6,7 @@ import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import { importJsonFile } from '@/services/export'
 import { UnsupportedSchemaError } from '@/core/migrations'
+import { readPrefs } from '@/services/prefs'
 import { analyze, extractDocument, type ImportDraft } from '@/services/pdfImport'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
@@ -49,7 +50,9 @@ async function onPdf(file: File) {
   }
 }
 
+/** A PDF says nothing about templates: over the open CV keep its own, a new CV gets the last pick. */
 async function apply(data: CVData, mode: 'new' | 'current') {
+  data.meta.templateId = mode === 'current' ? cv.templateId : readPrefs().lastTemplateId
   await cv.importData(data, mode)
   draft.value = null
   ui.goTo('personal')

@@ -121,7 +121,10 @@ export const useCvStore = defineStore('cv', () => {
 
   async function createNew(options: { persistNow?: boolean; seed?: Partial<CVData> } = {}) {
     const { persistNow = true, seed } = options
-    replaceData(createEmptyCV(seed))
+    const next = createEmptyCV(seed)
+    // A new CV starts in the template picked last, like the global template did before spec 021.
+    next.meta.templateId = readPrefs().lastTemplateId
+    replaceData(next)
     writePrefs({ lastCvId: data.value.meta.id })
     if (persistNow) {
       persist()
@@ -201,6 +204,17 @@ export const useCvStore = defineStore('cv', () => {
     data.value = merged
   }
 
+  /* ---- template -------------------------------------------------------- */
+
+  /** The open CV's template (spec 021); `getTemplate` resolves an unknown id to the default. */
+  const templateId = computed(() => data.value.meta.templateId)
+
+  /** An edit like any other (autosaved, undoable); the pick is also remembered for new CVs. */
+  function setTemplate(id: string) {
+    data.value.meta.templateId = id
+    writePrefs({ lastTemplateId: id })
+  }
+
   /* ---- undo / redo ----------------------------------------------------- */
 
   function undo() {
@@ -261,6 +275,8 @@ export const useCvStore = defineStore('cv', () => {
     canRedo,
     filledSections,
     totalSections,
+    templateId,
+    setTemplate,
     init,
     open,
     createNew,

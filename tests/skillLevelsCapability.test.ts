@@ -6,7 +6,6 @@ import { templates } from '@/templates/registry'
 import { createSampleCV } from '@/core/sample'
 import StepSkills from '@/components/form/StepSkills.vue'
 import { useCvStore } from '@/stores/cv'
-import { useUiStore } from '@/stores/ui'
 
 /**
  * A template must declare `skillLevels` exactly when it draws a rated skill's level, so the
@@ -34,7 +33,7 @@ describe('skills step', () => {
   }
 
   it('disables the level selectors, with the reason, on a template that does not show them', () => {
-    useUiStore().setTemplate('classic')
+    useCvStore().setTemplate('classic')
     const wrapper = mountStep()
 
     const selects = wrapper.findAll('select.level')
@@ -44,13 +43,13 @@ describe('skills step', () => {
   })
 
   it('keeps the levels already set, and enables the selectors again on a supporting template', async () => {
-    const ui = useUiStore()
-    ui.setTemplate('classic')
+    const cv = useCvStore()
+    cv.setTemplate('classic')
     const wrapper = mountStep()
     const rated = useCvStore().data.skills[0]!.items.filter((i) => i.level !== undefined).length
     expect(rated).toBeGreaterThan(0)
 
-    ui.setTemplate('meridian')
+    cv.setTemplate('meridian')
     await wrapper.vm.$nextTick()
     expect(wrapper.findAll('select.level').every((s) => s.attributes('disabled') === undefined)).toBe(true)
     expect(useCvStore().data.skills[0]!.items.filter((i) => i.level !== undefined).length).toBe(rated)

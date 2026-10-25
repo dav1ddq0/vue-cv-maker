@@ -24,7 +24,6 @@ export const useUiStore = defineStore('ui', () => {
 
   const view = ref<View>('editor')
   const step = ref<StepId>('personal')
-  const templateId = ref(prefs.lastTemplateId)
   const theme = ref<ThemeChoice>(prefs.theme)
   /** Live OS preference; only matters while the choice is `system`. */
   const systemDark = ref(systemPrefersDark())
@@ -59,11 +58,6 @@ export const useUiStore = defineStore('ui', () => {
     if (at > 0) step.value = STEPS[at - 1]
   }
 
-  function setTemplate(id: string) {
-    templateId.value = id
-    writePrefs({ lastTemplateId: id })
-  }
-
   function applyTheme() {
     document.documentElement.dataset.theme = resolvedTheme.value
   }
@@ -92,7 +86,6 @@ export const useUiStore = defineStore('ui', () => {
     step,
     stepIndex,
     steps: STEPS,
-    templateId,
     theme,
     resolvedTheme,
     previewOpen,
@@ -101,7 +94,6 @@ export const useUiStore = defineStore('ui', () => {
     goTo,
     nextStep,
     prevStep,
-    setTemplate,
     setTheme,
     dismissNotice,
     isDismissed,

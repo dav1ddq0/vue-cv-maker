@@ -19,6 +19,13 @@ vi.mock('@/services/storage', () => ({
   StorageQuotaError: class StorageQuotaError extends Error {},
 }))
 
+/** This file runs without a DOM, so preferences live in memory too. */
+let prefs: Record<string, unknown> = {}
+vi.mock('@/services/prefs', () => ({
+  readPrefs: () => ({ lastTemplateId: 'classic', lastCvId: null, ...prefs }),
+  writePrefs: (patch: Record<string, unknown>) => void (prefs = { ...prefs, ...patch }),
+}))
+
 const { useCvStore } = await import('@/stores/cv')
 
 /** Lets pending watchers and awaited microtasks settle. */
@@ -142,5 +149,55 @@ describe('cv store history', () => {
 
     expect(saved.size).toBe(writes)
     expect(saved.get(cv.data.meta.id)?.meta.updatedAt).toBe(stamp)
+  })
+})
+
+describe('per-CV template (spec 021)', () => {
+  beforeEach(() => {
+    saved.clear()
+    prefs = {}
+    setActivePinia(createPinia())
+    vi.useFakeTimers()
+  })
+
+  it('stores the pick in the open CV, autosaves it and undoes it like any edit', async () => {
+    const cv = useCvStore()
+    expect(cv.templateId).toBe('classic')
+
+    cv.setTemplate('meridian')
+    await idle(1500)
+    expect(saved.get(cv.data.meta.id)?.meta.templateId).toBe('meridian')
+
+    cv.undo()
+    await settle()
+    expect(cv.templateId).toBe('classic')
+  })
+
+  it('switches to the template of the CV being opened', async () => {
+    const cv = useCvStore()
+    cv.setTemplate('meridian')
+    await idle(1500)
+    const first = cv.data.meta.id
+
+    await cv.createNew()
+    cv.setTemplate('aurora')
+    await idle(1500)
+    expect(cv.templateId).toBe('aurora')
+
+    await cv.open(first)
+    expect(cv.templateId).toBe('meridian')
+  })
+
+  it('starts a new CV in the last template picked, and a duplicate in its source template', async () => {
+    const cv = useCvStore()
+    cv.setTemplate('meridian')
+    await idle(1500)
+    const source = cv.data.meta.id
+
+    await cv.createNew()
+    expect(cv.templateId).toBe('meridian')
+
+    const copy = await cv.duplicate(source)
+    expect(saved.get(copy)?.meta.templateId).toBe('meridian')
   })
 })

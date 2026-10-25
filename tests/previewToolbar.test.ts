@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import PreviewPane from '@/components/preview/PreviewPane.vue'
 import { useUiStore } from '@/stores/ui'
+import { useCvStore } from '@/stores/cv'
 import { getTemplate } from '@/templates/registry'
 
 beforeEach(() => setActivePinia(createPinia()))
@@ -15,7 +16,7 @@ describe('preview toolbar (spec 018)', () => {
     const ui = useUiStore()
     const wrapper = mountPane()
     const chip = wrapper.find('button.chip')
-    expect(chip.text()).toContain(getTemplate(ui.templateId).name)
+    expect(chip.text()).toContain(getTemplate(useCvStore().templateId).name)
     await chip.trigger('click')
     expect(ui.step).toBe('style')
   })

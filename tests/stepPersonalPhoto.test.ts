@@ -11,12 +11,11 @@ vi.mock('@/services/storage', async (original) => ({
 import { savePhoto } from '@/services/storage'
 import StepPersonal from '@/components/form/StepPersonal.vue'
 import { useCvStore } from '@/stores/cv'
-import { useUiStore } from '@/stores/ui'
 
 beforeEach(() => {
   setActivePinia(createPinia())
   // Classic shows no photo, which disables the field; Meridian does.
-  useUiStore().templateId = 'meridian'
+  useCvStore().setTemplate('meridian')
 })
 
 function dropOn(wrapper: ReturnType<typeof mount>, file: File) {

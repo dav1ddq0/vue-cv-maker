@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCvStore } from '@/stores/cv'
-import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { applyTemplateDefaults, templates } from '@/templates/registry'
@@ -12,7 +11,6 @@ import { useIsPhone } from '@/composables/useIsPhone'
 import { CV_LANGUAGES, FONT_OPTIONS, PAGE_MARGINS, PALETTE, isSameColor } from '@/core/stylePresets'
 
 const cv = useCvStore()
-const ui = useUiStore()
 const { t } = useI18n()
 const isPhone = useIsPhone()
 const { supports, reasonFor } = useCapabilities()
@@ -29,7 +27,7 @@ const style = computed(() => cv.data.style)
  * sets a custom accent, switching templates never overwrites it again.
  */
 function pickTemplate(id: string) {
-  ui.setTemplate(id)
+  cv.setTemplate(id)
   cv.data.style = applyTemplateDefaults(id, cv.data.style)
 }
 
@@ -50,7 +48,7 @@ function previewAccent(id: string): string {
 
     <TemplateGallery
       :templates="templates"
-      :active-id="ui.templateId"
+      :active-id="cv.templateId"
       :accent-for="previewAccent"
       @pick="pickTemplate"
     />
