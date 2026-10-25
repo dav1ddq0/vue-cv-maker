@@ -156,6 +156,8 @@ export interface ResolvedSection {
   kind: 'summary' | 'experience' | 'education' | 'skills' | 'languages' | 'custom'
   title: string
   custom?: CVData['customSections'][number]
+  /** Starts on a new page when paginated; templates honour it on main-column sections only. */
+  breakBefore?: true
 }
 
 const BUILTIN_TITLES: Record<string, Record<string, string>> = {
@@ -196,6 +198,7 @@ export function resolveSections(data: CVData): ResolvedSection[] {
       }
     })
     .filter((s): s is ResolvedSection => s !== null)
+    .map((s) => (data.pageBreaks.includes(s.id) ? { ...s, breakBefore: true } : s))
 }
 
 /** Strips the protocol so links read as "github.com/nadia" rather than the full URL. */

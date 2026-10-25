@@ -53,6 +53,7 @@ export function createEmptyCV(partial: Partial<CVData> = {}): CVData {
     languages: [],
     customSections: [],
     sectionOrder: [...SECTION_IDS],
+    pageBreaks: [],
     style: { ...DEFAULT_STYLE },
     ...partial,
   }

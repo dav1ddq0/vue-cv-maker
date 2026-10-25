@@ -12,6 +12,7 @@ import { isAccentColor, isFontOption, isPageMargin } from './stylePresets'
  * v2 → v3: optional personal extras (birth date and place, nationality, licence, marital status).
  * v3 → v4: `meta.templateId`. The value itself is filled by `normalize` from `MigrateOptions`, because
  *          only the caller knows which template the CV used to be shown in (spec 021).
+ * v4 → v5: `pageBreaks`, the sections that start on a new page (spec 022).
  */
 const steps: Record<number, (data: any) => any> = {
   1: (data) => ({
@@ -39,6 +40,7 @@ const steps: Record<number, (data: any) => any> = {
     },
   }),
   3: (data) => ({ ...data, schemaVersion: 4 }),
+  4: (data) => ({ ...data, schemaVersion: 5, pageBreaks: [] }),
 }
 
 export interface MigrateOptions {
@@ -126,6 +128,7 @@ export function normalize(input: any, options: MigrateOptions = {}): CVData {
       entries: withIds(s.entries, 'cen'),
     })),
     sectionOrder: [],
+    pageBreaks: [],
     style: toStyle(input.style),
   }
   if (out.personal.photo === undefined) delete out.personal.photo
@@ -134,6 +137,7 @@ export function normalize(input: any, options: MigrateOptions = {}): CVData {
   out.style.fontScale = clamp(Number(out.style.fontScale) || 1, 0.85, 1.15)
   out.style.spacingScale = clamp(Number(out.style.spacingScale) || 1, 0.85, 1.3)
   out.sectionOrder = reconcileOrder(input.sectionOrder, out)
+  out.pageBreaks = toPageBreaks(input.pageBreaks, out.sectionOrder)
   return out
 }
 
@@ -162,6 +166,12 @@ function toStyle(value: unknown): StyleTokens {
     fontFamily: isFontOption(style.fontFamily) ? style.fontFamily : DEFAULT_STYLE.fontFamily,
     pageMargin: isPageMargin(style.pageMargin) ? style.pageMargin : DEFAULT_STYLE.pageMargin,
   }
+}
+
+/** Only ids of sections the CV has, once each; a break before a removed section means nothing. */
+function toPageBreaks(value: unknown, order: string[]): string[] {
+  if (!Array.isArray(value)) return []
+  return order.filter((id) => value.includes(id))
 }
 
 /** A stored photo is an IndexedDB reference or an inline raster image; never a remote URL or SVG. */

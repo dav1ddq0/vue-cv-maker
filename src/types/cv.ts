@@ -6,7 +6,7 @@
  * `SCHEMA_VERSION` plus a migration step in `src/core/migrations.ts`.
  */
 
-export const SCHEMA_VERSION = 4
+export const SCHEMA_VERSION = 5
 
 export interface CVData {
   schemaVersion: number
@@ -20,6 +20,8 @@ export interface CVData {
   customSections: CustomSection[]
   /** Render order of the sections; ids come from `SECTION_IDS` plus custom section ids. */
   sectionOrder: string[]
+  /** Ids from `sectionOrder` whose section starts on a new page when paginated (spec 022). */
+  pageBreaks: string[]
   style: StyleTokens
 }
 

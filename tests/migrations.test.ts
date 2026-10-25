@@ -195,7 +195,7 @@ describe('schema v2 → v3 (optional personal data)', () => {
 describe('schema v3 → v4 (per-CV template, spec 021)', () => {
   it('gives a v3 file the fallback template, i.e. the one it used to be shown in', () => {
     const cv = migrate({ schemaVersion: 3, meta: { title: 'A' } }, { fallbackTemplateId: 'meridian' })
-    expect(cv.schemaVersion).toBe(4)
+    expect(cv.schemaVersion).toBe(SCHEMA_VERSION)
     expect(cv.meta.templateId).toBe('meridian')
     expect(cv.meta.title).toBe('A')
   })
@@ -216,5 +216,26 @@ describe('schema v3 → v4 (per-CV template, spec 021)', () => {
 
   it('creates new CVs with the default template', () => {
     expect(createEmptyCV().meta.templateId).toBe('classic')
+  })
+})
+
+describe('schema v4 → v5 (page breaks, spec 022)', () => {
+  it('gives a v4 file no breaks', () => {
+    const cv = migrate({ schemaVersion: 4 })
+    expect(cv.schemaVersion).toBe(5)
+    expect(cv.pageBreaks).toEqual([])
+  })
+
+  it('keeps only ids of existing sections, once each, in section order', () => {
+    const cv = migrate({
+      schemaVersion: 5,
+      customSections: [{ id: 'cus_1', title: 'Cursos', entries: [] }],
+      pageBreaks: ['cus_1', 'education', 'gone', 7, 'education'],
+    })
+    expect(cv.pageBreaks).toEqual(['education', 'cus_1'])
+  })
+
+  it('treats a non-array as no breaks', () => {
+    expect(migrate({ schemaVersion: 5, pageBreaks: 'education' }).pageBreaks).toEqual([])
   })
 })

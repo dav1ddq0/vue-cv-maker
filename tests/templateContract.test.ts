@@ -93,4 +93,16 @@ describe('shared template helpers', () => {
 
     expect(resolveSections(cv).map((s) => s.id)).toEqual(['languages', 'summary'])
   })
+
+  it('flags the sections that start on a new page (spec 022)', () => {
+    const cv = createEmptyCV()
+    cv.summary = 'Hola'
+    cv.languages = [{ id: 'l1', name: 'Español', level: 'Nativo' }]
+    cv.pageBreaks = ['languages']
+
+    expect(resolveSections(cv).map((s) => [s.id, s.breakBefore ?? false])).toEqual([
+      ['summary', false],
+      ['languages', true],
+    ])
+  })
 })
