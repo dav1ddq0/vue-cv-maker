@@ -115,9 +115,10 @@ const scaleStyle = computed(() => ({
 
 .bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: 0.5em 1em;
   padding: 0.5em 0.9em;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
@@ -135,7 +136,7 @@ const scaleStyle = computed(() => ({
 .zoom {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.25em;
   font-size: 0.8em;
   color: var(--text-muted);
 }
@@ -153,6 +154,7 @@ const scaleStyle = computed(() => ({
   font: inherit;
   font-size: 0.85em;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -163,6 +165,13 @@ const scaleStyle = computed(() => ({
 .chip-action {
   font-weight: 500;
   color: var(--text-muted);
+}
+
+/* Narrow desktop column: the template name alone still says what the button does (its label does). */
+@media (max-width: 1279px) {
+  .chip-action {
+    display: none;
+  }
 }
 
 .swatch {

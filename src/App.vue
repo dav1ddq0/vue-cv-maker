@@ -130,9 +130,16 @@ function onKeydown(event: KeyboardEvent) {
   min-height: 0;
 }
 
-/* Desktop (spec 018): step rail · form · preview. */
+/* Desktop (spec 018): step rail · form · preview. Below 1280px the form gets the larger share,
+   or its footer and the template grid run out of room. */
 .editor--rail {
-  grid-template-columns: 248px minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr) minmax(0, 0.7fr);
+}
+
+@media (min-width: 1280px) {
+  .editor--rail {
+    grid-template-columns: 248px minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 .scroll-view {

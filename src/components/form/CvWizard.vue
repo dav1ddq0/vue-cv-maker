@@ -129,8 +129,14 @@ const current = computed(() => STEP_COMPONENTS[ui.step])
 
 @media (min-width: 1001px) {
   .wizard {
-    padding: 1.75em 2.5em 0;
+    padding: 1.5em 1.5em 0;
     gap: 1.25em;
+  }
+}
+
+@media (min-width: 1280px) {
+  .wizard {
+    padding: 1.75em 2.5em 0;
   }
 }
 
