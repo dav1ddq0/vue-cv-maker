@@ -17,7 +17,7 @@ export const STEPS = [
 ] as const
 
 export type StepId = (typeof STEPS)[number]
-export type View = 'editor' | 'documents' | 'import'
+export type View = 'editor' | 'documents' | 'import' | 'welcome'
 
 export const useUiStore = defineStore('ui', () => {
   const prefs = readPrefs()

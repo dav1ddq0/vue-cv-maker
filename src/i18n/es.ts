@@ -363,6 +363,22 @@ export default {
   upload: {
     rejected: 'Ese tipo de archivo no es válido aquí.',
   },
+  welcome: {
+    title: 'Empieza tu CV',
+    lead: 'Sin cuenta y sin servidor: todo lo que escribas se queda en este navegador. Puedes cambiar de plantilla cuando quieras sin perder nada.',
+    blankTitle: 'En blanco',
+    blankHint: 'El asistente te guía en nueve pasos.',
+    blankCta: 'Empezar',
+    sampleTitle: 'Desde un ejemplo',
+    sampleHint: 'Un CV ya relleno para ver cómo queda y sustituir lo tuyo.',
+    sampleCta: 'Cargar ejemplo',
+    importTitle: 'Importar',
+    importHint: 'Desde tu CV en PDF o una copia JSON de CV Maker.',
+    importCta: 'Elegir archivo',
+    templates: '{n} plantillas para elegir',
+    preview: 'Vista previa en vivo mientras escribes',
+    pdf: 'PDF con texto seleccionable',
+  },
   importView: {
     title: 'Importar',
     json: 'Desde JSON',

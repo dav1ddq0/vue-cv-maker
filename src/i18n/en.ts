@@ -363,6 +363,22 @@ const en: typeof es = {
   upload: {
     rejected: 'That file type is not supported here.',
   },
+  welcome: {
+    title: 'Start your CV',
+    lead: 'No account and no server: everything you type stays in this browser. You can switch templates at any time without losing anything.',
+    blankTitle: 'Blank',
+    blankHint: 'The wizard guides you through nine steps.',
+    blankCta: 'Start',
+    sampleTitle: 'From a sample',
+    sampleHint: 'A filled-in CV to see how it looks and replace with yours.',
+    sampleCta: 'Load sample',
+    importTitle: 'Import',
+    importHint: 'From your CV as a PDF, or a CV Maker JSON backup.',
+    importCta: 'Choose a file',
+    templates: '{n} templates to choose from',
+    preview: 'Live preview as you type',
+    pdf: 'PDF with selectable text',
+  },
   importView: {
     title: 'Import',
     json: 'From JSON',

@@ -8,6 +8,7 @@ import CvWizard from '@/components/form/CvWizard.vue'
 import MobileDock from '@/components/form/MobileDock.vue'
 import PreviewPane from '@/components/preview/PreviewPane.vue'
 import DocumentList from '@/components/documents/DocumentList.vue'
+import WelcomeView from '@/components/documents/WelcomeView.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
 import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import StepRail from '@/components/form/StepRail.vue'
@@ -26,6 +27,8 @@ onMounted(async () => {
   ui.setTheme(ui.theme)
   await ui.probeEnvironment()
   await cv.init()
+  // First visit: nothing saved yet, so offer the ways in rather than an empty form (spec 019).
+  if (!cv.documents.length) ui.view = 'welcome'
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('beforeunload', flushPending)
 })
@@ -85,6 +88,10 @@ function onKeydown(event: KeyboardEvent) {
 
     <main v-else-if="ui.view === 'documents'" class="scroll-view">
       <DocumentList />
+    </main>
+
+    <main v-else-if="ui.view === 'welcome'" class="scroll-view">
+      <WelcomeView />
     </main>
 
     <main v-else class="scroll-view">
