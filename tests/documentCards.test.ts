@@ -44,6 +44,20 @@ describe('DocumentCard', () => {
   })
 })
 
+describe('template tag (spec 021)', () => {
+  it('names the template and paints the accent swatch', () => {
+    const wrapper = mount(DocumentCard, {
+      props: { doc: { ...doc, templateId: 'meridian', accentColor: '#0f766e' }, active: false },
+    })
+    expect(wrapper.find('.tag').text()).toBe('Plantilla Meridian')
+    expect(wrapper.find('.swatch').attributes('style')).toContain('background')
+  })
+
+  it('shows nothing for an entry indexed before the CV had its own template', () => {
+    expect(mount(DocumentCard, { props: { doc, active: false } }).find('.tag').exists()).toBe(false)
+  })
+})
+
 describe('DocumentActionsSheet', () => {
   const open = () => mount(DocumentActionsSheet, { props: { open: true, doc }, attachTo: document.body })
   const button = (wrapper: ReturnType<typeof mount>, text: string) =>

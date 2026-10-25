@@ -3,6 +3,7 @@
 import { computed } from 'vue'
 import { formatDate, useI18n } from '@/i18n'
 import type { CVSummary } from '@/types/cv'
+import DocumentTemplateTag from './DocumentTemplateTag.vue'
 
 const props = defineProps<{ doc: CVSummary; active: boolean }>()
 const emit = defineEmits<{ open: []; menu: [] }>()
@@ -31,6 +32,7 @@ const initials = computed(
         <span class="name">{{ label }}</span>
         <span v-if="showTitle" class="meta">{{ doc.title }}</span>
         <span class="meta">{{ t('documents.updated', { date: formatDate(doc.updatedAt) }) }}</span>
+        <DocumentTemplateTag :doc="doc" />
       </span>
     </button>
     <button type="button" class="menu" :aria-label="t('documents.more', { title: doc.title })" aria-haspopup="dialog" @click="emit('menu')">

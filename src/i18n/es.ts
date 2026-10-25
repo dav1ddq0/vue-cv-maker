@@ -415,6 +415,7 @@ export default {
     count: '{n} CVs en este navegador',
     newTile: 'Nuevo CV',
     newHint: 'En blanco: el asistente te guía paso a paso',
+    template: 'Plantilla {name}',
     noMatch: 'Ningún CV coincide con «{q}».',
   },
   notices: {

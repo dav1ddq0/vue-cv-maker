@@ -415,6 +415,7 @@ const en: typeof es = {
     count: '{n} CVs in this browser',
     newTile: 'New CV',
     newHint: 'Blank: the wizard guides you step by step',
+    template: '{name} template',
     noMatch: 'No CV matches “{q}”.',
   },
   notices: {

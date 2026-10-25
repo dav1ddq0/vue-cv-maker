@@ -10,6 +10,7 @@ import NoticeBar from '@/components/ui/NoticeBar.vue'
 import { useIsPhone } from '@/composables/useIsPhone'
 import DocumentCard from './DocumentCard.vue'
 import DocumentActionsSheet from './DocumentActionsSheet.vue'
+import DocumentTemplateTag from './DocumentTemplateTag.vue'
 import type { CVSummary } from '@/types/cv'
 
 const cv = useCvStore()
@@ -110,6 +111,7 @@ async function confirmDelete(id: string) {
             <span class="tile-name">{{ label(doc) }}</span>
             <span v-if="doc.title && doc.title !== label(doc)" class="meta">{{ doc.title }}</span>
             <span class="meta">{{ t('documents.updated', { date: formatDate(doc.updatedAt) }) }}</span>
+            <DocumentTemplateTag :doc="doc" />
           </button>
 
           <div v-if="pendingDelete === doc.id" class="confirm">
