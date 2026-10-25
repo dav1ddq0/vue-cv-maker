@@ -288,6 +288,8 @@ export default {
     longCareer: 'Trayectoria larga',
   },
   style: {
+    filterLabel: 'Filtrar plantillas',
+    filterAll: 'Todas',
     template: 'Plantilla',
     accentColor: 'Color de acento',
     palette: 'Colores sugeridos',

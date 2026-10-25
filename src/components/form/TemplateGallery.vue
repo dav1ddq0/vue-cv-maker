@@ -4,10 +4,11 @@
  * Presentational only: the active template and the accent each card previews come in as
  * props, and a click goes out as `pick`.
  */
+import { computed, ref } from 'vue'
 import { useI18n } from '@/i18n'
 import type { TemplateDefinition } from '@/types/template'
 
-defineProps<{
+const props = defineProps<{
   templates: TemplateDefinition[]
   activeId: string
   /** The accent a card would produce if picked (its own default, or the user's choice). */
@@ -15,13 +16,39 @@ defineProps<{
 }>()
 const emit = defineEmits<{ pick: [id: string] }>()
 const { t } = useI18n()
+
+/** Filters are the templates' own tags (spec 019): a new template is filterable by declaring them. */
+const FILTERS = ['tags.oneColumn', 'tags.twoColumn', 'tags.photo', 'tags.ats'] as const
+const filter = ref<(typeof FILTERS)[number] | null>(null)
+const available = computed(() => FILTERS.filter((tag) => props.templates.some((tpl) => tpl.tags.includes(tag))))
+/** The active template stays listed whatever the filter, so the current choice never disappears. */
+const shown = computed(() =>
+  filter.value === null
+    ? props.templates
+    : props.templates.filter((tpl) => tpl.tags.includes(filter.value!) || tpl.id === props.activeId),
+)
 </script>
 
 <template>
   <section class="block">
     <h3 class="subtitle">{{ t('style.template') }}</h3>
+    <div class="filters" role="group" :aria-label="t('style.filterLabel')">
+      <button type="button" class="filter" :aria-pressed="filter === null" @click="filter = null">
+        {{ t('style.filterAll') }} · {{ templates.length }}
+      </button>
+      <button
+        v-for="tag in available"
+        :key="tag"
+        type="button"
+        class="filter"
+        :aria-pressed="filter === tag"
+        @click="filter = filter === tag ? null : tag"
+      >
+        {{ t(tag) }}
+      </button>
+    </div>
     <ul class="templates">
-      <li v-for="template in templates" :key="template.id">
+      <li v-for="template in shown" :key="template.id">
         <button
           type="button"
           class="card"
@@ -59,6 +86,37 @@ const { t } = useI18n()
   margin: 0;
   font-size: 0.95em;
   font-weight: 600;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+
+.filter {
+  min-height: 32px;
+  padding: 0 0.8em;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82em;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter[aria-pressed='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+@media (pointer: coarse) {
+  .filter {
+    min-height: 44px;
+  }
 }
 
 .templates {

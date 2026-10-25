@@ -288,6 +288,8 @@ const en: typeof es = {
     longCareer: 'Long career',
   },
   style: {
+    filterLabel: 'Filter templates',
+    filterAll: 'All',
     template: 'Template',
     accentColor: 'Accent color',
     palette: 'Suggested colors',
