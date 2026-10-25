@@ -66,9 +66,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Only ever visible inside the print layer; see print.css. */
+/*
+ * Only ever visible inside the print layer; see print.css. Laid out but hidden off-screen rather
+ * than `display: none`: paged.js measures the content it paginates, and inside an unrendered
+ * element every measurement fails, so the PDF silently fell back to unpaginated output (spec 022).
+ */
 #print-root {
-  display: none;
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 button {

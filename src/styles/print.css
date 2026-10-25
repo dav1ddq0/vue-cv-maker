@@ -72,6 +72,8 @@
 
   #print-root {
     display: block !important;
+    position: static !important;
+    visibility: visible !important;
   }
 
   .cv-page {

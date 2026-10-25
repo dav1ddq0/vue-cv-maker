@@ -80,6 +80,8 @@ export async function paginateInto(
     await previewer.preview(html, [{ 'cv-export.css': css }], container)
     return container.querySelector('.pagedjs_page') !== null
   } catch (error) {
+    // A failed run leaves its half-built pages behind; printed before the fallback they were blank sheets.
+    container.innerHTML = ''
     console.warn('[export] paged.js failed; falling back to unpaginated output', error)
     return false
   }
