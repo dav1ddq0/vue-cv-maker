@@ -33,13 +33,13 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **020** · Housekeeping (favicon, base path, README deployment, CI Node 24, photo type and size checks)
 - **021** · Per-CV template (`meta.templateId`, schema v4; My CVs shows each CV's template and accent)
 - **022** · PDF page breaks (blank first page fixed, print rules applied when paginating, per-section "New page", schema v5)
+- **023** · CV suggestions (score and concrete advice in the Export step, from a pure function over `CVData`)
 
 ## Next 🔜
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
 - Candidate: photo crop / zoom (P2 in 011).
-- Candidate: actionable strength suggestions from a pure function over `CVData` (P2 in 011).
 - Candidate: web fonts via a bundled font package (needs a dependency decision).
 
 ## Backlog / ideas 💡

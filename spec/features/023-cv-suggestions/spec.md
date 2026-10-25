@@ -1,6 +1,6 @@
 # 023 · Actionable CV suggestions
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -41,15 +41,15 @@ Each rule is a check over the data; it produces at most a few suggestions and ne
 
 ## Acceptance criteria
 
-- [ ] `core/suggestions.ts` exports `suggest(data)` returning `{ id, level, step, params }[]`, important
+- [x] `core/suggestions.ts` exports `suggest(data)` returning `{ id, level, step, params }[]`, important
       first, then in step order; and `cvScore(data)` (0–100) from the rules that passed, important
       rules weighing twice a tip.
-- [ ] The Export step shows a "Review" card above the export options: the score, the suggestions with a
+- [x] The Export step shows a "Review" card above the export options: the score, the suggestions with a
       "Go to <step>" button each, or a short "nothing to add" line when the list is empty.
-- [ ] The Export step's detail in the desktop rail and the phone step sheet says how many suggestions
+- [x] The Export step's detail in the desktop rail and the phone step sheet says how many suggestions
       there are ("3 suggestions"), instead of nothing.
-- [ ] Texts are UI-language strings; entry names come from the CV ("Senior developer · Cartograf").
-- [ ] No data model change.
+- [x] Texts are UI-language strings; entry names come from the CV ("Senior developer · Cartograf").
+- [x] No data model change.
 
 ## Out of scope
 
@@ -58,6 +58,9 @@ Each rule is a check over the data; it produces at most a few suggestions and ne
 
 ## Verification
 
-- Unit tests: each rule firing and not firing, caps per entry, ordering, score bounds and weighting.
-- Component test for the card and the navigation button.
-- Screenshot of the Export step with the sample CV and with an empty CV, desktop and phone.
+- 427 unit tests (new: every rule firing and not firing, the per-entry cap, partial-date comparison,
+  ordering, score bounds and weighting; the card's lines, navigation and empty state; the rail's
+  export line with a count and without).
+- Dev server, sample CV with a missing headline, a 26-character summary, a job without start date and
+  no languages: 76 of 100 and four lines, the important one first; 1440×900 and 390×844, no horizontal
+  overflow, no console errors.
