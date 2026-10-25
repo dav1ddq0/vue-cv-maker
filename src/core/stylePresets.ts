@@ -40,6 +40,26 @@ export const FONT_OPTIONS: FontOption[] = [
   { id: 'verdana', label: 'Verdana', value: "Verdana, 'DejaVu Sans', Geneva, sans-serif" },
 ]
 
+/** Page margins offered by the style step; anything else in a file falls back to the default. */
+export const PAGE_MARGINS = ['10mm', '13mm', '16mm', '20mm'] as const
+
+/**
+ * An accent colour as the colour input produces it. The value ends up in a CSS variable that
+ * templates paint as a background, so anything looser (`url(…)`) would let a file load a remote
+ * resource when the CV is opened (spec 017).
+ */
+export function isAccentColor(value: unknown): value is string {
+  return typeof value === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)
+}
+
+export function isFontOption(value: unknown): value is string {
+  return FONT_OPTIONS.some((font) => font.value === value)
+}
+
+export function isPageMargin(value: unknown): value is string {
+  return (PAGE_MARGINS as readonly unknown[]).includes(value)
+}
+
 export interface CvLanguageOption {
   code: string
   /** Written in its own language so it stays readable whatever the UI language is. */

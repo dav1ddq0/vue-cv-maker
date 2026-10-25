@@ -9,7 +9,7 @@ import BaseField from '@/components/ui/BaseField.vue'
 import TemplateGallery from './TemplateGallery.vue'
 import StylePreviewStrip from './StylePreviewStrip.vue'
 import { useIsPhone } from '@/composables/useIsPhone'
-import { CV_LANGUAGES, FONT_OPTIONS, PALETTE, isSameColor } from '@/core/stylePresets'
+import { CV_LANGUAGES, FONT_OPTIONS, PAGE_MARGINS, PALETTE, isSameColor } from '@/core/stylePresets'
 
 const cv = useCvStore()
 const ui = useUiStore()
@@ -123,7 +123,7 @@ function previewAccent(id: string): string {
 
         <BaseField v-slot="{ id }" :label="t('style.pageMargin')">
           <select :id="id" v-model="style.pageMargin">
-            <option v-for="margin in ['10mm', '13mm', '16mm', '20mm']" :key="margin" :value="margin">
+            <option v-for="margin in PAGE_MARGINS" :key="margin" :value="margin">
               {{ margin }}
             </option>
           </select>

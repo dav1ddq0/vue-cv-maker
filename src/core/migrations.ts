@@ -1,7 +1,8 @@
 import { MARITAL_STATUSES, SCHEMA_VERSION, SECTION_IDS } from '@/types/cv'
-import type { CVData, MaritalStatus, SkillItem } from '@/types/cv'
+import type { CVData, MaritalStatus, SkillItem, StyleTokens } from '@/types/cv'
 import { createEmptyCV, DEFAULT_STYLE } from './factory'
 import { uid } from './id'
+import { isAccentColor, isFontOption, isPageMargin } from './stylePresets'
 
 /**
  * Migration steps, keyed by the version they upgrade *from*. A file at version N
@@ -74,12 +75,22 @@ export function normalize(input: any): CVData {
     personal: {
       ...base.personal,
       ...(input.personal ?? {}),
+      fullName: str(input.personal?.fullName),
+      headline: str(input.personal?.headline),
+      email: str(input.personal?.email),
+      phone: str(input.personal?.phone),
+      location: str(input.personal?.location),
+      photo: toPhoto(input.personal?.photo),
       birthDate: str(input.personal?.birthDate),
       birthPlace: str(input.personal?.birthPlace),
       nationality: str(input.personal?.nationality),
       drivingLicense: str(input.personal?.drivingLicense),
       maritalStatus: toMaritalStatus(input.personal?.maritalStatus),
-      links: withIds(input.personal?.links, 'lnk'),
+      links: withIds(input.personal?.links, 'lnk').map((link: any) => ({
+        ...link,
+        label: str(link.label),
+        url: str(link.url),
+      })),
     },
     summary: str(input.summary),
     experience: withIds(input.experience, 'exp').map((e: any) => ({
@@ -103,8 +114,9 @@ export function normalize(input: any): CVData {
       entries: withIds(s.entries, 'cen'),
     })),
     sectionOrder: [],
-    style: { ...DEFAULT_STYLE, ...(input.style ?? {}) },
+    style: toStyle(input.style),
   }
+  if (out.personal.photo === undefined) delete out.personal.photo
 
   out.meta.id ||= uid('cv')
   out.style.fontScale = clamp(Number(out.style.fontScale) || 1, 0.85, 1.15)
@@ -122,6 +134,29 @@ export function reconcileOrder(stored: unknown, data: CVData): string[] {
   const kept = Array.isArray(stored) ? stored.filter((id) => typeof id === 'string' && valid.has(id)) : []
   const seen = new Set(kept)
   return [...kept, ...[...valid].filter((id) => !seen.has(id))]
+}
+
+/**
+ * Style values reach CSS variables and the exported HTML, so only values the style step itself can
+ * produce are kept; anything else — e.g. `url(https://…)`, which made the browser contact a third
+ * party when the CV was opened — falls back to the default (spec 017).
+ */
+function toStyle(value: unknown): StyleTokens {
+  const style: any = value && typeof value === 'object' ? value : {}
+  return {
+    ...DEFAULT_STYLE,
+    ...style,
+    accentColor: isAccentColor(style.accentColor) ? style.accentColor : DEFAULT_STYLE.accentColor,
+    fontFamily: isFontOption(style.fontFamily) ? style.fontFamily : DEFAULT_STYLE.fontFamily,
+    pageMargin: isPageMargin(style.pageMargin) ? style.pageMargin : DEFAULT_STYLE.pageMargin,
+  }
+}
+
+/** A stored photo is an IndexedDB reference or an inline raster image; never a remote URL or SVG. */
+function toPhoto(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  if (value.startsWith('photo:')) return value
+  return /^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(value) ? value : undefined
 }
 
 /** Anything that is not one of the known codes (a typo, a label from elsewhere) becomes empty. */

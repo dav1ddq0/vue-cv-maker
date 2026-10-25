@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { migrate, normalize, reconcileOrder, UnsupportedSchemaError } from '@/core/migrations'
-import { createEmptyCV } from '@/core/factory'
+import { createEmptyCV, DEFAULT_STYLE } from '@/core/factory'
 import { SCHEMA_VERSION } from '@/types/cv'
 
 describe('migrate', () => {
@@ -145,4 +145,49 @@ describe('schema v2 → v3 (optional personal data)', () => {
     expect(cv.personal.maritalStatus).toBe('')
     expect(cv.skills[0]!.items).toEqual([{ name: 'Go' }])
   })
+
+  describe('untrusted files (spec 017)', () => {
+    it('drops style values that could load a remote resource and keeps valid ones', () => {
+      const bad = migrate({
+        schemaVersion: 3,
+        style: {
+          accentColor: 'url(https://attacker.invalid/a.png)',
+          fontFamily: 'x; background: url(https://attacker.invalid/f.png)',
+          pageMargin: 'url(https://attacker.invalid/m.png)',
+        },
+      })
+      expect(bad.style.accentColor).toBe(DEFAULT_STYLE.accentColor)
+      expect(bad.style.fontFamily).toBe(DEFAULT_STYLE.fontFamily)
+      expect(bad.style.pageMargin).toBe(DEFAULT_STYLE.pageMargin)
+
+      const good = migrate({
+        schemaVersion: 3,
+        style: { accentColor: '#AbC', fontFamily: "Georgia, 'Times New Roman', serif", pageMargin: '20mm' },
+      })
+      expect(good.style.accentColor).toBe('#AbC')
+      expect(good.style.fontFamily).toBe("Georgia, 'Times New Roman', serif")
+      expect(good.style.pageMargin).toBe('20mm')
+    })
+
+    it('keeps a photo only as a stored reference or an inline raster image', () => {
+      const photo = (value: unknown) => migrate({ schemaVersion: 3, personal: { photo: value } }).personal.photo
+      expect(photo('photo:cv_1')).toBe('photo:cv_1')
+      expect(photo('data:image/png;base64,AAAA')).toBe('data:image/png;base64,AAAA')
+      expect(photo('https://attacker.invalid/p.png')).toBeUndefined()
+      expect(photo('data:image/svg+xml;base64,AAAA')).toBeUndefined()
+      expect(photo(42)).toBeUndefined()
+      expect('photo' in migrate({ schemaVersion: 3 }).personal).toBe(false)
+    })
+
+    it('turns non-string personal fields and link parts into strings', () => {
+      const cv = migrate({
+        schemaVersion: 3,
+        personal: { fullName: { a: 1 }, email: 5, links: [{ label: null, url: ['x'] }] },
+      })
+      expect(cv.personal.fullName).toBe('')
+      expect(cv.personal.email).toBe('')
+      expect(cv.personal.links[0]).toMatchObject({ label: '', url: '' })
+    })
+  })
 })
+

@@ -51,3 +51,16 @@ describe('per-template style defaults', () => {
     }
   })
 })
+
+describe('template defaults and import validation (spec 017)', () => {
+  it('only uses values that normalize() keeps, so loading never resets a template default', async () => {
+    const { isAccentColor, isFontOption, isPageMargin } = await import('@/core/stylePresets')
+    expect(isAccentColor(DEFAULT_STYLE.accentColor)).toBe(true)
+    expect(isFontOption(DEFAULT_STYLE.fontFamily)).toBe(true)
+    expect(isPageMargin(DEFAULT_STYLE.pageMargin)).toBe(true)
+    for (const template of templates) {
+      expect(isAccentColor(template.defaults?.accentColor), template.id).toBe(true)
+      expect(isFontOption(template.defaults?.fontFamily), template.id).toBe(true)
+    }
+  })
+})
