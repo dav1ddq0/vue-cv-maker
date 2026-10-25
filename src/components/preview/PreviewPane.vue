@@ -5,7 +5,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
-import { useIsCompact, useIsPhone } from '@/composables/useIsPhone'
+import { useIsCompact, useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import { getTemplate } from '@/templates/registry'
 import CvRenderer from './CvRenderer.vue'
 
@@ -15,6 +15,14 @@ const { t } = useI18n()
 
 const isPhone = useIsPhone()
 const isCompact = useIsCompact()
+const isDesktop = useIsDesktop()
+
+/** Steps whose content is one kind of section on the page (templates mark them with `data-section`). */
+const SECTION_STEPS = ['summary', 'experience', 'education', 'skills', 'languages', 'custom'] as const
+/** Desktop only: with form and page side by side, the outline shows where the edit lands (spec 019). */
+const highlight = computed(() =>
+  isDesktop.value && (SECTION_STEPS as readonly string[]).includes(ui.step) ? ui.step : undefined,
+)
 const zoom = ref(0.72)
 
 /** A4 width in CSS px (210mm at 96dpi). */
@@ -95,7 +103,7 @@ const scaleStyle = computed(() => ({
     </header>
 
     <div ref="scroller" class="scroll">
-      <div class="page-wrap" :style="scaleStyle">
+      <div class="page-wrap" :style="scaleStyle" :data-highlight="highlight">
         <div class="cv-page">
           <CvRenderer :data="cv.data" :template-id="ui.templateId" />
         </div>
@@ -234,6 +242,20 @@ const scaleStyle = computed(() => ({
     /* The scaled page keeps its 794px layout box; nothing useful is out there to scroll to. */
     overflow-x: hidden;
   }
+}
+
+/* The outline lives here only, so exports (rendered separately) never carry it. */
+.page-wrap[data-highlight='summary'] :deep([data-section='summary']),
+.page-wrap[data-highlight='experience'] :deep([data-section='experience']),
+.page-wrap[data-highlight='education'] :deep([data-section='education']),
+.page-wrap[data-highlight='skills'] :deep([data-section='skills']),
+.page-wrap[data-highlight='languages'] :deep([data-section='languages']),
+.page-wrap[data-highlight='custom'] :deep([data-section='custom']) {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  transition: outline-color 0.2s ease;
 }
 
 .page-wrap {

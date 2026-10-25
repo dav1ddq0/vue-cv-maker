@@ -52,7 +52,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
         </p>
       </section>
 
-      <section v-for="section in sidebarSections" :key="section.id" class="side-section">
+      <section v-for="section in sidebarSections" :key="section.id" :data-section="section.kind" class="side-section">
         <h2 class="side-title">{{ section.title }}</h2>
 
         <template v-if="section.kind === 'skills'">
@@ -77,7 +77,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
         <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
       </header>
 
-      <section v-for="section in mainSections" :key="section.id" class="section">
+      <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" class="section">
         <h2 class="section-title">{{ section.title }}</h2>
 
         <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>

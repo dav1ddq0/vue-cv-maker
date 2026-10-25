@@ -21,6 +21,13 @@ describe.each(templates)('$name renders', (definition) => {
     expect(wrapper.find('a[href^="https://"]').exists()).toBe(true)
   })
 
+  it('marks every section with its kind, so the preview can outline it (spec 019)', async () => {
+    const component = await definition.component()
+    const wrapper = mount(component as any, { props: { data: createSampleCV() } })
+    const kinds = wrapper.findAll('[data-section]').map((el) => el.attributes('data-section'))
+    expect(kinds).toEqual(expect.arrayContaining(['summary', 'experience', 'education', 'skills', 'languages', 'custom']))
+  })
+
   it('survives a completely empty CV', async () => {
     const component = await definition.component()
     const wrapper = mount(component as any, { props: { data: createEmptyCV() } })

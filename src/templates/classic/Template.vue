@@ -42,7 +42,7 @@ const contactLine = computed(() =>
       </p>
     </header>
 
-    <section v-for="section in sections" :key="section.id" class="section">
+    <section v-for="section in sections" :key="section.id" :data-section="section.kind" class="section">
       <h2 class="section-title">{{ section.title }}</h2>
 
       <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>

@@ -55,7 +55,7 @@ const languages = computed(() => resolveLanguages(props.data))
       </div>
     </header>
 
-    <section v-for="section in mainSections" :key="section.id" class="section">
+    <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" class="section">
       <h2 class="section-title">{{ section.title }}</h2>
 
       <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>
@@ -105,7 +105,7 @@ const languages = computed(() => resolveLanguages(props.data))
     </section>
 
     <div v-if="blockSections.length" class="block">
-      <section v-for="section in blockSections" :key="section.id" class="block-section">
+      <section v-for="section in blockSections" :key="section.id" :data-section="section.kind" class="block-section">
         <h2 class="section-title">{{ section.title }}</h2>
 
         <template v-if="section.kind === 'skills'">
