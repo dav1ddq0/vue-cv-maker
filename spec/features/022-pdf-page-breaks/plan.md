@@ -6,8 +6,8 @@
    Check every template's PDF with Playwright.
 3. Model: `pageBreaks`, schema v5, `normalize` filter; `ResolvedSection.breakBefore` in
    `templates/shared.ts`. Tests.
-4. Templates and print CSS: `:data-break-before` on every main-column `<section>`, and a
-   `.cv-page [data-break-before]` rule. Tests across all templates.
+4. Templates and print CSS: `:data-page-break` on every main-column `<section>`, and a
+   `.cv-page [data-page-break]` rule. Tests across all templates.
 5. UI: a switch per row of the section order list, i18n, note on two-column templates. Tests.
 6. Playwright check, roadmap, close.
 

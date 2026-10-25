@@ -36,7 +36,7 @@
       with a v4 → v5 step; `normalize` keeps only ids of existing sections.
 - [ ] The section order list (Custom sections step) has a "Start on a new page" switch per section,
       except the first one; it is undoable and autosaved like any edit.
-- [ ] Templates mark the main-column section with `data-break-before`; `print.css` breaks before it.
+- [ ] Templates mark the main-column section with `data-page-break`; `print.css` breaks before it.
       The PDF, the paginated preview and printing the exported HTML all honour it.
 - [ ] Sections a two-column template puts in its sidebar are not broken (a break there would push
       the whole main column to the next page); the list says the switch only affects the main column.
@@ -49,6 +49,6 @@
 ## Verification
 
 - Unit tests: migration v4 → v5, `normalize` filtering, `resolveSections` carrying the flag, the
-  switch in the order list, every template rendering `data-break-before` for a flagged main section.
+  switch in the order list, every template rendering `data-page-break` for a flagged main section.
 - Playwright: PDF of every template, sample and long CV, blank-page count; a long CV with a break
   before Education starts that section at the top of a page.

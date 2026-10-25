@@ -3,10 +3,13 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 
+const received: string[] = []
+
 /** paged.js that builds a page and then fails, the way it did inside a `display: none` root. */
 vi.mock('pagedjs', () => ({
   Previewer: class {
-    async preview(_html: string, _css: unknown, container: HTMLElement) {
+    async preview(html: string, _css: unknown, container: HTMLElement) {
+      received.push(html)
       container.innerHTML = '<div class="pagedjs_pages"><div class="pagedjs_page"></div></div>'
       throw new TypeError("Cannot read properties of null (reading 'getBoundingClientRect')")
     }
@@ -22,6 +25,12 @@ describe('PDF export pagination (spec 022)', () => {
 
     expect(await paginateInto(container, '<p>CV</p>', '')).toBe(false)
     expect(container.innerHTML).toBe('')
+  })
+
+  it('hands paged.js the CV inside .cv-page, the scope of every print.css rule', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    await paginateInto(document.createElement('div'), '<article>CV</article>', '')
+    expect(received.at(-1)).toBe('<div class="cv-page cv-page--paged"><article>CV</article></div>')
   })
 
   it('keeps the print root rendered on screen; paged.js cannot measure inside display: none', () => {

@@ -28,6 +28,19 @@ describe.each(templates)('$name renders', (definition) => {
     expect(kinds).toEqual(expect.arrayContaining(['summary', 'experience', 'education', 'skills', 'languages', 'custom']))
   })
 
+  it('starts a flagged main-column section on a new page, never a sidebar one (spec 022)', async () => {
+    const component = await definition.component()
+    const data = createSampleCV()
+    data.pageBreaks = ['education', 'skills', 'languages']
+    const wrapper = mount(component as any, { props: { data } })
+
+    const flagged = wrapper.findAll('[data-page-break]').map((el) => el.attributes('data-section'))
+    expect(flagged).toContain('education')
+    // These templates put languages in a sidebar, aside or block row; a break there would push the main column.
+    const twoColumn = ['aurora', 'banner', 'chevron', 'facet', 'frame', 'harbor', 'meridian', 'modern']
+    expect(flagged.includes('languages')).toBe(!twoColumn.includes(definition.id))
+  })
+
   it('survives a completely empty CV', async () => {
     const component = await definition.component()
     const wrapper = mount(component as any, { props: { data: createEmptyCV() } })

@@ -64,7 +64,7 @@ const languages = computed(() => resolveLanguages(props.data))
     </div>
 
     <div class="main">
-      <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" class="section">
+      <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" :data-page-break="section.breakBefore" class="section">
         <h2 class="section-title">{{ section.title }}</h2>
 
         <template v-if="section.kind === 'experience'">

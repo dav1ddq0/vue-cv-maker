@@ -25,3 +25,13 @@ describe('print.css / paged.js compatibility', () => {
     expect(offenders).toEqual([])
   })
 })
+
+describe('print.css / per-section page breaks (spec 022)', () => {
+  it('breaks before sections marked with our own attribute', () => {
+    expect(css).toMatch(/\.cv-page \[data-page-break\]\s*\{[^}]*break-before:\s*page/)
+  })
+
+  it('never uses data-break-before, which paged.js owns and only honours for its own values', () => {
+    expect(css).not.toMatch(/\[data-break-before/)
+  })
+})

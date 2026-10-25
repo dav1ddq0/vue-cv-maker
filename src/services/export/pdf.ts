@@ -76,8 +76,11 @@ export async function paginateInto(
   try {
     const { Previewer } = await import('pagedjs')
     const previewer = new Previewer()
+    // The `.cv-page` wrapper is what every print.css rule is scoped to (keep entries whole, section
+    // page breaks); without it paged.js laid the CV out ignoring all of them (spec 022).
+    const page = `<div class="cv-page cv-page--paged">${html}</div>`
     // An object entry feeds paged.js raw CSS text instead of a URL to fetch.
-    await previewer.preview(html, [{ 'cv-export.css': css }], container)
+    await previewer.preview(page, [{ 'cv-export.css': css }], container)
     return container.querySelector('.pagedjs_page') !== null
   } catch (error) {
     // A failed run leaves its half-built pages behind; printed before the fallback they were blank sheets.

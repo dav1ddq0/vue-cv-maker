@@ -27,6 +27,12 @@
   flex: 1 0 auto;
 }
 
+/* Inside paged.js the page box is the sheet; a sheet-high wrapper would overflow each page by a hair. */
+.cv-page--paged {
+  display: block;
+  min-height: 0;
+}
+
 /*
  * Never split an entry across a page boundary.
  *
@@ -49,6 +55,16 @@
 .cv-page h3 {
   break-after: avoid;
   page-break-after: avoid;
+}
+
+/*
+ * Sections the user asked to start on a new page (spec 022); templates set it on main-column sections
+ * only. Our own attribute on purpose: paged.js owns `data-break-before` (it writes it from this rule)
+ * and ignores any value it does not define.
+ */
+.cv-page [data-page-break] {
+  break-before: page;
+  page-break-before: always;
 }
 
 .cv-page p,
