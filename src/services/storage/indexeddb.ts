@@ -1,6 +1,7 @@
 import { createStore, del, get, set } from 'idb-keyval'
 import type { CVData, CVSummary } from '@/types/cv'
 import { migrate } from '@/core/migrations'
+import { readPrefs } from '@/services/prefs'
 import { NotFoundError, StorageQuotaError, type StorageAdapter } from './adapter'
 
 const store = createStore('cv-maker', 'kv')
@@ -24,7 +25,8 @@ export class IndexedDBAdapter implements StorageAdapter {
   async load(id: string): Promise<CVData> {
     const raw = await get<CVData>(cvKey(id), store)
     if (!raw) throw new NotFoundError(id)
-    return migrate(raw)
+    // Before spec 021 every CV was shown in the global last pick; keep it looking that way.
+    return migrate(raw, { fallbackTemplateId: readPrefs().lastTemplateId })
   }
 
   async save(data: CVData): Promise<void> {
@@ -51,6 +53,8 @@ export class IndexedDBAdapter implements StorageAdapter {
       title: data.meta.title,
       fullName: data.personal.fullName,
       updatedAt: data.meta.updatedAt,
+      templateId: data.meta.templateId,
+      accentColor: data.style.accentColor,
     }
     const at = index.findIndex((s) => s.id === summary.id)
     if (at >= 0) index[at] = summary

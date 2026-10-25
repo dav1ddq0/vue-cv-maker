@@ -1,6 +1,6 @@
 import { MARITAL_STATUSES, SCHEMA_VERSION, SECTION_IDS } from '@/types/cv'
 import type { CVData, MaritalStatus, SkillItem, StyleTokens } from '@/types/cv'
-import { createEmptyCV, DEFAULT_STYLE } from './factory'
+import { createEmptyCV, DEFAULT_STYLE, DEFAULT_TEMPLATE_ID } from './factory'
 import { uid } from './id'
 import { isAccentColor, isFontOption, isPageMargin } from './stylePresets'
 
@@ -10,6 +10,8 @@ import { isAccentColor, isFontOption, isPageMargin } from './stylePresets'
  *
  * v1 → v2: skill items went from plain strings to `{ name, level? }`.
  * v2 → v3: optional personal extras (birth date and place, nationality, licence, marital status).
+ * v3 → v4: `meta.templateId`. The value itself is filled by `normalize` from `MigrateOptions`, because
+ *          only the caller knows which template the CV used to be shown in (spec 021).
  */
 const steps: Record<number, (data: any) => any> = {
   1: (data) => ({
@@ -36,6 +38,12 @@ const steps: Record<number, (data: any) => any> = {
       ...(data.personal && typeof data.personal === 'object' ? data.personal : {}),
     },
   }),
+  3: (data) => ({ ...data, schemaVersion: 4 }),
+}
+
+export interface MigrateOptions {
+  /** Template for a CV that does not name one; before spec 021 that was the global last pick. */
+  fallbackTemplateId?: string
 }
 
 export class UnsupportedSchemaError extends Error {
@@ -50,7 +58,7 @@ export class UnsupportedSchemaError extends Error {
  * every missing field. Import must never produce a half-shaped `CVData`: a
  * template that crashes on a missing array is a worse failure than a lossy import.
  */
-export function migrate(input: unknown): CVData {
+export function migrate(input: unknown, options: MigrateOptions = {}): CVData {
   if (!input || typeof input !== 'object') throw new UnsupportedSchemaError(0)
   let data = structuredClone(input) as any
 
@@ -63,15 +71,19 @@ export function migrate(input: unknown): CVData {
     version += 1
   }
 
-  return normalize(data)
+  return normalize(data, options)
 }
 
 /** Fills defaults and re-issues missing ids so every list item is keyable. */
-export function normalize(input: any): CVData {
+export function normalize(input: any, options: MigrateOptions = {}): CVData {
   const base = createEmptyCV()
   const out: CVData = {
     schemaVersion: SCHEMA_VERSION,
-    meta: { ...base.meta, ...(input.meta ?? {}) },
+    meta: {
+      ...base.meta,
+      ...(input.meta ?? {}),
+      templateId: str(input.meta?.templateId) || options.fallbackTemplateId || DEFAULT_TEMPLATE_ID,
+    },
     personal: {
       ...base.personal,
       ...(input.personal ?? {}),

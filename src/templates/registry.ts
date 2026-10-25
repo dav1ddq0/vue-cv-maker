@@ -1,6 +1,8 @@
 import type { StyleTokens } from '@/types/cv'
 import type { TemplateCapability, TemplateDefinition } from '@/types/template'
-import { DEFAULT_STYLE } from '@/core/factory'
+import { DEFAULT_STYLE, DEFAULT_TEMPLATE_ID } from '@/core/factory'
+
+export { DEFAULT_TEMPLATE_ID }
 
 /**
  * Auto-discovery (spec §4). Adding a template is creating a folder with an
@@ -19,8 +21,6 @@ export const templates: TemplateDefinition[] = Object.entries(modules)
     return definition
   })
   .sort((a, b) => a.name.localeCompare(b.name))
-
-export const DEFAULT_TEMPLATE_ID = 'classic'
 
 export function getTemplate(id: string): TemplateDefinition {
   return templates.find((t) => t.id === id) ?? templates.find((t) => t.id === DEFAULT_TEMPLATE_ID) ?? templates[0]

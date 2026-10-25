@@ -6,7 +6,7 @@
  * `SCHEMA_VERSION` plus a migration step in `src/core/migrations.ts`.
  */
 
-export const SCHEMA_VERSION = 3
+export const SCHEMA_VERSION = 4
 
 export interface CVData {
   schemaVersion: number
@@ -31,6 +31,8 @@ export interface CVMeta {
   updatedAt: string
   /** Language of the CV *content*, independent from the UI language. */
   language: string
+  /** Template that renders this CV; an id the registry does not know renders with the default. */
+  templateId: string
 }
 
 /** Codes, not labels: the CV shows them in its own content language. */
@@ -144,4 +146,7 @@ export interface CVSummary {
   title: string
   fullName: string
   updatedAt: string
+  /** Absent on entries indexed before spec 021, until their CV is saved again. */
+  templateId?: string
+  accentColor?: string
 }

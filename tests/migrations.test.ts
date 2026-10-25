@@ -106,7 +106,7 @@ describe('schema v2 → v3 (optional personal data)', () => {
       schemaVersion: 2,
       personal: { fullName: 'Ana', email: 'ana@correo.com', phone: '', location: 'Valencia', links: [] },
     })
-    expect(cv.schemaVersion).toBe(3)
+    expect(cv.schemaVersion).toBe(SCHEMA_VERSION)
     expect(cv.personal).toMatchObject({
       fullName: 'Ana',
       location: 'Valencia',
@@ -141,7 +141,7 @@ describe('schema v2 → v3 (optional personal data)', () => {
 
   it('walks a v1 file all the way up', () => {
     const cv = migrate({ schemaVersion: 1, skills: [{ items: ['Go'] }] })
-    expect(cv.schemaVersion).toBe(3)
+    expect(cv.schemaVersion).toBe(SCHEMA_VERSION)
     expect(cv.personal.maritalStatus).toBe('')
     expect(cv.skills[0]!.items).toEqual([{ name: 'Go' }])
   })
@@ -191,3 +191,30 @@ describe('schema v2 → v3 (optional personal data)', () => {
   })
 })
 
+
+describe('schema v3 → v4 (per-CV template, spec 021)', () => {
+  it('gives a v3 file the fallback template, i.e. the one it used to be shown in', () => {
+    const cv = migrate({ schemaVersion: 3, meta: { title: 'A' } }, { fallbackTemplateId: 'meridian' })
+    expect(cv.schemaVersion).toBe(4)
+    expect(cv.meta.templateId).toBe('meridian')
+    expect(cv.meta.title).toBe('A')
+  })
+
+  it('uses the default template when there is no fallback', () => {
+    expect(migrate({ schemaVersion: 3 }).meta.templateId).toBe('classic')
+  })
+
+  it('keeps the template a v4 file names, even one this version does not know', () => {
+    const named = { schemaVersion: 4, meta: { templateId: 'from-a-newer-version' } }
+    expect(migrate(named, { fallbackTemplateId: 'meridian' }).meta.templateId).toBe('from-a-newer-version')
+  })
+
+  it('replaces a non-string or empty template with the fallback', () => {
+    expect(migrate({ schemaVersion: 4, meta: { templateId: 7 } }, { fallbackTemplateId: 'nova' }).meta.templateId).toBe('nova')
+    expect(migrate({ schemaVersion: 4, meta: { templateId: '' } }).meta.templateId).toBe('classic')
+  })
+
+  it('creates new CVs with the default template', () => {
+    expect(createEmptyCV().meta.templateId).toBe('classic')
+  })
+})

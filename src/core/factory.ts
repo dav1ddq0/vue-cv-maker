@@ -11,6 +11,8 @@ import type {
 } from '@/types/cv'
 import { uid } from './id'
 
+export const DEFAULT_TEMPLATE_ID = 'classic'
+
 export const DEFAULT_STYLE: StyleTokens = {
   accentColor: '#2563eb',
   fontFamily: "'Source Sans 3', 'Segoe UI', system-ui, sans-serif",
@@ -29,6 +31,7 @@ export function createEmptyCV(partial: Partial<CVData> = {}): CVData {
       createdAt: now,
       updatedAt: now,
       language: 'es',
+      templateId: DEFAULT_TEMPLATE_ID,
     },
     personal: {
       fullName: '',
