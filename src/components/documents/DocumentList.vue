@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** Multi-CV management (spec §8.2, phase 4). */
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { formatDate, useI18n } from '@/i18n'
@@ -19,6 +19,17 @@ const { t } = useI18n()
 const pendingDelete = ref<string | null>(null)
 const isPhone = useIsPhone()
 const menuDoc = ref<CVSummary | null>(null)
+const query = ref('')
+
+const label = (doc: CVSummary) => doc.fullName || doc.title || t('documents.untitled')
+
+/** Case- and accent-insensitive, on the name and the document title (spec 018). */
+const fold = (value: string) => value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
+const shown = computed(() => {
+  const q = fold(query.value.trim())
+  if (!q) return cv.documents
+  return cv.documents.filter((doc) => fold(`${doc.fullName ?? ''} ${doc.title ?? ''}`).includes(q))
+})
 
 async function open(id: string) {
   await cv.open(id)
@@ -78,30 +89,47 @@ async function confirmDelete(id: string) {
       />
     </ul>
 
-    <ul v-else class="list">
-      <li v-for="doc in cv.documents" :key="doc.id" class="item" :class="{ 'item--active': doc.id === cv.data.meta.id }">
-        <div class="info">
-          <p class="name">{{ doc.fullName || doc.title || t('documents.untitled') }}</p>
-          <p class="meta">{{ doc.title }} · {{ t('documents.updated', { date: formatDate(doc.updatedAt) }) }}</p>
-        </div>
+    <template v-else>
+      <label class="search">
+        <span class="sr-only">{{ t('documents.search') }}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+        <input v-model="query" type="search" :placeholder="t('documents.search')" />
+        <span class="count">{{ cv.documents.length === 1 ? t('documents.countOne') : t('documents.count', { n: cv.documents.length }) }}</span>
+      </label>
 
-        <div v-if="pendingDelete === doc.id" class="confirm">
-          <span class="confirm-text">{{ t('documents.deleteConfirm', { title: doc.title }) }}</span>
-          <BaseButton size="sm" @click="pendingDelete = null">{{ t('actions.cancel') }}</BaseButton>
-          <BaseButton size="sm" variant="danger" @click="confirmDelete(doc.id)">
-            {{ t('actions.confirm') }}
-          </BaseButton>
-        </div>
+      <ul class="grid">
+        <li>
+          <button type="button" class="tile tile--new" @click="createBlank">
+            <span class="plus" aria-hidden="true">+</span>
+            <span class="tile-name">{{ t('documents.newTile') }}</span>
+            <span class="meta">{{ t('documents.newHint') }}</span>
+          </button>
+        </li>
+        <li v-for="doc in shown" :key="doc.id" class="tile" :class="{ 'tile--active': doc.id === cv.data.meta.id }">
+          <button type="button" class="tile-open" @click="open(doc.id)">
+            <span class="tile-name">{{ label(doc) }}</span>
+            <span v-if="doc.title && doc.title !== label(doc)" class="meta">{{ doc.title }}</span>
+            <span class="meta">{{ t('documents.updated', { date: formatDate(doc.updatedAt) }) }}</span>
+          </button>
 
-        <div v-else class="actions">
-          <BaseButton size="sm" @click="open(doc.id)">{{ t('actions.open') }}</BaseButton>
-          <BaseButton size="sm" @click="cv.duplicate(doc.id)">{{ t('actions.duplicate') }}</BaseButton>
-          <BaseButton size="sm" variant="danger" @click="pendingDelete = doc.id">
-            {{ t('actions.remove') }}
-          </BaseButton>
-        </div>
-      </li>
-    </ul>
+          <div v-if="pendingDelete === doc.id" class="confirm">
+            <span class="confirm-text">{{ t('documents.deleteConfirm', { title: doc.title }) }}</span>
+            <BaseButton size="sm" @click="pendingDelete = null">{{ t('actions.cancel') }}</BaseButton>
+            <BaseButton size="sm" variant="danger" @click="confirmDelete(doc.id)">
+              {{ t('actions.confirm') }}
+            </BaseButton>
+          </div>
+          <div v-else class="actions">
+            <BaseButton size="sm" @click="open(doc.id)">{{ t('actions.open') }}</BaseButton>
+            <BaseButton size="sm" @click="cv.duplicate(doc.id)">{{ t('actions.duplicate') }}</BaseButton>
+            <BaseButton size="sm" variant="danger" @click="pendingDelete = doc.id">
+              {{ t('actions.remove') }}
+            </BaseButton>
+          </div>
+        </li>
+      </ul>
+      <p v-if="query && !shown.length" class="empty">{{ t('documents.noMatch', { q: query }) }}</p>
+    </template>
     <div v-if="isPhone" class="bottom">
       <BaseButton variant="primary" class="big" @click="createBlank">+ {{ t('actions.newCv') }}</BaseButton>
       <div class="pair">
@@ -126,7 +154,7 @@ async function confirmDelete(id: string) {
   flex-direction: column;
   gap: 1em;
   padding: 1.4em;
-  max-width: 900px;
+  max-width: 1180px;
   margin: 0 auto;
   width: 100%;
   min-height: 100%;
@@ -163,29 +191,114 @@ async function confirmDelete(id: string) {
   gap: 0.6em;
 }
 
-.item {
+.search {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1em;
-  flex-wrap: wrap;
-  padding: 0.8em 1em;
+  gap: 0.6em;
+  max-width: 520px;
+  min-height: 40px;
+  padding: 0 0.8em;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 10px;
   background: var(--surface);
+  color: var(--text-muted);
 }
 
-.item--active {
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.search:focus-within {
   border-color: var(--accent);
 }
 
-.name {
+.count {
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+.grid {
+  list-style: none;
   margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1em;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.8em;
+  min-height: 150px;
+  padding: 1em;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.tile--active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.tile--new {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  border: 2px dashed var(--border);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tile--new:hover {
+  border-color: var(--accent);
+}
+
+.plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 1.4em;
+  font-weight: 700;
+}
+
+.tile-open {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tile-name {
   font-weight: 600;
 }
 
 .meta {
-  margin: 0.1em 0 0;
+  margin: 0;
   font-size: 0.8em;
   color: var(--text-muted);
 }

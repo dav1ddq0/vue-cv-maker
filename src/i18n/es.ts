@@ -388,6 +388,12 @@ export default {
     deleteConfirm: '¿Eliminar «{title}»? No se puede deshacer.',
     more: 'Más acciones de «{title}»',
     untitled: 'Sin título',
+    search: 'Buscar por nombre',
+    countOne: '1 CV en este navegador',
+    count: '{n} CVs en este navegador',
+    newTile: 'Nuevo CV',
+    newHint: 'En blanco: el asistente te guía paso a paso',
+    noMatch: 'Ningún CV coincide con «{q}».',
   },
   notices: {
     localOnly:

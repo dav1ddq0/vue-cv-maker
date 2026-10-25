@@ -388,6 +388,12 @@ const en: typeof es = {
     deleteConfirm: 'Delete “{title}”? This cannot be undone.',
     more: 'More actions for “{title}”',
     untitled: 'Untitled',
+    search: 'Search by name',
+    countOne: '1 CV in this browser',
+    count: '{n} CVs in this browser',
+    newTile: 'New CV',
+    newHint: 'Blank: the wizard guides you step by step',
+    noMatch: 'No CV matches “{q}”.',
   },
   notices: {
     localOnly:
