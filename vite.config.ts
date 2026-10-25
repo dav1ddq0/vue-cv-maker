@@ -31,10 +31,10 @@ function contentSecurityPolicy(): Plugin {
   }
 }
 
-// `base` targets GitHub Pages project sites (/<repo>/). Override with BASE_PATH
-// when deploying to a user site or another host.
+// `base` targets the GitHub Pages project site (/<repo>/), so local preview matches production.
+// Override with BASE_PATH when deploying to a user site or another host.
 export default defineConfig({
-  base: process.env.BASE_PATH ?? '/cv-maker/',
+  base: process.env.BASE_PATH ?? '/vue-cv-maker/',
   plugins: [vue(), contentSecurityPolicy()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },

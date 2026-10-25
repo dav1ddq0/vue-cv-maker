@@ -7,7 +7,7 @@ phases 1 to 4.
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/cv-maker/
+npm run dev        # http://localhost:5173/vue-cv-maker/
 npm test           # unit tests (Vitest)
 npm run typecheck  # vue-tsc
 npm run build      # production bundle into dist/
@@ -103,3 +103,16 @@ out of scope.
 
 Chrome and Firefox are the tested targets. Print output differs slightly between
 browsers; Chrome currently gives the closest match to the on-screen preview.
+
+## Deployment
+
+Published at <https://dav1ddq0.github.io/vue-cv-maker/> by `.github/workflows/deploy.yml`: every
+push to `main` installs, runs the tests, builds and deploys to GitHub Pages. A red test suite blocks
+the deploy.
+
+- **One-time setup:** repository *Settings → Pages → Build and deployment → Source: GitHub Actions*.
+- **Base path:** `vite.config.ts` defaults to `/vue-cv-maker/`, the project-site path, so
+  `npm run preview` behaves like production. Set `BASE_PATH` to build for another location, for
+  example `BASE_PATH=/ npm run build` for a user site or a custom domain.
+- **Content-Security-Policy:** the build adds a CSP `<meta>` tag (GitHub Pages cannot send headers);
+  it is not applied by `npm run dev`.
