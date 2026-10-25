@@ -36,12 +36,12 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **023** · CV suggestions (score and concrete advice in the Export step, from a pure function over `CVData`)
 - **024** · PDF file name and print guidance (`<name> – CV.pdf` suggested by the print dialog)
 - **025** · Photo crop and zoom (frame before storing: drag, zoom, rotate; 800 px JPEG; preview refreshes on replace)
+- **026** · Bundled fonts (Fontsource, served from the app; PDF and HTML export use them)
 
 ## Next 🔜
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
-- Candidate: web fonts via a bundled font package (needs a dependency decision).
 
 ## Backlog / ideas 💡
 
