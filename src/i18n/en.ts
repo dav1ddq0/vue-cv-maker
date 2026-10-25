@@ -119,6 +119,26 @@ const en: typeof es = {
     add: 'Add language',
     empty: 'No languages yet.',
   },
+  header: {
+    breadcrumb: 'Location',
+    docTitle: 'Document name',
+    saved: 'Saved in this browser',
+    saving: 'Saving…',
+    undo: 'Undo (Ctrl+Z)',
+    redo: 'Redo (Ctrl+Shift+Z)',
+    preferences: 'Preferences',
+    export: 'Export',
+  },
+  prefs: {
+    title: 'Preferences',
+    language: 'Interface language',
+    languageHint: 'The CV language is chosen separately, in Template and style.',
+    theme: 'Theme',
+    storage: 'Storage',
+    storageText: 'Your CVs are saved only in this browser. Clearing site data, or the browser running out of space, deletes them.',
+    backup: 'Download a backup (JSON)',
+    shortcuts: 'Keyboard shortcuts',
+  },
   menu: {
     title: 'Menu',
     open: 'Menu: views, language and theme',
@@ -356,6 +376,7 @@ const en: typeof es = {
       'Browser storage is unavailable (private mode?). You can work, but nothing will be kept when you close the tab.',
     notPersisted:
       'The browser may evict this data if it runs low on space. Export the JSON as a backup.',
+    saveFailed: 'Could not save',
     quota: 'Storage is full. Delete a CV or remove a photo.',
     importIsAnAid:
       'PDF import saves typing, it does not replace review. Always check the result.',

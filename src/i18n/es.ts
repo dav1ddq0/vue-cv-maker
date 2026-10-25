@@ -119,6 +119,26 @@ export default {
     add: 'Añadir idioma',
     empty: 'Sin idiomas todavía.',
   },
+  header: {
+    breadcrumb: 'Ubicación',
+    docTitle: 'Nombre del documento',
+    saved: 'Guardado en este navegador',
+    saving: 'Guardando…',
+    undo: 'Deshacer (Ctrl+Z)',
+    redo: 'Rehacer (Ctrl+Mayús+Z)',
+    preferences: 'Preferencias',
+    export: 'Exportar',
+  },
+  prefs: {
+    title: 'Preferencias',
+    language: 'Idioma de la interfaz',
+    languageHint: 'El idioma del CV se elige aparte, en Plantilla y estilo.',
+    theme: 'Tema',
+    storage: 'Almacenamiento',
+    storageText: 'Tus CVs se guardan solo en este navegador. Si borras los datos del sitio o el navegador necesita espacio, se pierden.',
+    backup: 'Descargar copia de seguridad (JSON)',
+    shortcuts: 'Atajos de teclado',
+  },
   menu: {
     title: 'Menú',
     open: 'Menú: vistas, idioma y tema',
@@ -356,6 +376,7 @@ export default {
       'El almacenamiento del navegador no está disponible (¿modo privado?). Puedes trabajar, pero nada se guardará al cerrar.',
     notPersisted:
       'El navegador puede borrar estos datos si le falta espacio. Exporta el JSON como respaldo.',
+    saveFailed: 'No se pudo guardar',
     quota: 'No queda espacio de almacenamiento. Elimina algún CV o quita alguna foto.',
     importIsAnAid:
       'La importación de PDF ahorra teclear, no sustituye la revisión. Comprueba siempre el resultado.',
