@@ -134,6 +134,9 @@ const en: typeof es = {
     next: 'Next: {step}',
   },
   stepSheet: {
+    short: '{n} of {total}',
+    prev: 'Previous step',
+    next: 'Next step: {step}',
     title: 'Go to a step',
     position: 'Step {n} of {total}',
     open: 'Change step',
@@ -289,6 +292,7 @@ const en: typeof es = {
     paginatedHint: 'Preview the real page breaks without opening the print dialog.',
     paginatedFailed: 'Pagination failed. The CV is shown without page breaks; PDF export still works.',
     download: 'Download',
+    printShort: 'Print',
     print: 'Print / Save as PDF',
     preparing: 'Preparing…',
   },

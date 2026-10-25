@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** The exports that do not fit in the dock: HTML and JSON (phones, spec 013). */
+/** Every export in one phone sheet: the dock has room for a single Export button (specs 013, 016). */
 import { useI18n } from '@/i18n'
 import { useCvExport, type ExportKind } from '@/composables/useCvExport'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
@@ -11,6 +11,7 @@ const { t } = useI18n()
 const { busy, run } = useCvExport()
 
 const OPTIONS: { kind: ExportKind; title: string; hint: string }[] = [
+  { kind: 'pdf', title: 'exportView.pdf', hint: 'exportView.pdfHint' },
   { kind: 'html', title: 'exportView.html', hint: 'exportView.htmlHint' },
   { kind: 'json', title: 'exportView.json', hint: 'exportView.jsonHint' },
 ]
@@ -30,7 +31,7 @@ async function pick(kind: ExportKind) {
             <span class="name">{{ t(option.title) }}</span>
             <span class="hint">{{ t(option.hint) }}</span>
           </span>
-          <span class="action">{{ busy === option.kind ? t('exportView.preparing') : t('exportView.download') }}</span>
+          <span class="action">{{ busy === option.kind ? t('exportView.preparing') : t(option.kind === 'pdf' ? 'exportView.printShort' : 'exportView.download') }}</span>
         </button>
       </li>
     </ul>

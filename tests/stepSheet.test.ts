@@ -26,9 +26,25 @@ describe('StepHeader and step sheet', () => {
     const ui = useUiStore()
     ui.goTo('experience')
     const wrapper = mountHeader()
-    expect(wrapper.find('.position').text()).toBe('Paso 3 de 9')
+    expect(wrapper.find('.position').text()).toBe('3 de 9')
     expect(wrapper.find('.name').text()).toBe('Experiencia')
     expect(wrapper.findAll('.segment--on')).toHaveLength(3)
+  })
+
+  it('moves with the arrows and disables them at the ends', async () => {
+    const ui = useUiStore()
+    const wrapper = mountHeader()
+    const [prev, next] = wrapper.findAll('button.arrow')
+    expect(prev!.attributes('disabled')).toBeDefined()
+    await next!.trigger('click')
+    expect(ui.step).toBe('summary')
+    expect(next!.attributes('aria-label')).toBe('Paso siguiente: Experiencia')
+    await prev!.trigger('click')
+    expect(ui.step).toBe('personal')
+
+    ui.goTo('export')
+    await wrapper.vm.$nextTick()
+    expect(next!.attributes('disabled')).toBeDefined()
   })
 
   it('opens a labelled modal sheet from the heading button', async () => {

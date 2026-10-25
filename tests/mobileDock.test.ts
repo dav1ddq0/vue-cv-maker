@@ -1,9 +1,16 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import MobileDock from '@/components/form/MobileDock.vue'
 import { useUiStore } from '@/stores/ui'
+
+// jsdom ships <dialog> without showModal/close; a minimal stand-in keeps `open`.
+beforeAll(() => {
+  const proto = HTMLDialogElement.prototype
+  proto.showModal = function (this: HTMLDialogElement) { this.setAttribute('open', '') }
+  proto.close = function (this: HTMLDialogElement) { this.removeAttribute('open') }
+})
 
 beforeEach(() => setActivePinia(createPinia()))
 
@@ -11,25 +18,17 @@ const text = (wrapper: ReturnType<typeof mount>, label: string) =>
   wrapper.findAll('button').find((b) => b.text().includes(label))!
 
 describe('MobileDock', () => {
-  it('names the next step on the primary button', () => {
+  it('has one main action that goes to the next step and is disabled on the last one', async () => {
     const ui = useUiStore()
     ui.goTo('personal')
     const wrapper = mount(MobileDock)
-    expect(wrapper.find('.next').text()).toBe('Siguiente: Resumen')
-  })
-
-  it('moves through the steps and disables the ends', async () => {
-    const ui = useUiStore()
-    const wrapper = mount(MobileDock)
-    expect(wrapper.find('.back').attributes('disabled')).toBeDefined()
-    await wrapper.find('.next').trigger('click')
+    expect(wrapper.find('.action').text()).toBe('Siguiente')
+    await wrapper.find('.action').trigger('click')
     expect(ui.step).toBe('summary')
-    await wrapper.find('.back').trigger('click')
-    expect(ui.step).toBe('personal')
 
     ui.goTo('export')
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.next').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('.action').attributes('disabled')).toBeDefined()
   })
 
   it('switches between editing and preview and keeps a way back', async () => {
@@ -40,21 +39,27 @@ describe('MobileDock', () => {
     await text(wrapper, 'Vista previa').trigger('click')
     expect(ui.previewOpen).toBe(true)
     expect(text(wrapper, 'Vista previa').attributes('aria-pressed')).toBe('true')
-    expect(wrapper.find('.nav').exists()).toBe(false)
+    expect(wrapper.find('.action').text()).toBe('Exportar')
 
     await text(wrapper, 'Editar').trigger('click')
     expect(ui.previewOpen).toBe(false)
-    expect(wrapper.find('.nav').exists()).toBe(true)
+    expect(wrapper.find('.action').text()).toBe('Siguiente')
+  })
+
+  it('keeps both modes reachable by name when the unselected label is hidden', () => {
+    const wrapper = mount(MobileDock)
+    const labels = wrapper.findAll('.mode').map((b) => b.attributes('aria-label'))
+    expect(labels).toEqual(['Editar', 'Vista previa'])
   })
 })
 
 describe('MobileDock in preview mode', () => {
-  it('offers the PDF export as the main action and the other formats behind a menu', async () => {
+  it('opens one export sheet with PDF, HTML and JSON', async () => {
     const ui = useUiStore()
     ui.previewOpen = true
     const wrapper = mount(MobileDock)
-    expect(wrapper.find('.nav').exists()).toBe(false)
-    expect(wrapper.find('.exports .next').text()).toBe('Imprimir / Guardar como PDF')
-    expect(wrapper.find('.exports .more').attributes('aria-label')).toBe('Más formas de exportar')
+    await wrapper.find('.action').trigger('click')
+    expect(wrapper.findAll('dialog li')).toHaveLength(3)
+    expect(wrapper.find('dialog li').text()).toContain('PDF')
   })
 })

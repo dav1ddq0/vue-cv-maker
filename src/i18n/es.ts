@@ -134,6 +134,9 @@ export default {
     next: 'Siguiente: {step}',
   },
   stepSheet: {
+    short: '{n} de {total}',
+    prev: 'Paso anterior',
+    next: 'Paso siguiente: {step}',
     title: 'Ir a un paso',
     position: 'Paso {n} de {total}',
     open: 'Cambiar de paso',
@@ -289,6 +292,7 @@ export default {
     paginatedHint: 'Previsualiza los saltos de página reales sin abrir el diálogo de impresión.',
     paginatedFailed: 'No se pudo paginar. Se muestra el CV sin saltos de página; la exportación a PDF sigue funcionando.',
     download: 'Descargar',
+    printShort: 'Imprimir',
     print: 'Imprimir / Guardar como PDF',
     preparing: 'Preparando…',
   },
