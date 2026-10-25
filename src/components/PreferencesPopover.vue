@@ -75,6 +75,7 @@ function toggleFallback() {
         <div class="segments" role="radiogroup" :aria-labelledby="`${id}-theme`">
           <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'light'" @click="ui.setTheme('light')">{{ t('menu.light') }}</button>
           <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'dark'" @click="ui.setTheme('dark')">{{ t('menu.dark') }}</button>
+          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'system'" @click="ui.setTheme('system')">{{ t('menu.system') }}</button>
         </div>
       </div>
 

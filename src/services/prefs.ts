@@ -2,13 +2,15 @@
  * `localStorage` is reserved for trivial UI preferences (spec §8.1). CVs never
  * go here: it is synchronous, capped at ~5 MB per origin and throws when full.
  */
+import type { ThemeChoice } from '@/core/theme'
+
 const KEY = 'cv-maker:prefs'
 
 export interface Prefs {
   uiLanguage: 'es' | 'en'
   lastTemplateId: string
   lastCvId: string | null
-  theme: 'light' | 'dark'
+  theme: ThemeChoice
   dismissedNotices: string[]
 }
 

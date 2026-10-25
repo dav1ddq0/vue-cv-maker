@@ -157,6 +157,7 @@ const en: typeof es = {
     open: 'Menu: views, language and theme',
     light: 'Light',
     dark: 'Dark',
+    system: 'System',
     saved: 'Saved',
     saving: 'Saving…',
   },

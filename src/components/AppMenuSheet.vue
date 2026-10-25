@@ -60,6 +60,9 @@ function go(view: (typeof VIEWS)[number]) {
           <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'dark'" @click="ui.setTheme('dark')">
             {{ t('menu.dark') }}
           </button>
+          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'system'" @click="ui.setTheme('system')">
+            {{ t('menu.system') }}
+          </button>
         </div>
       </div>
     </div>

@@ -110,9 +110,9 @@ const phoneState = computed(() => {
         size="sm"
         variant="ghost"
         :aria-label="t('nav.theme')"
-        @click="ui.setTheme(ui.theme === 'dark' ? 'light' : 'dark')"
+        @click="ui.setTheme(ui.resolvedTheme === 'dark' ? 'light' : 'dark')"
       >
-        {{ ui.theme === 'dark' ? '☀' : '☾' }}
+        {{ ui.resolvedTheme === 'dark' ? '☀' : '☾' }}
       </BaseButton>
     </div>
   </header>

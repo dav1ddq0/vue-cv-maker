@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { readPrefs, writePrefs } from '@/services/prefs'
 import { isStorageAvailable, requestPersistence } from '@/services/storage'
+import { DARK_QUERY, resolveTheme, systemPrefersDark, type ThemeChoice } from '@/core/theme'
 
 export const STEPS = [
   'personal',
@@ -24,7 +25,16 @@ export const useUiStore = defineStore('ui', () => {
   const view = ref<View>('editor')
   const step = ref<StepId>('personal')
   const templateId = ref(prefs.lastTemplateId)
-  const theme = ref(prefs.theme)
+  const theme = ref<ThemeChoice>(prefs.theme)
+  /** Live OS preference; only matters while the choice is `system`. */
+  const systemDark = ref(systemPrefersDark())
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    window.matchMedia(DARK_QUERY).addEventListener('change', (event) => {
+      systemDark.value = event.matches
+      if (theme.value === 'system') applyTheme()
+    })
+  }
+  const resolvedTheme = computed(() => resolveTheme(theme.value, systemDark.value))
   const previewOpen = ref(false)
   const dismissedNotices = ref<string[]>(prefs.dismissedNotices)
 
@@ -54,10 +64,14 @@ export const useUiStore = defineStore('ui', () => {
     writePrefs({ lastTemplateId: id })
   }
 
-  function setTheme(next: 'light' | 'dark') {
+  function applyTheme() {
+    document.documentElement.dataset.theme = resolvedTheme.value
+  }
+
+  function setTheme(next: ThemeChoice) {
     theme.value = next
     writePrefs({ theme: next })
-    document.documentElement.dataset.theme = next
+    applyTheme()
   }
 
   function dismissNotice(id: string) {
@@ -80,6 +94,7 @@ export const useUiStore = defineStore('ui', () => {
     steps: STEPS,
     templateId,
     theme,
+    resolvedTheme,
     previewOpen,
     storageAvailable,
     storagePersisted,

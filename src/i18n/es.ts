@@ -157,6 +157,7 @@ export default {
     open: 'Menú: vistas, idioma y tema',
     light: 'Claro',
     dark: 'Oscuro',
+    system: 'Sistema',
     saved: 'Guardado',
     saving: 'Guardando…',
   },
