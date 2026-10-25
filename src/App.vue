@@ -9,10 +9,12 @@ import MobileDock from '@/components/form/MobileDock.vue'
 import PreviewPane from '@/components/preview/PreviewPane.vue'
 import DocumentList from '@/components/documents/DocumentList.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
+import { useIsPhone } from '@/composables/useIsPhone'
 
 const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
+const isPhone = useIsPhone()
 
 // pdf.js is ~500 kB: the import view — and the parser behind it — load only when
 // someone actually opens it, so the editor's first paint never pays for it.
@@ -52,7 +54,8 @@ function onKeydown(event: KeyboardEvent) {
   <div class="app">
     <AppHeader />
 
-    <div v-if="!ui.storageAvailable || !ui.storagePersisted" class="notices">
+    <!-- Phones: the eviction notice lives in the menu sheet; it cost 56px of every screen (spec 016). -->
+    <div v-if="!ui.storageAvailable || (!isPhone && !ui.storagePersisted)" class="notices">
       <NoticeBar v-if="!ui.storageAvailable" tone="warning">
         {{ t('notices.privateMode') }}
       </NoticeBar>

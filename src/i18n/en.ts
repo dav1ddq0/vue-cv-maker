@@ -119,6 +119,14 @@ const en: typeof es = {
     add: 'Add language',
     empty: 'No languages yet.',
   },
+  menu: {
+    title: 'Menu',
+    open: 'Menu: views, language and theme',
+    light: 'Light',
+    dark: 'Dark',
+    saved: 'Saved',
+    saving: 'Saving…',
+  },
   dock: {
     label: 'Editor mode',
     more: 'More ways to export',

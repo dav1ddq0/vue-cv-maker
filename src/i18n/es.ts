@@ -119,6 +119,14 @@ export default {
     add: 'Añadir idioma',
     empty: 'Sin idiomas todavía.',
   },
+  menu: {
+    title: 'Menú',
+    open: 'Menú: vistas, idioma y tema',
+    light: 'Claro',
+    dark: 'Oscuro',
+    saved: 'Guardado',
+    saving: 'Guardando…',
+  },
   dock: {
     label: 'Modo del editor',
     more: 'Más formas de exportar',
