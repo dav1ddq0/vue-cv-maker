@@ -37,3 +37,16 @@ describe('StepRail', () => {
     expect(ui.step).toBe('custom')
   })
 })
+
+describe('CvWizard scroll (spec 019)', () => {
+  it('starts each step at the top of the form', async () => {
+    const { default: CvWizard } = await import('@/components/form/CvWizard.vue')
+    const ui = useUiStore()
+    const wrapper = mount(CvWizard, { global: { stubs: { TagInput: true } } })
+    const el = wrapper.element as HTMLElement
+    el.scrollTop = 400
+    ui.goTo('summary')
+    await wrapper.vm.$nextTick()
+    expect(el.scrollTop).toBe(0)
+  })
+})

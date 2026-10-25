@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -46,10 +46,19 @@ const STEP_COMPONENTS = {
 } as const
 
 const current = computed(() => STEP_COMPONENTS[ui.step])
+
+/** A new step starts at its top: the form is one scroller, and it kept the last step's position. */
+const root = ref<HTMLElement | null>(null)
+watch(
+  () => ui.step,
+  () => {
+    if (root.value) root.value.scrollTop = 0
+  },
+)
 </script>
 
 <template>
-  <div class="wizard">
+  <div ref="root" class="wizard">
     <StepHeader v-if="isPhone" />
     <!-- Desktop: the rail (StepRail, beside this form) replaces the tab strip. -->
     <div v-else-if="isDesktop" class="intro">
