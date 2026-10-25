@@ -336,6 +336,7 @@ const en: typeof es = {
       verdana: 'Open and legible',
     },
     fontFamily: 'Typeface',
+    systemFont: 'depends on the computer',
     fontScale: 'Font size',
     spacingScale: 'Spacing',
     pageMargin: 'Page margin',

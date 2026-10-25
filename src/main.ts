@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import { readPrefs } from '@/services/prefs'
 import { resolveTheme, systemPrefersDark } from '@/core/theme'
+import './styles/fonts.css'
 import './styles/app.css'
 import './styles/print.css'
 

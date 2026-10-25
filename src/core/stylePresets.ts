@@ -13,31 +13,39 @@ export function isSameColor(a: string, b: string): boolean {
 export interface FontOption {
   id: string
   label: string
-  /** CSS `font-family` stack. System fonts only, each ending in a generic family. */
+  /** CSS `font-family` stack, ending in a generic family. */
   value: string
+  /**
+   * The app ships a face for this stack (spec 026): the font itself, or a metric-compatible stand-in
+   * (Carlito for Calibri, Caladea for Cambria, EB Garamond for Garamond). Otherwise it depends on
+   * what the computer has installed.
+   */
+  bundled: boolean
 }
 
 /**
- * Fonts that resolve without downloading anything (local-first, no font package).
+ * The fonts the style step offers. The bundled ones are served by the app (spec 026); the rest are
+ * system fonts, used when the computer has them.
+ *
  * The first four keep the exact values the select used before, so documents that
  * already store them keep matching an option; the Iowan stack is the editorial
  * template's own default and must be listed or the select would render blank.
  */
 export const FONT_OPTIONS: FontOption[] = [
-  { id: 'sourceSans', label: 'Source Sans', value: "'Source Sans 3', 'Segoe UI', system-ui, sans-serif" },
-  { id: 'inter', label: 'Inter', value: "'Inter', system-ui, -apple-system, sans-serif" },
-  { id: 'georgia', label: 'Georgia', value: "Georgia, 'Times New Roman', serif" },
-  { id: 'jetbrainsMono', label: 'JetBrains Mono', value: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace" },
-  { id: 'iowan', label: 'Iowan Old Style', value: "'Iowan Old Style', Georgia, 'Times New Roman', serif" },
-  { id: 'calibri', label: 'Calibri', value: "Calibri, Carlito, 'Segoe UI', system-ui, sans-serif" },
-  { id: 'cambria', label: 'Cambria', value: "Cambria, Caladea, Georgia, serif" },
-  { id: 'helvetica', label: 'Helvetica', value: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
-  { id: 'arial', label: 'Arial', value: "Arial, 'Liberation Sans', Helvetica, sans-serif" },
-  { id: 'timesNewRoman', label: 'Times New Roman', value: "'Times New Roman', Times, 'Liberation Serif', serif" },
-  { id: 'garamond', label: 'Garamond', value: "Garamond, 'EB Garamond', 'Times New Roman', serif" },
-  { id: 'palatino', label: 'Palatino', value: "'Palatino Linotype', Palatino, 'Book Antiqua', serif" },
-  { id: 'tahoma', label: 'Tahoma', value: "Tahoma, 'DejaVu Sans', Verdana, sans-serif" },
-  { id: 'verdana', label: 'Verdana', value: "Verdana, 'DejaVu Sans', Geneva, sans-serif" },
+  { id: 'sourceSans', label: 'Source Sans', value: "'Source Sans 3', 'Segoe UI', system-ui, sans-serif", bundled: true },
+  { id: 'inter', label: 'Inter', value: "'Inter', system-ui, -apple-system, sans-serif", bundled: true },
+  { id: 'georgia', label: 'Georgia', value: "Georgia, 'Times New Roman', serif", bundled: false },
+  { id: 'jetbrainsMono', label: 'JetBrains Mono', value: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace", bundled: true },
+  { id: 'iowan', label: 'Iowan Old Style', value: "'Iowan Old Style', Georgia, 'Times New Roman', serif", bundled: false },
+  { id: 'calibri', label: 'Calibri', value: "Calibri, Carlito, 'Segoe UI', system-ui, sans-serif", bundled: true },
+  { id: 'cambria', label: 'Cambria', value: "Cambria, Caladea, Georgia, serif", bundled: true },
+  { id: 'helvetica', label: 'Helvetica', value: "'Helvetica Neue', Helvetica, Arial, sans-serif", bundled: false },
+  { id: 'arial', label: 'Arial', value: "Arial, 'Liberation Sans', Helvetica, sans-serif", bundled: false },
+  { id: 'timesNewRoman', label: 'Times New Roman', value: "'Times New Roman', Times, 'Liberation Serif', serif", bundled: false },
+  { id: 'garamond', label: 'Garamond', value: "Garamond, 'EB Garamond', 'Times New Roman', serif", bundled: true },
+  { id: 'palatino', label: 'Palatino', value: "'Palatino Linotype', Palatino, 'Book Antiqua', serif", bundled: false },
+  { id: 'tahoma', label: 'Tahoma', value: "Tahoma, 'DejaVu Sans', Verdana, sans-serif", bundled: false },
+  { id: 'verdana', label: 'Verdana', value: "Verdana, 'DejaVu Sans', Geneva, sans-serif", bundled: false },
 ]
 
 /** Page margins offered by the style step; anything else in a file falls back to the default. */

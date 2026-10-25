@@ -22,6 +22,8 @@ export async function renderTemplateHtml(data: CVData, templateId: string): Prom
   const app = createApp({ render: () => h(component, { data }) })
   app.mount(host)
   await nextFrame()
+  // Laying the CV out requests its fonts; paged.js measures text, so it must see the real ones (spec 026).
+  await document.fonts?.ready
   const html = host.innerHTML
   app.unmount()
   host.remove()
@@ -36,19 +38,29 @@ export async function renderTemplateHtml(data: CVData, templateId: string): Prom
  * template's styles without duplicating them. Cross-origin sheets throw on
  * `cssRules` access and are skipped.
  */
-export function collectDocumentCss(): string {
+export function collectDocumentCss(options: { fontFaces?: boolean } = {}): string {
+  const { fontFaces = true } = options
   const chunks: string[] = []
   for (const sheet of Array.from(document.styleSheets)) {
     // paged.js output from an earlier run (see `PAGED_STYLE_ATTR` in pdf.ts): copying it would make
     // the CSS grow with every export.
     if (sheet.ownerNode instanceof Element && sheet.ownerNode.hasAttribute('data-cv-paged')) continue
     try {
-      for (const rule of Array.from(sheet.cssRules)) chunks.push(rule.cssText)
+      for (const rule of Array.from(sheet.cssRules)) {
+        // A standalone file cannot follow the app's font URLs; it embeds its own (see fonts.ts).
+        if (!fontFaces && isFontFace(rule)) continue
+        chunks.push(rule.cssText)
+      }
     } catch {
       // Cross-origin sheet (e.g. a font CDN) — the @import in the export head covers it.
     }
   }
   return chunks.join('\n')
+}
+
+/** jsdom has no `CSSFontFaceRule`; a missing class simply means there is nothing to skip. */
+export function isFontFace(rule: CSSRule): rule is CSSFontFaceRule {
+  return typeof CSSFontFaceRule !== 'undefined' && rule instanceof CSSFontFaceRule
 }
 
 /**

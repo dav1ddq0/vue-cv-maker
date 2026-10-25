@@ -88,7 +88,7 @@ function previewAccent(id: string): string {
         >
           <select :id="id" v-model="style.fontFamily" :disabled="!fontSupported">
             <option v-for="font in FONT_OPTIONS" :key="font.id" :value="font.value">
-              {{ font.label }} · {{ t(`style.fonts.${font.id}`) }}
+              {{ font.label }} · {{ t(`style.fonts.${font.id}`) }}{{ font.bundled ? '' : ` · ${t('style.systemFont')}` }}
             </option>
           </select>
         </BaseField>

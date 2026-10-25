@@ -1,0 +1,50 @@
+/*
+ * Fonts the style step offers, served from the app's own origin (spec 026): no third-party request,
+ * and the CSP's `font-src 'self'` holds. Latin and Latin Extended only, the scripts a CV in the
+ * supported languages needs. Each face has a `unicode-range`, so a browser fetches only what a page
+ * uses. Carlito and Caladea are the metric-compatible stand-ins for Calibri and Cambria.
+ */
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-ext-400.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-ext-600.css';
+@import '@fontsource/inter/latin-700.css';
+@import '@fontsource/inter/latin-ext-700.css';
+@import '@fontsource/inter/latin-400-italic.css';
+@import '@fontsource/inter/latin-ext-400-italic.css';
+@import '@fontsource/source-sans-3/latin-400.css';
+@import '@fontsource/source-sans-3/latin-ext-400.css';
+@import '@fontsource/source-sans-3/latin-600.css';
+@import '@fontsource/source-sans-3/latin-ext-600.css';
+@import '@fontsource/source-sans-3/latin-700.css';
+@import '@fontsource/source-sans-3/latin-ext-700.css';
+@import '@fontsource/source-sans-3/latin-400-italic.css';
+@import '@fontsource/source-sans-3/latin-ext-400-italic.css';
+@import '@fontsource/jetbrains-mono/latin-400.css';
+@import '@fontsource/jetbrains-mono/latin-ext-400.css';
+@import '@fontsource/jetbrains-mono/latin-600.css';
+@import '@fontsource/jetbrains-mono/latin-ext-600.css';
+@import '@fontsource/jetbrains-mono/latin-700.css';
+@import '@fontsource/jetbrains-mono/latin-ext-700.css';
+@import '@fontsource/jetbrains-mono/latin-400-italic.css';
+@import '@fontsource/jetbrains-mono/latin-ext-400-italic.css';
+@import '@fontsource/eb-garamond/latin-400.css';
+@import '@fontsource/eb-garamond/latin-ext-400.css';
+@import '@fontsource/eb-garamond/latin-600.css';
+@import '@fontsource/eb-garamond/latin-ext-600.css';
+@import '@fontsource/eb-garamond/latin-700.css';
+@import '@fontsource/eb-garamond/latin-ext-700.css';
+@import '@fontsource/eb-garamond/latin-400-italic.css';
+@import '@fontsource/eb-garamond/latin-ext-400-italic.css';
+@import '@fontsource/carlito/latin-400.css';
+@import '@fontsource/carlito/latin-ext-400.css';
+@import '@fontsource/carlito/latin-700.css';
+@import '@fontsource/carlito/latin-ext-700.css';
+@import '@fontsource/carlito/latin-400-italic.css';
+@import '@fontsource/carlito/latin-ext-400-italic.css';
+@import '@fontsource/caladea/latin-400.css';
+@import '@fontsource/caladea/latin-ext-400.css';
+@import '@fontsource/caladea/latin-700.css';
+@import '@fontsource/caladea/latin-ext-700.css';
+@import '@fontsource/caladea/latin-400-italic.css';
+@import '@fontsource/caladea/latin-ext-400-italic.css';

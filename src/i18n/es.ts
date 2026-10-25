@@ -336,6 +336,7 @@ export default {
       verdana: 'Abierta y legible',
     },
     fontFamily: 'Tipografía',
+    systemFont: 'según el equipo',
     fontScale: 'Tamaño de letra',
     spacingScale: 'Espaciado',
     pageMargin: 'Margen de página',

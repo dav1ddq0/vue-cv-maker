@@ -2,9 +2,10 @@ import type { CVData } from '@/types/cv'
 import printCss from '@/styles/print.css?raw'
 import { collectDocumentCss, renderTemplateHtml, resolvePhoto } from './render'
 import { downloadBlob, slugify } from './download'
+import { embeddedFontCss } from './fonts'
 
 /**
- * A single `.html` file with the CSS embedded, no external references.
+ * A single `.html` file with the CSS and the CV's font embedded, no external references.
  *
  * The app's own stylesheet is inlined wholesale rather than filtered down to the
  * template's rules: filtering means parsing selectors and guessing, and the
@@ -14,7 +15,9 @@ export async function buildStandaloneHtml(data: CVData, templateId: string): Pro
   const { data: rendered, revoke } = await resolvePhoto(data, 'dataUrl')
   try {
     const body = await renderTemplateHtml(rendered, templateId)
-    const css = `${collectDocumentCss()}\n${printCss}`
+    // The app's @font-face URLs mean nothing in a file opened from disk: the CV's own font is inlined.
+    const fonts = await embeddedFontCss(data.style.fontFamily)
+    const css = `${fonts}\n${collectDocumentCss({ fontFaces: false })}\n${printCss}`
     const title = escapeHtml(data.personal.fullName || data.meta.title)
 
     return `<!doctype html>

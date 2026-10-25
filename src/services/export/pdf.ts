@@ -63,8 +63,10 @@ export async function printCv(
       fillUnpaginated(root, html)
     }
 
-    // Pagination is async; the print dialog must not open before it resolves.
+    // Pagination is async; the print dialog must not open before it resolves, nor before the fonts
+    // the pages ask for have loaded (spec 026).
     await nextFrame()
+    await document.fonts?.ready
     await new Promise<void>((resolve) => {
       const done = () => {
         window.removeEventListener('afterprint', done)
@@ -87,7 +89,10 @@ export async function printCv(
 
 /** Markup + CSS as handed to paged.js, the HTML export and (Phase 5) WeasyPrint. */
 export function exportCss(): string {
-  return `${collectDocumentCss()}\n${printCss}`
+  // No @font-face: the fonts are already registered in this document, and paged.js re-declares every
+  // rule it gets in a sheet of its own, where the copied font URLs no longer resolve. Being later,
+  // those broken faces won, and the PDF came out in the system font (spec 026).
+  return `${collectDocumentCss({ fontFaces: false })}\n${printCss}`
 }
 
 /**
