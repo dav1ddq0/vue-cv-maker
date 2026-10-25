@@ -25,12 +25,21 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **012** · Section library (presets over custom sections)
 - **013** · Mobile experience (touch-first flow: step sheet, dock, bottom sheets, fitted preview)
 - **014** · Optional personal data (date/place of birth, nationality, licence, marital status)
+- **015** · GitHub Pages deployment (analysis; the workflow was already in place)
+- **016** · Mobile polish (one-row header and dock, menu sheet, two panes on tablets and landscape)
+- **017** · Security hardening (import validation, CSP, least-privilege CI, dependency advisories)
+- **018** · Desktop redesign (step rail, header with Export, export dialog, collapsible entries, preview toolbar, My CVs grid)
+- **019** · Desktop redesign, second part (template filters, CEFR picker, System theme, first-run chooser, preview section outline, side-by-side PDF review)
+- **020** · Housekeeping (favicon, base path, README deployment, CI Node 24, photo type and size checks)
 
 ## Next 🔜
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
-- Candidate: template carousel with rendered thumbnails and preview controls (zoom, pages, full screen).
+- Candidate: per-CV template (today the template is a global preference), which would also allow colour thumbnails in My CVs.
+- Candidate: per-section page-break toggle (P2 in 011).
+- Candidate: photo crop / zoom (P2 in 011).
+- Candidate: actionable strength suggestions from a pure function over `CVData` (P2 in 011).
 - Candidate: web fonts via a bundled font package (needs a dependency decision).
 
 ## Backlog / ideas 💡

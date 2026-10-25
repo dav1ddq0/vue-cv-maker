@@ -1,6 +1,6 @@
 # 020 · Housekeeping: deploy details and photo checks
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -20,13 +20,20 @@ CI, photo type and size checks, and an up-to-date roadmap.
 
 ## Acceptance criteria
 
-- [ ] `public/favicon.svg` linked from `index.html`; no 404 on load.
-- [ ] Default `base` is `/vue-cv-maker/`; README, tech-stack doc and the dev URL agree; `BASE_PATH` still overrides it.
-- [ ] README has a Deployment section (URL, Pages source setting, `BASE_PATH`).
-- [ ] CI uses Node 24.
-- [ ] The photo accepts JPG, PNG and WebP only, up to 5 MB; a larger file shows a message with its size and nothing is stored.
-- [ ] Roadmap lists 015–020.
+- [x] `public/favicon.svg` linked from `index.html`; no 404 on load.
+- [x] Default `base` is `/vue-cv-maker/`; README, tech-stack doc and the dev URL agree; `BASE_PATH` still overrides it.
+- [x] README has a Deployment section (URL, Pages source setting, `BASE_PATH`).
+- [x] CI uses Node 24.
+- [x] The photo accepts JPG, PNG and WebP only, up to 5 MB; a larger file shows a message with its size and nothing is stored.
+- [x] Roadmap lists 015–020.
 
 ## Out of scope
 
 - Photo crop / zoom (needs its own design), the shared `github.io` origin (needs a custom domain).
+
+## Verification
+
+- 378 unit tests (new: photo rules, the photo field refusing a 6 MB file and storing a small one).
+- Built site (`vite preview` at `/vue-cv-maker/`): no response ≥ 400 on load (the favicon request
+  returns 200), no CSP violation. `dist/index.html` links `/vue-cv-maker/favicon.svg`.
+- CI on Node 24 is only verifiable on the next push to `main`.
