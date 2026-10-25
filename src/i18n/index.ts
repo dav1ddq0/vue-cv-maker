@@ -48,3 +48,11 @@ export function formatDate(iso: string, locale: Locale = current.value): string 
   if (Number.isNaN(date.getTime())) return ''
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date)
 }
+
+/** "2022-03" → "mar 2022" in the UI language; anything else is returned as typed. */
+export function formatMonth(value: string, locale: Locale = current.value): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(value)
+  if (!match) return value
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, 1)
+  return new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(date)
+}

@@ -1,14 +1,66 @@
 <script setup lang="ts">
+import { computed, useId } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import BaseField from '@/components/ui/BaseField.vue'
 
 const cv = useCvStore()
 const { t } = useI18n()
+const meterId = useId()
+
+/** Recruiters skim: 150–450 characters is two or three sentences (spec 018). Advisory only. */
+const MIN = 150
+const MAX = 450
+const length = computed(() => cv.data.summary.trim().length)
+const verdict = computed(() => (length.value < MIN ? 'short' : length.value > MAX ? 'long' : 'good'))
 </script>
 
 <template>
   <BaseField v-slot="{ id }" :label="t('summary.label')" :hint="t('summary.hint')">
-    <textarea :id="id" v-model="cv.data.summary" rows="6" />
+    <textarea :id="id" v-model="cv.data.summary" rows="6" :aria-describedby="meterId" />
   </BaseField>
+  <div v-if="length > 0" :id="meterId" class="length">
+    <meter :min="0" :max="600" :low="MIN" :high="MAX" :optimum="300" :value="length" aria-hidden="true" />
+    <span class="verdict" :class="`verdict--${verdict}`">
+      {{ t('summary.length', { n: length }) }} · {{ t(`summary.${verdict}`) }}
+    </span>
+  </div>
 </template>
+
+<style scoped>
+.length {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin-top: 0.6em;
+}
+
+meter {
+  flex: 1;
+  max-width: 260px;
+  height: 8px;
+}
+
+.verdict {
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.verdict--good {
+  color: #166534;
+}
+
+.verdict--short,
+.verdict--long {
+  color: #92400e;
+}
+
+:root[data-theme='dark'] .verdict--good {
+  color: #6ee7a0;
+}
+
+:root[data-theme='dark'] .verdict--short,
+:root[data-theme='dark'] .verdict--long {
+  color: #f0c36d;
+}
+</style>

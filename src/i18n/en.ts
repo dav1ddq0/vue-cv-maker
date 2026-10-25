@@ -80,6 +80,10 @@ const en: typeof es = {
   summary: {
     label: 'Professional summary',
     hint: 'Two or three sentences. What you do, with which technologies, and what you are after.',
+    length: '{n} characters',
+    short: 'short — aim for 150–450',
+    good: 'good length',
+    long: 'long — aim for 150–450',
   },
   experience: {
     position: 'Position',
@@ -93,6 +97,13 @@ const en: typeof es = {
     addHighlight: 'Add highlight',
     add: 'Add experience',
     empty: 'No experience yet.',
+  },
+  entry: {
+    expand: 'Expand {title}',
+    collapse: 'Collapse {title}',
+    newExperience: 'New position',
+    newEducation: 'New degree',
+    present: 'Present',
   },
   education: {
     degree: 'Degree',

@@ -80,6 +80,10 @@ export default {
   summary: {
     label: 'Resumen profesional',
     hint: 'Dos o tres frases. Qué haces, con qué tecnologías y qué buscas.',
+    length: '{n} caracteres',
+    short: 'corto: apunta a 150–450',
+    good: 'buena longitud',
+    long: 'largo: apunta a 150–450',
   },
   experience: {
     position: 'Puesto',
@@ -93,6 +97,13 @@ export default {
     addHighlight: 'Añadir logro',
     add: 'Añadir experiencia',
     empty: 'Sin experiencias todavía.',
+  },
+  entry: {
+    expand: 'Desplegar {title}',
+    collapse: 'Contraer {title}',
+    newExperience: 'Puesto nuevo',
+    newEducation: 'Estudio nuevo',
+    present: 'Actualidad',
   },
   education: {
     degree: 'Titulación',
