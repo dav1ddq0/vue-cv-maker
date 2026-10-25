@@ -54,7 +54,8 @@ export default {
     photoRemove: 'Quitar foto',
     photoDrop: 'Arrastra una imagen o haz clic',
     photoReplace: 'Cambiar imagen',
-    photoHint: 'JPG, PNG, WebP',
+    photoHint: 'JPG, PNG o WebP · máx. 5 MB',
+    photoTooLarge: 'La foto pesa {size} MB; el máximo es {max} MB. Prueba con una copia más pequeña.',
     extras: 'Datos adicionales (opcional)',
     extrasNote:
       'Normalmente no hacen falta y en algunos países pueden favorecer la discriminación. Añade solo lo que el puesto o el país pidan: lo que dejes vacío no aparece en el CV.',

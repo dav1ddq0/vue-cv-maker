@@ -6,6 +6,7 @@ import { useValidation } from '@/composables/useValidation'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { usePhotoThumb } from '@/composables/usePhotoThumb'
 import { createLink } from '@/core/factory'
+import { PHOTO_ACCEPT, PHOTO_MAX_MB, checkPhoto } from '@/core/photo'
 import { MARITAL_STATUSES } from '@/types/cv'
 import { deletePhoto, savePhoto, StorageQuotaError } from '@/services/storage'
 import BaseField from '@/components/ui/BaseField.vue'
@@ -35,6 +36,11 @@ const extrasOpen = ref(hasExtras.value)
 
 async function onPhoto(file: File) {
   photoError.value = null
+  const check = checkPhoto(file)
+  if (!check.ok) {
+    photoError.value = t('personal.photoTooLarge', { size: check.sizeMb, max: PHOTO_MAX_MB })
+    return
+  }
   try {
     cv.data.personal.photo = await savePhoto(cv.data.meta.id, file)
     await refreshThumb()
@@ -96,7 +102,7 @@ async function removePhoto() {
             class="photo-drop"
             :input-id="id"
             compact
-            accept="image/*"
+            :accept="PHOTO_ACCEPT"
             :disabled="!photoSupported"
             :hint="t('personal.photoHint')"
             @file="onPhoto"

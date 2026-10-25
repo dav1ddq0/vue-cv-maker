@@ -54,7 +54,8 @@ const en: typeof es = {
     photoRemove: 'Remove photo',
     photoDrop: 'Drag an image or click',
     photoReplace: 'Change image',
-    photoHint: 'JPG, PNG, WebP',
+    photoHint: 'JPG, PNG or WebP · up to 5 MB',
+    photoTooLarge: 'The photo is {size} MB; the limit is {max} MB. Try a smaller copy.',
     extras: 'Additional data (optional)',
     extrasNote:
       'These are usually not needed and in some countries can invite discrimination. Add only what the job or country asks for: anything left empty does not appear on the CV.',
