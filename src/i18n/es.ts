@@ -413,6 +413,12 @@ export default {
     show: 'Ver vista previa',
     hide: 'Ocultar vista previa',
     page: 'Página {n} de {total}',
+    zoomOut: 'Alejar',
+    zoomIn: 'Acercar',
+    fit: 'Ajustar',
+    fitLabel: 'Ajustar la página al panel',
+    change: 'Cambiar',
+    changeTemplate: 'Plantilla {name}: cambiar',
   },
   cv: {
     present: 'Actualidad',

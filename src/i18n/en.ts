@@ -413,6 +413,12 @@ const en: typeof es = {
     show: 'Show preview',
     hide: 'Hide preview',
     page: 'Page {n} of {total}',
+    zoomOut: 'Zoom out',
+    zoomIn: 'Zoom in',
+    fit: 'Fit',
+    fitLabel: 'Fit the page to the panel',
+    change: 'Change',
+    changeTemplate: 'Template {name}: change',
   },
   cv: {
     present: 'Present',

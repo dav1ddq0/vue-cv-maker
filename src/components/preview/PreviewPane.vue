@@ -6,6 +6,7 @@ import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import { useIsCompact, useIsPhone } from '@/composables/useIsPhone'
+import { getTemplate } from '@/templates/registry'
 import CvRenderer from './CvRenderer.vue'
 
 const cv = useCvStore()
@@ -21,12 +22,16 @@ const PAGE_PX = 793.7
 const scroller = ref<HTMLElement | null>(null)
 const available = ref(0)
 let observer: ResizeObserver | undefined
+let userZoomed = false
 
 onMounted(() => {
   const el = scroller.value
   if (!el || typeof ResizeObserver === 'undefined') return
   observer = new ResizeObserver(([entry]) => {
-    if (entry) available.value = entry.contentRect.width
+    if (!entry) return
+    available.value = entry.contentRect.width
+    // Until the user picks a zoom, the page follows the panel width (spec 018).
+    if (!userZoomed) fit()
   })
   observer.observe(el)
 })
@@ -38,6 +43,28 @@ const effectiveZoom = computed(() => {
   return Math.min(1, available.value / PAGE_PX)
 })
 
+const ZOOM_MIN = 0.4
+const ZOOM_MAX = 1.2
+const ZOOM_STEP = 0.1
+const zoomPercent = computed(() => Math.round(zoom.value * 100))
+
+function zoomBy(delta: number) {
+  userZoomed = true
+  zoom.value = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round((zoom.value + delta) * 10) / 10))
+}
+
+/** The zoom at which the page fills the panel (`contentRect` already excludes the padding). */
+function fit() {
+  if (available.value > 0) zoom.value = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, available.value / PAGE_PX))
+}
+
+function fitToPanel() {
+  userZoomed = false
+  fit()
+}
+
+const templateName = computed(() => getTemplate(ui.templateId).name)
+
 const scaleStyle = computed(() => ({
   transform: `scale(${effectiveZoom.value})`,
   // A scaled element keeps its layout box, which would leave a large gap below.
@@ -48,12 +75,23 @@ const scaleStyle = computed(() => ({
 <template>
   <section class="pane" :aria-label="t('preview.title')">
     <header v-if="!isPhone" class="bar">
-      <h2 class="title">{{ t('preview.title') }}</h2>
-      <label v-if="!isCompact" class="zoom">
-        <span class="sr-only">Zoom</span>
-        <input v-model.number="zoom" type="range" min="0.4" max="1" step="0.02" />
-        <output>{{ Math.round(zoom * 100) }}%</output>
-      </label>
+      <h2 class="title" :class="{ 'sr-only': !isCompact }">{{ t('preview.title') }}</h2>
+      <button
+        v-if="!isCompact"
+        type="button"
+        class="chip"
+        :aria-label="t('preview.changeTemplate', { name: templateName })"
+        @click="ui.goTo('style')"
+      >
+        <span class="swatch" :style="{ background: cv.data.style.accentColor }" aria-hidden="true" />
+        {{ templateName }} <span class="chip-action">· {{ t('preview.change') }}</span>
+      </button>
+      <div v-if="!isCompact" class="zoom" role="group" aria-label="Zoom">
+        <button type="button" class="zoom-btn" :aria-label="t('preview.zoomOut')" :disabled="zoom <= ZOOM_MIN" @click="zoomBy(-ZOOM_STEP)">−</button>
+        <output class="zoom-value" aria-live="polite">{{ zoomPercent }} %</output>
+        <button type="button" class="zoom-btn" :aria-label="t('preview.zoomIn')" :disabled="zoom >= ZOOM_MAX" @click="zoomBy(ZOOM_STEP)">+</button>
+        <button type="button" class="fit" :aria-label="t('preview.fitLabel')" @click="fitToPanel">{{ t('preview.fit') }}</button>
+      </div>
     </header>
 
     <div ref="scroller" class="scroll">
@@ -102,8 +140,73 @@ const scaleStyle = computed(() => ({
   color: var(--text-muted);
 }
 
-.zoom input {
-  width: 7em;
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 34px;
+  padding: 0 0.7em;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: var(--surface-2);
+}
+
+.chip-action {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.zoom-btn,
+.fit {
+  min-width: 32px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.zoom-btn {
+  font-size: 1.1em;
+}
+
+.zoom-btn:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.zoom-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.fit {
+  padding: 0 0.6em;
+  background: var(--surface-2);
+  font-size: 0.85em;
+}
+
+.zoom-value {
+  min-width: 3.5em;
+  text-align: center;
+  color: var(--text);
 }
 
 .scroll {
