@@ -210,11 +210,14 @@ const languages = computed(() => resolveLanguages(props.data))
   padding-top: calc(var(--cv-page-margin) * 0.5);
 }
 
+/* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
 .main {
+  grid-column: 1;
   padding-left: calc(var(--cv-page-margin) * 0.4);
 }
 
 .aside {
+  grid-column: 2;
   padding-right: calc(var(--cv-page-margin) * 0.4);
 }
 

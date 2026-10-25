@@ -39,6 +39,9 @@ export async function renderTemplateHtml(data: CVData, templateId: string): Prom
 export function collectDocumentCss(): string {
   const chunks: string[] = []
   for (const sheet of Array.from(document.styleSheets)) {
+    // paged.js output from an earlier run (see `PAGED_STYLE_ATTR` in pdf.ts): copying it would make
+    // the CSS grow with every export.
+    if (sheet.ownerNode instanceof Element && sheet.ownerNode.hasAttribute('data-cv-paged')) continue
     try {
       for (const rule of Array.from(sheet.cssRules)) chunks.push(rule.cssText)
     } catch {

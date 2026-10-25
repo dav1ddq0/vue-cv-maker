@@ -208,11 +208,14 @@ const languages = computed(() => resolveLanguages(props.data))
   color: var(--cv-accent-text);
 }
 
+/* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
 .main {
+  grid-column: 1;
   padding: 0 calc(var(--cv-page-margin) * 0.7) var(--cv-page-margin) var(--cv-page-margin);
 }
 
 .aside {
+  grid-column: 2;
   margin-right: var(--cv-page-margin);
   margin-bottom: var(--cv-page-margin);
   padding-left: calc(var(--cv-page-margin) * 0.7);

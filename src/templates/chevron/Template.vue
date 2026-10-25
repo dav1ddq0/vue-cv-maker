@@ -237,11 +237,14 @@ const languages = computed(() => resolveLanguages(props.data))
   color: #555;
 }
 
+/* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
 .main {
+  grid-column: 1;
   padding: 0 0 var(--cv-page-margin) var(--cv-page-margin);
 }
 
 .aside {
+  grid-column: 2;
   padding: 0 var(--cv-page-margin) var(--cv-page-margin) 0;
 }
 

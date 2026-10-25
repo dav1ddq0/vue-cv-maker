@@ -8,7 +8,7 @@
  */
 import { onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { CVData } from '@/types/cv'
-import { exportCss, paginateInto, renderTemplateHtml, resolvePhoto } from '@/services/export'
+import { exportCss, paginateInto, releasePagination, renderTemplateHtml, resolvePhoto } from '@/services/export'
 import { useI18n } from '@/i18n'
 import { debounce } from '@/core/debounce'
 
@@ -35,6 +35,7 @@ watch([() => props.data, () => props.templateId, host], () => schedule(), {
 onBeforeUnmount(() => {
   schedule.cancel()
   revokeCurrent?.()
+  if (host.value) releasePagination(host.value)
 })
 
 async function repaginate() {

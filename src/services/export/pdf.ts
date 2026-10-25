@@ -11,6 +11,22 @@ import { collectDocumentCss, renderTemplateHtml, resolvePhoto } from './render'
 
 const PRINT_ROOT_ID = 'print-root'
 
+/** Marks the `<style>` elements a paged.js run added to `<head>`; `collectDocumentCss` skips them. */
+export const PAGED_STYLE_ATTR = 'data-cv-paged'
+
+/**
+ * paged.js appends its styles to `<head>` on every run and never removes them. Left there, the next
+ * export copied them into its own CSS, which then doubled on every run (72 KB, 166 KB, 354 KB…) until
+ * pagination crawled (spec 022). Each container keeps only the styles of its latest run.
+ */
+const pagedStyles = new WeakMap<HTMLElement, HTMLStyleElement[]>()
+
+/** Drops the styles of `container`'s last pagination; call once its pages are gone. */
+export function releasePagination(container: HTMLElement): void {
+  for (const style of pagedStyles.get(container) ?? []) style.remove()
+  pagedStyles.delete(container)
+}
+
 export interface PrintOptions {
   /** Run paged.js first. Falls back to plain print if pagination fails. */
   paginate?: boolean
@@ -50,6 +66,7 @@ export async function printCv(
     })
   } finally {
     root.innerHTML = ''
+    releasePagination(root)
     revoke()
   }
 }
@@ -73,6 +90,8 @@ export async function paginateInto(
   html: string,
   css: string,
 ): Promise<boolean> {
+  releasePagination(container)
+  const before = new Set(document.head.querySelectorAll('style'))
   try {
     const { Previewer } = await import('pagedjs')
     const previewer = new Previewer()
@@ -87,6 +106,10 @@ export async function paginateInto(
     container.innerHTML = ''
     console.warn('[export] paged.js failed; falling back to unpaginated output', error)
     return false
+  } finally {
+    const added = [...document.head.querySelectorAll('style')].filter((style) => !before.has(style))
+    for (const style of added) style.setAttribute(PAGED_STYLE_ATTR, '')
+    pagedStyles.set(container, added)
   }
 }
 

@@ -130,7 +130,9 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
   --gap: calc(1em * var(--cv-spacing-scale));
 }
 
+/* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
 .sidebar {
+  grid-column: 1;
   background: var(--cv-accent);
   color: #fff;
   padding: var(--cv-page-margin) calc(var(--cv-page-margin) * 0.7);
@@ -186,6 +188,7 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
 }
 
 .main {
+  grid-column: 2;
   padding: var(--cv-page-margin);
 }
 

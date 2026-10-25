@@ -147,7 +147,9 @@ const languages = computed(() => resolveLanguages(props.data))
   --gap: calc(1em * var(--cv-spacing-scale));
 }
 
+/* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
 .sidebar {
+  grid-column: 1;
   background: var(--cv-accent);
   color: var(--cv-on-accent);
   padding: var(--cv-page-margin) calc(var(--cv-page-margin) * 0.7);
@@ -220,6 +222,7 @@ const languages = computed(() => resolveLanguages(props.data))
 }
 
 .main {
+  grid-column: 2;
   padding: var(--cv-page-margin);
 }
 

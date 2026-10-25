@@ -10,13 +10,15 @@ vi.mock('pagedjs', () => ({
   Previewer: class {
     async preview(html: string, _css: unknown, container: HTMLElement) {
       received.push(html)
+      // Like paged.js, leave a style behind in <head> on every run.
+      document.head.appendChild(document.createElement('style'))
       container.innerHTML = '<div class="pagedjs_pages"><div class="pagedjs_page"></div></div>'
       throw new TypeError("Cannot read properties of null (reading 'getBoundingClientRect')")
     }
   },
 }))
 
-const { paginateInto } = await import('@/services/export/pdf')
+const { paginateInto, releasePagination, PAGED_STYLE_ATTR } = await import('@/services/export/pdf')
 
 describe('PDF export pagination (spec 022)', () => {
   it('leaves nothing behind when paged.js fails, so the fallback cannot follow a blank sheet', async () => {
@@ -31,6 +33,20 @@ describe('PDF export pagination (spec 022)', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     await paginateInto(document.createElement('div'), '<article>CV</article>', '')
     expect(received.at(-1)).toBe('<div class="cv-page cv-page--paged"><article>CV</article></div>')
+  })
+
+  it("keeps only the latest run's paged.js styles per container, and releases them", async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const container = document.createElement('div')
+    const earlier = document.head.querySelectorAll(`style[${PAGED_STYLE_ATTR}]`).length
+    const tagged = () => document.head.querySelectorAll(`style[${PAGED_STYLE_ATTR}]`).length - earlier
+
+    await paginateInto(container, '<p>1</p>', '')
+    await paginateInto(container, '<p>2</p>', '')
+    expect(tagged()).toBe(1)
+
+    releasePagination(container)
+    expect(tagged()).toBe(0)
   })
 
   it('keeps the print root rendered on screen; paged.js cannot measure inside display: none', () => {

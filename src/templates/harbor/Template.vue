@@ -151,6 +151,7 @@ const languages = computed(() => resolveLanguages(props.data))
 }
 
 .sidebar {
+  grid-column: 2;
   background: #1f2937;
   color: #fff;
   border-top: 0.45em solid var(--cv-accent);
@@ -224,7 +225,9 @@ const languages = computed(() => resolveLanguages(props.data))
   overflow-wrap: break-word;
 }
 
+/* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
 .main {
+  grid-column: 1;
   padding: var(--cv-page-margin);
 }
 
