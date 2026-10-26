@@ -185,6 +185,7 @@ async function removePhoto() {
             <BaseButton
               size="sm"
               variant="danger"
+              :aria-label="item.label || item.url ? t('actions.removeNamed', { name: item.label || item.url }) : undefined"
               @click="cv.data.personal.links.splice(index, 1)"
             >
               {{ t('actions.remove') }}

@@ -29,8 +29,10 @@ describe('WelcomeView (spec 019)', () => {
 
     ui.view = 'welcome'
     await blank!.trigger('click')
-    expect(ui.view).toBe('editor')
+    await vi.waitFor(() => expect(ui.view).toBe('editor'))
     expect(ui.step).toBe('personal')
+    // Stored at once, so a reload opens the editor and not the welcome screen again (spec 027).
+    expect(createNew).toHaveBeenCalledWith()
 
     await sample!.trigger('click')
     expect(createNew).toHaveBeenCalledWith({ seed: expect.objectContaining({ personal: expect.any(Object) }) })

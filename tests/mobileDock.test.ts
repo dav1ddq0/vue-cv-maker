@@ -18,7 +18,7 @@ const text = (wrapper: ReturnType<typeof mount>, label: string) =>
   wrapper.findAll('button').find((b) => b.text().includes(label))!
 
 describe('MobileDock', () => {
-  it('has one main action that goes to the next step and is disabled on the last one', async () => {
+  it('has one main action that goes to the next step, and exports on the last one (spec 027)', async () => {
     const ui = useUiStore()
     ui.goTo('personal')
     const wrapper = mount(MobileDock)
@@ -28,7 +28,10 @@ describe('MobileDock', () => {
 
     ui.goTo('export')
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.action').attributes('disabled')).toBeDefined()
+    const action = wrapper.find('.action')
+    expect(action.text()).toBe('Exportar')
+    expect(action.attributes('disabled')).toBeUndefined()
+    expect(action.attributes('aria-haspopup')).toBe('dialog')
   })
 
   it('switches between editing and preview and keeps a way back', async () => {

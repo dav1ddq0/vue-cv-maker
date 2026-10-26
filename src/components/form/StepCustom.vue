@@ -35,7 +35,7 @@ const orderItems = computed(() =>
     id,
     label:
       cv.data.customSections.find((section) => section.id === id)?.title ||
-      (isBuiltin(id) ? t(`steps.${id}`) : t('custom.title')),
+      (isBuiltin(id) ? t(`steps.${id}`) : t('custom.untitled')),
   })),
 )
 
@@ -84,7 +84,7 @@ function removeSection(index: number) {
               <BaseField v-slot="{ id }" :label="t('custom.title')" :hint="t('custom.titleHint')">
                 <input :id="id" v-model="item.title" />
               </BaseField>
-              <BaseButton size="sm" variant="danger" @click="removeSection(index)">
+              <BaseButton size="sm" variant="danger" :aria-label="t('actions.removeNamed', { name: item.title || t('custom.untitled') })" @click="removeSection(index)">
                 {{ t('actions.remove') }}
               </BaseButton>
             </div>
@@ -107,7 +107,7 @@ function removeSection(index: number) {
                     <textarea :id="id" v-model="entry.description" rows="2" />
                   </BaseField>
                   <div class="actions">
-                    <BaseButton size="sm" variant="danger" @click="item.entries.splice(entryIndex, 1)">
+                    <BaseButton size="sm" variant="danger" :aria-label="entry.title ? t('actions.removeNamed', { name: entry.title }) : undefined" @click="item.entries.splice(entryIndex, 1)">
                       {{ t('actions.remove') }}
                     </BaseButton>
                   </div>

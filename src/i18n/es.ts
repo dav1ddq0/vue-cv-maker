@@ -15,6 +15,8 @@ export default {
   actions: {
     add: 'Añadir',
     remove: 'Eliminar',
+    /** Screen-reader name of a Remove button: the visible word plus what it removes (spec 027). */
+    removeNamed: 'Eliminar {name}',
     duplicate: 'Duplicar',
     cancel: 'Cancelar',
     confirm: 'Confirmar',
@@ -144,7 +146,7 @@ export default {
     levelHelp: 'A1–A2 básico · B1–B2 independiente · C1–C2 competente. O escribe tu propio nivel.',
   },
   header: {
-    breadcrumb: 'Ubicación',
+    breadcrumb: 'Ruta',
     docTitle: 'Nombre del documento',
     saved: 'Guardado en este navegador',
     saving: 'Guardando…',
@@ -213,6 +215,7 @@ export default {
   custom: {
     title: 'Título de la sección',
     titleHint: 'Ej.: Publicaciones, Voluntariado',
+    untitled: 'Sección sin título',
     entryTitle: 'Título',
     entrySubtitle: 'Subtítulo',
     entryDate: 'Fecha',

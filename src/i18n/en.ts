@@ -15,6 +15,7 @@ const en: typeof es = {
   actions: {
     add: 'Add',
     remove: 'Remove',
+    removeNamed: 'Remove {name}',
     duplicate: 'Duplicate',
     cancel: 'Cancel',
     confirm: 'Confirm',
@@ -144,7 +145,7 @@ const en: typeof es = {
     levelHelp: 'A1–A2 basic · B1–B2 independent · C1–C2 proficient. Or type your own level.',
   },
   header: {
-    breadcrumb: 'Location',
+    breadcrumb: 'Breadcrumb',
     docTitle: 'Document name',
     saved: 'Saved in this browser',
     saving: 'Saving…',
@@ -213,6 +214,7 @@ const en: typeof es = {
   custom: {
     title: 'Section title',
     titleHint: 'e.g. Publications, Volunteering',
+    untitled: 'Untitled section',
     entryTitle: 'Title',
     entrySubtitle: 'Subtitle',
     entryDate: 'Date',

@@ -6,6 +6,9 @@ import en from './en'
 export type Locale = 'es' | 'en'
 export type Messages = typeof es
 
+/** Each UI language named in itself, so it reads right whatever the current UI language (spec 027). */
+export const LOCALE_NAMES: Record<Locale, string> = { es: 'Español', en: 'English' }
+
 const dictionaries: Record<Locale, Messages> = { es, en }
 
 const current = ref<Locale>(readPrefs().uiLanguage)

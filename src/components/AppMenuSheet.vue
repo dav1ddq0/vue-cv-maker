@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Phone menu (spec 016): what the one-row header cannot hold — views, language, theme, storage note. */
 import { useUiStore } from '@/stores/ui'
-import { useI18n, type Locale } from '@/i18n'
+import { LOCALE_NAMES, useI18n, type Locale } from '@/i18n'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
 
 defineProps<{ open: boolean }>()
@@ -45,9 +45,10 @@ function go(view: (typeof VIEWS)[number]) {
             role="radio"
             class="segment"
             :aria-checked="locale === code"
+            :lang="code"
             @click="locale = code as Locale"
           >
-            {{ (code as Locale).toUpperCase() }}
+            {{ LOCALE_NAMES[code as Locale] }}
           </button>
         </div>
       </div>

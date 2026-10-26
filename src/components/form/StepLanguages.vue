@@ -24,7 +24,7 @@ const { t } = useI18n()
           <BaseField v-slot="{ id }" :label="t('languages.level')">
             <input :id="id" v-model="item.level" list="cv-language-levels" />
           </BaseField>
-          <BaseButton size="sm" variant="danger" @click="cv.data.languages.splice(index, 1)">
+          <BaseButton size="sm" variant="danger" :aria-label="item.name ? t('actions.removeNamed', { name: item.name }) : undefined" @click="cv.data.languages.splice(index, 1)">
             {{ t('actions.remove') }}
           </BaseButton>
           <LanguageLevelPicker

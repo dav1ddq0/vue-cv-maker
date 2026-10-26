@@ -101,7 +101,7 @@ function entrySubtitle(item: ExperienceEntry): string {
             </BaseField>
 
             <div class="actions">
-              <BaseButton size="sm" variant="danger" @click="cv.data.experience.splice(index, 1)">
+              <BaseButton size="sm" variant="danger" :aria-label="t('actions.removeNamed', { name: entryTitle(item) })" @click="cv.data.experience.splice(index, 1)">
                 {{ t('actions.remove') }}
               </BaseButton>
             </div>

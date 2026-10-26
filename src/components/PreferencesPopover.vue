@@ -6,7 +6,7 @@
  */
 import { onMounted, ref, useId } from 'vue'
 import { useUiStore } from '@/stores/ui'
-import { useI18n, type Locale } from '@/i18n'
+import { LOCALE_NAMES, useI18n, type Locale } from '@/i18n'
 import { useCvExport } from '@/composables/useCvExport'
 
 const ui = useUiStore()
@@ -62,9 +62,10 @@ function toggleFallback() {
             role="radio"
             class="segment"
             :aria-checked="locale === code"
+            :lang="code"
             @click="locale = code as Locale"
           >
-            {{ (code as Locale).toUpperCase() }}
+            {{ LOCALE_NAMES[code as Locale] }}
           </button>
         </div>
         <span class="hint">{{ t('prefs.languageHint') }}</span>

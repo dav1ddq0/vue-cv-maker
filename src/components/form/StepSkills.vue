@@ -33,7 +33,7 @@ const levelsReason = reasonFor('skillLevels')
             <SkillItemsEditor :id="id" v-model="item.items" :levels-disabled="!levelsSupported" />
           </BaseField>
           <div class="actions">
-            <BaseButton size="sm" variant="danger" @click="cv.data.skills.splice(index, 1)">
+            <BaseButton size="sm" variant="danger" :aria-label="item.category ? t('actions.removeNamed', { name: item.category }) : undefined" @click="cv.data.skills.splice(index, 1)">
               {{ t('actions.remove') }}
             </BaseButton>
           </div>

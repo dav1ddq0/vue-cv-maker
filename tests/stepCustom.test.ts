@@ -95,3 +95,20 @@ describe('StepCustom page breaks (spec 022)', () => {
     expect(cv.data.pageBreaks).toEqual(['education'])
   })
 })
+
+describe('StepCustom names (spec 027)', () => {
+  beforeEach(() => setActivePinia(createPinia()))
+
+  it('calls an untitled section "Sección sin título" and names what each Remove removes', async () => {
+    const wrapper = mount(StepCustom)
+    await button(wrapper, 'Sección en blanco').trigger('click')
+    const labels = wrapper.findAll('.order-label').map((l) => l.text())
+    expect(labels.at(-1)).toBe('Sección sin título')
+    expect(wrapper.find('input[aria-label="Página nueva antes de Sección sin título"]').exists()).toBe(true)
+    expect(wrapper.find('button[aria-label="Eliminar Sección sin título"]').exists()).toBe(true)
+
+    await button(wrapper, 'Cursos').trigger('click')
+    const section = useCvStore().data.customSections.at(-1)!
+    expect(wrapper.find(`button[aria-label="Eliminar ${section.title}"]`).text()).toBe('Eliminar')
+  })
+})

@@ -10,8 +10,12 @@ const cv = useCvStore()
 const ui = useUiStore()
 const { t } = useI18n()
 
-/** The blank CV already exists (cv.init made it, unsaved): just open the wizard on it. */
-function startBlank() {
+/**
+ * Stores the empty CV right away. cv.init's blank document is never saved until edited, so only
+ * navigating to it brought the welcome screen back on the next visit (spec 027).
+ */
+async function startBlank() {
+  await cv.createNew()
   ui.goTo('personal')
 }
 
