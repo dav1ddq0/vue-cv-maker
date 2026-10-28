@@ -35,7 +35,18 @@
 - Same page count as the print for all 13; `pdftotext` of the download contains every character the
   printed PDF does (0 missing); 0.2–3 % of pixels differ at 50 dpi, except Chevron (14 %: its
   clip-path header). 230–530 ms per CV; 20–30 KB per PDF.
-- Still missing: clip-path shapes (Chevron header, Facet corners), glyphs no bundled font has (★ in
-  Harbor's levels), the photo, SVG marks, gradients.
+- Then missing: the Chevron header and Facet corners (inline SVG), Harbor's level stars (boxes cut by
+  `clip-path: polygon()`, not a ★ glyph), the opacity of the "off" level marks, the photo.
+
+## Converter result (13 templates × sample, photo, long CV, page break = 52 PDFs)
+
+- Same page count as the print in all 52; 0 characters missing; at most 2.5 % of pixels differ
+  (threshold 4 %). 230–650 ms per CV; 20–43 KB per PDF (the photo adds ~17 KB).
+- Generated CVs: Latin Extended inside a word (Żółkiewski-Dvořák) splits across the latin and
+  latin-ext files; «», €, `<b>` as literal text and a 70-letter word come out as text; links equal
+  the print's. Only the colour emoji is left out, as specified.
+- System fonts (Georgia, Arial): PDF standard Times / Helvetica, positions kept by the width
+  matching (diff 1.8 %); characters WinAnsi lacks (Ł, ř) take EB Garamond or Source Sans instead of
+  disappearing.
 - **Visual comparison** with `pdftoppm` renders of both PDFs and a per-pixel difference, in the
   scratch QA tooling (not a unit test): it needs Chromium's print to PDF as the reference.
