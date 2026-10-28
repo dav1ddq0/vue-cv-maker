@@ -40,3 +40,40 @@ describe('ui store theme', () => {
     expect(document.documentElement.dataset.theme).toBe('dark')
   })
 })
+
+describe('theme on Android and first visits (spec 029)', () => {
+  afterEach(() => {
+    // @ts-expect-error restore the jsdom default (no matchMedia)
+    delete window.matchMedia
+    localStorage.clear()
+    document.head.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove())
+  })
+
+  it('follows the system on a first visit, and keeps a stored choice', async () => {
+    window.matchMedia = vi.fn(() => ({ matches: true, addEventListener: () => {}, removeEventListener: () => {} })) as unknown as typeof window.matchMedia
+    const { readPrefs } = await import('@/services/prefs')
+    expect(readPrefs().theme).toBe('system')
+    setActivePinia(createPinia())
+    const { useUiStore } = await import('@/stores/ui')
+    expect(useUiStore().resolvedTheme).toBe('dark')
+
+    localStorage.setItem('cv-maker:prefs', JSON.stringify({ theme: 'light' }))
+    setActivePinia(createPinia())
+    expect(useUiStore().resolvedTheme).toBe('light')
+  })
+
+  it('paints theme-color with the page colour of the theme in use', async () => {
+    for (const media of ['(prefers-color-scheme: light)', '(prefers-color-scheme: dark)']) {
+      const meta = document.createElement('meta')
+      meta.name = 'theme-color'
+      meta.media = media
+      document.head.append(meta)
+    }
+    document.body.style.backgroundColor = 'rgb(17, 19, 23)'
+    setActivePinia(createPinia())
+    const { useUiStore } = await import('@/stores/ui')
+    useUiStore().setTheme('dark')
+    const colours = [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((m) => m.content)
+    expect(colours).toEqual(['rgb(17, 19, 23)', 'rgb(17, 19, 23)'])
+  })
+})

@@ -18,7 +18,8 @@ const DEFAULTS: Prefs = {
   uiLanguage: 'es',
   lastTemplateId: 'classic',
   lastCvId: null,
-  theme: 'light',
+  // Like any Android or desktop app: follow the system until the user picks one (spec 029).
+  theme: 'system',
   dismissedNotices: [],
 }
 

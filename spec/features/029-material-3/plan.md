@@ -29,5 +29,9 @@
 - **`unicode-range`**: `fonts.css` declares the faces itself (Latin and Latin Extended, with M3's
   ranges from Fontsource's combined CSS) pointing at the package files, instead of importing the
   per-subset CSS that lacks the range. A test fails if a face has no range.
-- **CV paper in dark**: stays `#fff`; dark mode adds a surface-container frame and M3 elevation
-  around it, and dims nothing inside it (what you see is what prints).
+- **CV paper in dark**: stays `#fff` in the document; on screen, dark mode dims the preview paper to
+  88 % brightness (M3 allows dimming images in dark themes), which removes the glare the user
+  reported. Print, PDF and HTML export render separately and are unaffected. Template thumbnails are
+  drawings, so their four fixed colours are remapped to M3 roles in dark.
+- **Text fields fill their container**: the label is drawn over the control, which spans the whole
+  56 dp box, so the entire field is the touch target, as in M3.

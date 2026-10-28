@@ -216,7 +216,7 @@ async function removePhoto() {
 .extras-summary {
   display: flex;
   align-items: center;
-  min-height: 44px;
+  min-height: var(--target);
   font-weight: 600;
   cursor: pointer;
 }

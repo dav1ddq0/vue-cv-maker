@@ -16,7 +16,7 @@ const { t } = useI18n()
 
 <template>
   <div class="strip">
-    <div class="page" aria-hidden="true" inert>
+    <div class="page cv-preview-paper" aria-hidden="true" inert>
       <div class="scaled">
         <CvRenderer :data="cv.data" :template-id="cv.templateId" />
       </div>

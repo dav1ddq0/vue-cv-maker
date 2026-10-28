@@ -165,6 +165,15 @@ function onKeydown(event: KeyboardEvent) {
 
 /* Phones: name and remove share the first line; the level select gets its own, so the name is
    not squeezed to a few letters next to the select. */
+/* Touch: every control in a row reaches the 48 dp target (spec 029). */
+@media (pointer: coarse) {
+  .name,
+  .add,
+  .level {
+    min-height: var(--target);
+  }
+}
+
 @media (max-width: 480px) {
   .row {
     grid-template-columns: minmax(0, 1fr) auto;

@@ -138,6 +138,31 @@ const shown = computed(() =>
   height: 100%;
 }
 
+/*
+ * Dark theme: the thumbnails are drawings of a page, not the CV, so they take the theme's tones
+ * instead of glaring white (spec 029). Their four fixed colours map onto M3 roles; white on the
+ * accent (headers) stays white.
+ */
+:root[data-theme='dark'] .thumb {
+  background: var(--md-surface-container-highest);
+}
+
+:root[data-theme='dark'] .thumb :deep(svg > rect:first-child[fill='#fff']) {
+  fill: var(--md-surface-container-highest);
+}
+
+:root[data-theme='dark'] .thumb :deep([fill='#1f2937']) {
+  fill: var(--md-on-surface);
+}
+
+:root[data-theme='dark'] .thumb :deep([fill='#9ca3af']) {
+  fill: var(--md-on-surface-variant);
+}
+
+:root[data-theme='dark'] .thumb :deep([fill='#d1d5db']) {
+  fill: var(--md-outline-variant);
+}
+
 .card-name {
   font-weight: 600;
 }

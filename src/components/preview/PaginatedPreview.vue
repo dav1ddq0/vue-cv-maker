@@ -85,7 +85,7 @@ async function repaginate() {
       <span v-else-if="failed" class="failed">{{ t('exportView.paginatedFailed') }}</span>
       <span v-else-if="pages">{{ t('preview.page', { n: pages, total: pages }) }}</span>
     </p>
-    <div ref="host" class="pages" />
+    <div ref="host" class="pages cv-preview-paper" />
   </div>
 </template>
 

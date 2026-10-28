@@ -60,6 +60,9 @@ export const useUiStore = defineStore('ui', () => {
 
   function applyTheme() {
     document.documentElement.dataset.theme = resolvedTheme.value
+    // The status bar and Chrome's toolbar take the page colour of the theme in use (spec 029).
+    const colour = getComputedStyle(document.body).backgroundColor
+    for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) meta.content = colour
   }
 
   function setTheme(next: ThemeChoice) {

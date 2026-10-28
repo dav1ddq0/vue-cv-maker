@@ -40,10 +40,10 @@ const id = useId()
 /* Container: surface-container-highest, rounded on top, an active indicator along the bottom. */
 .box {
   --indicator: var(--md-on-surface-variant);
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 56px;
-  padding: 8px 16px 0;
   border-radius: var(--shape-xs) var(--shape-xs) 0 0;
   background: var(--md-surface-container-highest);
   box-shadow: inset 0 -1px 0 var(--indicator);
@@ -60,7 +60,16 @@ const id = useId()
   box-shadow: inset 0 -2px 0 var(--indicator);
 }
 
+/* Drawn over the control, which fills the whole container: all of it is the touch target (M3). */
 .label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  right: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
   font: var(--type-body-small);
   letter-spacing: var(--tracking-body-small);
   color: var(--md-on-surface-variant);
@@ -95,8 +104,8 @@ const id = useId()
 .box > :deep(textarea),
 .box > :deep(select) {
   width: 100%;
-  min-height: 0;
-  padding: 2px 0 8px;
+  min-height: 56px;
+  padding: 24px 16px 8px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -108,7 +117,12 @@ const id = useId()
 
 .box > :deep(textarea) {
   resize: vertical;
-  min-height: 5em;
+  min-height: 7em;
+}
+
+/* Composite controls (chips, skill rows) sit below the label on the same container. */
+.box > :deep(:not(input, textarea, select, label)) {
+  padding: 24px 16px 8px;
 }
 
 /*

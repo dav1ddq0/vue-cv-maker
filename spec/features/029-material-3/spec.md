@@ -1,6 +1,6 @@
 # 029 · Material 3 interface (dark mode and Android)
 
-**Status:** in progress 🚧
+**Status:** implemented ✅
 
 ## What it does
 
@@ -55,16 +55,32 @@ The Android audit of 2026-10-28 (Pixel 7, Chrome, dark and light):
 
 ### Dark mode and Android
 
-10. [ ] **"System" is the default theme**; a stored "Light" or "Dark" choice is kept.
-11. [ ] **`theme-color`** follows the resolved theme, live.
-12. [ ] **The CV paper stays white** (it is what prints) but sits on a tonal frame in dark: template
-        thumbnails and the small preview no longer glare.
-13. [ ] **48 dp touch targets** on phones for every interactive element.
+10. [x] **"System" is the default theme**; a stored "Light" or "Dark" choice is kept. (Saving any
+        preference used to store the default too, so earlier visitors may carry a stored "Light".)
+11. [x] **`theme-color`** follows the resolved theme, live.
+12. [x] **No glare in dark**: the template thumbnails (drawings of a page, not the CV) take the
+        theme's tones; the on-screen CV paper is dimmed to 88 % brightness. Print, PDF and the HTML
+        export are rendered separately and unchanged. Before the script runs, the page uses the
+        system's canvas colour, so a dark phone sees no light flash.
+13. [x] **48 dp touch targets** on phones for every interactive element.
 
 ### Unchanged
 
 - The CV templates, their fonts, print and PDF output.
 - Layout and flows (steps, sheets, views); this is a visual and token change.
+
+## Verification
+
+- 466 unit tests. New: every M3 colour pairing meets WCAG AA in light and dark; every bundled font
+  face has its `unicode-range`; "System" is the first-visit default; `theme-color` follows the theme.
+- Android audit (Pixel 7 profile, Chromium) on 16 screens in dark and light: no text below WCAG AA,
+  no light patch in dark beyond M3's own primary, every control's touch target ≥ 48 dp (only the
+  visually hidden file inputs, reached through their drop zones, are smaller).
+- The E2E suite on the built site: 80/80 checks. First load: 87 KB JS, 14 KB CSS, 34 KB fonts in 6
+  requests (was 176 KB of fonts in 11).
+- The browser-print PDF for 13 templates × sample, long CV and a manual page break: 39/39 with the
+  same page counts as before the redesign, no blank pages, the break where set.
+- Latin Extended loads on demand: typing "Dvořák" fetches the latin-ext files then, not before.
 
 ## Out of scope
 

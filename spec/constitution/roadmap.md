@@ -39,10 +39,9 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **026** · Bundled fonts (Fontsource, served from the app; PDF and HTML export use them)
 - **027** · Fixes from the functional review (blank CV stored, phone export on the last step, Fit ≤ 100 %, screen-reader names)
 - **028** · Vue best-practices pass (async races in the preview and crop dialog, custom-section store actions, `DateRangeFields`, `useModalDialog`, Vue 3.5 idioms)
+- **029** · Material 3 interface (M3 tokens and components, Roboto Flex, System theme by default, `theme-color`, no glare in dark, 48 dp targets, fonts by need)
 
 ## Next 🔜
-
-- **029** · Material 3 interface (dark mode and Android) — planned
 
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 

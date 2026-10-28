@@ -178,6 +178,26 @@
   color-scheme: dark;
 }
 
+/*
+ * Before the app sets data-theme, follow the system with its own canvas colour: a phone in dark mode
+ * must not flash a light page while the script loads (spec 029).
+ */
+:root:not([data-theme]) {
+  color-scheme: light dark;
+}
+
+:root:not([data-theme]) body {
+  background: Canvas;
+}
+
+/*
+ * In dark, the white CV paper is dimmed a little on screen so it does not glare (M3 lets images be
+ * dimmed in dark themes). Only the on-screen preview: print and PDF come from their own render.
+ */
+:root[data-theme='dark'] .cv-preview-paper {
+  filter: brightness(0.88);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -283,7 +303,8 @@ textarea {
     height: 22px;
   }
 
-  label:has(> input[type='checkbox'], > input[type='radio']) {
-    min-height: 44px;
+  label:has(> input[type='checkbox'], > input[type='radio']),
+  summary {
+    min-height: var(--target);
   }
 }

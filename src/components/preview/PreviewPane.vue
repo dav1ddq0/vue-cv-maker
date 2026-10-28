@@ -106,7 +106,7 @@ const scaleStyle = computed(() => ({
     </header>
 
     <div ref="scroller" class="scroll">
-      <div class="page-wrap" :style="scaleStyle" :data-highlight="highlight">
+      <div class="page-wrap cv-preview-paper" :style="scaleStyle" :data-highlight="highlight">
         <div class="cv-page">
           <CvRenderer :data="cv.data" :template-id="cv.templateId" />
         </div>
