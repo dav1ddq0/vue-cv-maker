@@ -24,9 +24,9 @@ left and the cut part could not be scrolled to.
        most 100 %; + still reaches 120 %).
 4. [ ] **Session state only**: not stored; leaving the editor or narrowing below desktop width
        shows the normal layout.
-5. [ ] **Zoom never cuts the page**: at any zoom the whole page can be reached by scrolling, and it
+5. [x] **Zoom never cuts the page**: at any zoom the whole page can be reached by scrolling, and it
        stays centred while it fits.
-6. [ ] **M3 toolbar**: zoom out / in and expand are M3 icon buttons with 48 dp targets.
+6. [x] **M3 toolbar**: zoom out / in and expand are M3 icon buttons with 48 dp targets.
 
 ## Out of scope
 

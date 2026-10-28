@@ -28,20 +28,28 @@ const zoom = ref(0.72)
 /** A4 width in CSS px (210mm at 96dpi). */
 const PAGE_PX = 793.7
 const scroller = useTemplateRef<HTMLElement>('scroller')
+const page = useTemplateRef<HTMLElement>('page')
 const available = ref(0)
+/** The page's unscaled height: a long CV is taller than one sheet. */
+const pageHeight = ref(0)
 let observer: ResizeObserver | undefined
 let userZoomed = false
 
 onMounted(() => {
-  const el = scroller.value
-  if (!el || typeof ResizeObserver === 'undefined') return
-  observer = new ResizeObserver(([entry]) => {
-    if (!entry) return
-    available.value = entry.contentRect.width
-    // Until the user picks a zoom, the page follows the panel width (spec 018).
-    if (!userZoomed) fit()
+  if (typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.target === scroller.value) {
+        available.value = entry.contentRect.width
+        // Until the user picks a zoom, the page follows the panel width (spec 018).
+        if (!userZoomed) fit()
+      } else {
+        pageHeight.value = (entry.target as HTMLElement).offsetHeight
+      }
+    }
   })
-  observer.observe(el)
+  if (scroller.value) observer.observe(scroller.value)
+  if (page.value) observer.observe(page.value)
 })
 onBeforeUnmount(() => observer?.disconnect())
 
@@ -76,11 +84,16 @@ function fitToPanel() {
 
 const templateName = computed(() => getTemplate(cv.templateId).name)
 
-const scaleStyle = computed(() => ({
-  transform: `scale(${effectiveZoom.value})`,
-  // A scaled element keeps its layout box, which would leave a large gap below.
-  marginBottom: `${(effectiveZoom.value - 1) * 297}mm`,
+/*
+ * The page is scaled from its top-left corner inside a frame the size of the scaled page, so the
+ * layout box matches what is seen: zoomed past the panel, all of it can be scrolled to (spec 030).
+ * Scaling from the centre left the overflow on the left out of the scroll range.
+ */
+const frameStyle = computed(() => ({
+  width: `${PAGE_PX * effectiveZoom.value}px`,
+  height: pageHeight.value ? `${pageHeight.value * effectiveZoom.value}px` : undefined,
 }))
+const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` }))
 </script>
 
 <template>
@@ -98,17 +111,23 @@ const scaleStyle = computed(() => ({
         {{ templateName }} <span class="chip-action">· {{ t('preview.change') }}</span>
       </button>
       <div v-if="!isCompact" class="zoom" role="group" aria-label="Zoom">
-        <button type="button" class="zoom-btn" :aria-label="t('preview.zoomOut')" :disabled="zoom <= ZOOM_MIN" @click="zoomBy(-ZOOM_STEP)">−</button>
+        <button type="button" class="zoom-btn m3-icon-btn m3-state m3-target" :aria-label="t('preview.zoomOut')" :disabled="zoom <= ZOOM_MIN" @click="zoomBy(-ZOOM_STEP)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg>
+        </button>
         <output class="zoom-value" aria-live="polite">{{ zoomPercent }} %</output>
-        <button type="button" class="zoom-btn" :aria-label="t('preview.zoomIn')" :disabled="zoom >= ZOOM_MAX" @click="zoomBy(ZOOM_STEP)">+</button>
-        <button type="button" class="fit" :aria-label="t('preview.fitLabel')" @click="fitToPanel">{{ t('preview.fit') }}</button>
+        <button type="button" class="zoom-btn m3-icon-btn m3-state m3-target" :aria-label="t('preview.zoomIn')" :disabled="zoom >= ZOOM_MAX" @click="zoomBy(ZOOM_STEP)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        </button>
+        <button type="button" class="fit m3-state m3-target" :aria-label="t('preview.fitLabel')" @click="fitToPanel">{{ t('preview.fit') }}</button>
       </div>
     </header>
 
     <div ref="scroller" class="scroll">
-      <div class="page-wrap cv-preview-paper" :style="scaleStyle" :data-highlight="highlight">
-        <div class="cv-page">
-          <CvRenderer :data="cv.data" :template-id="cv.templateId" />
+      <div class="page-frame" :style="frameStyle">
+        <div ref="page" class="page-wrap cv-preview-paper" :style="scaleStyle" :data-highlight="highlight">
+          <div class="cv-page">
+            <CvRenderer :data="cv.data" :template-id="cv.templateId" />
+          </div>
         </div>
       </div>
     </div>
@@ -147,9 +166,9 @@ const scaleStyle = computed(() => ({
 .zoom {
   display: flex;
   align-items: center;
-  gap: 0.25em;
-  font-size: 0.8em;
-  color: var(--text-muted);
+  gap: 4px;
+  font: var(--type-label-large);
+  color: var(--md-on-surface-variant);
 }
 
 .chip {
@@ -193,40 +212,30 @@ const scaleStyle = computed(() => ({
 
 .zoom-btn,
 .fit {
-  min-width: 32px;
-  min-height: 32px;
   border: 0;
-  border-radius: var(--shape-sm);
-  background: transparent;
-  color: var(--text);
-  font: inherit;
-  font-weight: 600;
   cursor: pointer;
 }
 
 .zoom-btn {
-  font-size: 1.1em;
+  width: 40px;
+  height: 40px;
 }
 
-.zoom-btn:hover:not(:disabled) {
-  background: var(--surface-2);
-}
-
-.zoom-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
 
 .fit {
-  padding: 0 0.6em;
-  background: var(--surface-2);
-  font-size: 0.85em;
+  --container: transparent;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: var(--shape-full);
+  color: var(--md-primary);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
 }
 
 .zoom-value {
   min-width: 3.5em;
   text-align: center;
-  color: var(--text);
+  color: var(--md-on-surface);
 }
 
 .scroll {
@@ -234,7 +243,8 @@ const scaleStyle = computed(() => ({
   overflow: auto;
   padding: 1.2em;
   display: flex;
-  justify-content: center;
+  /* safe: a page wider than the panel starts at its left edge instead of overflowing out of reach. */
+  justify-content: safe center;
   align-items: flex-start;
 }
 
@@ -261,8 +271,13 @@ const scaleStyle = computed(() => ({
   transition: outline-color 0.2s ease;
 }
 
+.page-frame {
+  flex-shrink: 0;
+}
+
 .page-wrap {
-  transform-origin: top center;
+  width: 210mm;
+  transform-origin: top left;
 }
 
 .cv-page {

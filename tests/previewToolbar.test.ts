@@ -32,4 +32,14 @@ describe('preview toolbar (spec 018)', () => {
     expect(value()).toBe('40 %')
     expect(out!.attributes('disabled')).toBeDefined()
   })
+
+  it('sizes the page frame to the scaled page, so a zoomed page is never cut (spec 030)', async () => {
+    const wrapper = mountPane()
+    const width = () => parseFloat((wrapper.find('.page-frame').element as HTMLElement).style.width)
+    expect(width()).toBeCloseTo(793.7 * 0.72, 0)
+    const into = wrapper.findAll('button.zoom-btn')[1]!
+    for (let i = 0; i < 10; i++) await into.trigger('click')
+    expect(width()).toBeCloseTo(793.7 * 1.2, 0)
+    expect((wrapper.find('.page-wrap').element as HTMLElement).style.marginBottom).toBe('')
+  })
 })
