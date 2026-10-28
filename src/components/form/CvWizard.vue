@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, useTemplateRef, watch } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -48,7 +48,7 @@ const STEP_COMPONENTS = {
 const current = computed(() => STEP_COMPONENTS[ui.step])
 
 /** A new step starts at its top: the form is one scroller, and it kept the last step's position. */
-const root = ref<HTMLElement | null>(null)
+const root = useTemplateRef<HTMLElement>('root')
 watch(
   () => ui.step,
   () => {

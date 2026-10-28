@@ -4,7 +4,7 @@
  * anchored to the header button. Uses the native `popover` attribute (light dismiss, Esc, top layer)
  * and falls back to a plain toggled panel where it does not exist.
  */
-import { onMounted, ref, useId } from 'vue'
+import { onMounted, ref, useId, useTemplateRef } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { LOCALE_NAMES, useI18n, type Locale } from '@/i18n'
 import { useCvExport } from '@/composables/useCvExport'
@@ -14,7 +14,7 @@ const { t, locale, availableLocales } = useI18n()
 const { busy, run } = useCvExport()
 
 const id = useId()
-const panel = ref<HTMLElement | null>(null)
+const panel = useTemplateRef<HTMLElement>('panel')
 const native = ref(true)
 const fallbackOpen = ref(false)
 

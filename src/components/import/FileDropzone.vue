@@ -6,7 +6,7 @@
  *
  * `compact` lays it out as a single row (used next to the profile photo).
  */
-import { ref, useId } from 'vue'
+import { ref, useId, useTemplateRef } from 'vue'
 import { useI18n } from '@/i18n'
 import { matchesAccept } from '@/core/fileAccept'
 
@@ -26,8 +26,8 @@ const { t } = useI18n()
 const hintId = useId()
 const over = ref(false)
 const rejected = ref(false)
-const root = ref<HTMLElement | null>(null)
-const input = ref<HTMLInputElement | null>(null)
+const root = useTemplateRef<HTMLElement>('root')
+const input = useTemplateRef<HTMLInputElement>('input')
 
 function handle(file: File | undefined) {
   if (!file) return

@@ -4,7 +4,7 @@
  * `+`/`-` to zoom, a quarter-turn button. The preview canvas and the stored file are drawn by the same
  * `drawCrop`, so what the user frames is what gets saved. A modal native <dialog>, like ExportDialog.
  */
-import { computed, ref, shallowRef, useId, watch } from 'vue'
+import { computed, ref, shallowRef, useId, useTemplateRef, watch } from 'vue'
 import { useI18n } from '@/i18n'
 import { useModalDialog } from '@/composables/useModalDialog'
 import { clampOffset, clampZoom, cropRect, ZOOM_MAX, ZOOM_MIN, type Offset } from '@/core/photoCrop'
@@ -23,8 +23,8 @@ const FRAME = 280
 const KEY_STEP = 8
 const ZOOM_STEP = 0.1
 
-const dialog = ref<HTMLDialogElement | null>(null)
-const canvas = ref<HTMLCanvasElement | null>(null)
+const dialog = useTemplateRef<HTMLDialogElement>('dialog')
+const canvas = useTemplateRef<HTMLCanvasElement>('canvas')
 const decoded = shallowRef<CropSource | null>(null)
 const turns = ref(0)
 const zoom = ref(1)

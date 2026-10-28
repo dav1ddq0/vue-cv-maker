@@ -19,6 +19,12 @@ const OPTIONS: { kind: ExportKind; title: string; hint: string }[] = [
   { kind: 'json', title: 'exportView.json', hint: 'exportView.jsonHint' },
 ]
 
+/** "Preparing…" while that export runs; otherwise what tapping the row does. */
+function actionLabel(kind: ExportKind): string {
+  if (busy.value === kind) return t('exportView.preparing')
+  return t(kind === 'pdf' ? 'exportView.printShort' : 'exportView.download')
+}
+
 async function pick(kind: ExportKind) {
   await run(kind)
   emit('close')
@@ -35,7 +41,7 @@ async function pick(kind: ExportKind) {
             <span class="hint">{{ t(option.hint) }}</span>
             <span v-if="option.kind === 'pdf'" class="hint">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</span>
           </span>
-          <span class="action">{{ busy === option.kind ? t('exportView.preparing') : t(option.kind === 'pdf' ? 'exportView.printShort' : 'exportView.download') }}</span>
+          <span class="action">{{ actionLabel(option.kind) }}</span>
         </button>
       </li>
     </ul>

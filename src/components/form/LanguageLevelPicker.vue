@@ -5,27 +5,27 @@
  */
 import { computed } from 'vue'
 
-const props = defineProps<{ modelValue: string; cvLanguage: string; label: string }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const props = defineProps<{ cvLanguage: string; label: string }>()
+const level = defineModel<string>({ required: true })
 
 /** "Native" is CV content, so it follows the CV language, not the interface. */
 const NATIVE: Record<string, string> = { es: 'Nativo', en: 'Native' }
-const levels = computed(() => ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', NATIVE[props.cvLanguage] ?? NATIVE.en!])
+const options = computed(() => ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', NATIVE[props.cvLanguage] ?? NATIVE.en!])
 
-const isCurrent = (level: string) => props.modelValue.trim().toLowerCase() === level.toLowerCase()
+const isCurrent = (option: string) => level.value.trim().toLowerCase() === option.toLowerCase()
 </script>
 
 <template>
   <div class="picker" role="group" :aria-label="label">
     <button
-      v-for="level in levels"
-      :key="level"
+      v-for="option in options"
+      :key="option"
       type="button"
       class="level"
-      :aria-pressed="isCurrent(level)"
-      @click="emit('update:modelValue', level)"
+      :aria-pressed="isCurrent(option)"
+      @click="level = option"
     >
-      {{ level }}
+      {{ option }}
     </button>
   </div>
 </template>

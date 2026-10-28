@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Live, reactive preview. Paginated output is a separate component on purpose —
  *  paged.js must never touch a Vue-managed subtree (spec §6). */
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
@@ -27,7 +27,7 @@ const zoom = ref(0.72)
 
 /** A4 width in CSS px (210mm at 96dpi). */
 const PAGE_PX = 793.7
-const scroller = ref<HTMLElement | null>(null)
+const scroller = useTemplateRef<HTMLElement>('scroller')
 const available = ref(0)
 let observer: ResizeObserver | undefined
 let userZoomed = false

@@ -58,6 +58,12 @@ const counts = computed(() => ({
 const lowConfidence = (key: 'fullName' | 'headline' | 'email' | 'phone' | 'location') =>
   props.draft[key].confidence === 'low' ? t('importView.lowConfidence') : undefined
 
+function targetLabel(target: BlockTarget): string {
+  if (target === 'discard') return t('importView.discard')
+  if (target === 'custom') return t('custom.add')
+  return t(`steps.${target}`)
+}
+
 function apply(mode: 'new' | 'current') {
   emit('apply', assembleCV(props.draft, decisions.value), mode)
 }
@@ -117,7 +123,7 @@ function apply(mode: 'new' | 'current') {
             <span class="assign-label">{{ t('importView.assignTo') }}</span>
             <select v-model="blocks[block.id]">
               <option v-for="target in TARGETS" :key="target" :value="target">
-                {{ target === 'discard' ? t('importView.discard') : target === 'custom' ? t('custom.add') : t(`steps.${target}`) }}
+                {{ targetLabel(target) }}
               </option>
             </select>
           </label>

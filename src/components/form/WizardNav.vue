@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** Free navigation: any step is reachable at any time (spec §5). */
-import { onMounted, ref, useId, watch } from 'vue'
+import { onMounted, useId, useTemplateRef, watch } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
@@ -9,8 +9,8 @@ const ui = useUiStore()
 const cv = useCvStore()
 const { t } = useI18n()
 
-const nav = ref<HTMLElement | null>(null)
-const strip = ref<HTMLElement | null>(null)
+const nav = useTemplateRef<HTMLElement>('nav')
+const strip = useTemplateRef<HTMLElement>('strip')
 const labelId = useId()
 
 /**

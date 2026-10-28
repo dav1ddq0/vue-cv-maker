@@ -2,8 +2,8 @@
 /** Comma/Enter separated chips — used for skill items and experience highlights. */
 import { ref } from 'vue'
 
-const props = defineProps<{ modelValue: string[]; placeholder?: string; id?: string }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
+defineProps<{ placeholder?: string; id?: string }>()
+const tags = defineModel<string[]>({ required: true })
 
 const draft = ref('')
 
@@ -12,12 +12,12 @@ function commit() {
     .split(',')
     .map((part) => part.trim())
     .filter(Boolean)
-  if (parts.length) emit('update:modelValue', [...props.modelValue, ...parts])
+  if (parts.length) tags.value = [...tags.value, ...parts]
   draft.value = ''
 }
 
 function removeAt(index: number) {
-  emit('update:modelValue', props.modelValue.filter((_, i) => i !== index))
+  tags.value = tags.value.filter((_, i) => i !== index)
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -27,15 +27,15 @@ function onKeydown(event: KeyboardEvent) {
     return
   }
   // Backspace on an empty field removes the last chip — the expected behaviour here.
-  if (event.key === 'Backspace' && !draft.value && props.modelValue.length) {
-    removeAt(props.modelValue.length - 1)
+  if (event.key === 'Backspace' && !draft.value && tags.value.length) {
+    removeAt(tags.value.length - 1)
   }
 }
 </script>
 
 <template>
   <div class="tags">
-    <span v-for="(tag, index) in modelValue" :key="`${tag}-${index}`" class="tag">
+    <span v-for="(tag, index) in tags" :key="`${tag}-${index}`" class="tag">
       {{ tag }}
       <button type="button" class="remove" :aria-label="`${tag} ✕`" @click="removeAt(index)">✕</button>
     </span>

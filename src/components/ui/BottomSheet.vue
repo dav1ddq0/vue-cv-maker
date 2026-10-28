@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** Modal bottom sheet on a native <dialog>: focus trap, Esc, top layer and focus return come free. */
-import { ref, useId } from 'vue'
+import { useId, useTemplateRef } from 'vue'
 import { useI18n } from '@/i18n'
 import { useModalDialog } from '@/composables/useModalDialog'
 
@@ -8,7 +8,7 @@ const props = defineProps<{ open: boolean; title: string }>()
 const emit = defineEmits<{ close: [] }>()
 
 const { t } = useI18n()
-const dialog = ref<HTMLDialogElement | null>(null)
+const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const titleId = useId()
 
 useModalDialog(dialog, () => props.open)

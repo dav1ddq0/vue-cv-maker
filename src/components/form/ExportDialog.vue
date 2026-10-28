@@ -3,7 +3,7 @@
  * Desktop export (spec 018): pick a format, see what is still missing, run it. A modal native
  * <dialog>: focus trap, Esc and focus return come free, as in BottomSheet.
  */
-import { computed, ref, useId } from 'vue'
+import { computed, ref, useId, useTemplateRef } from 'vue'
 import { useModalDialog } from '@/composables/useModalDialog'
 import { useUiStore, type StepId } from '@/stores/ui'
 import { useCvStore } from '@/stores/cv'
@@ -20,7 +20,7 @@ const cv = useCvStore()
 const { t } = useI18n()
 const { busy, run } = useCvExport()
 
-const dialog = ref<HTMLDialogElement | null>(null)
+const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const titleId = useId()
 const kind = ref<ExportKind>('pdf')
 

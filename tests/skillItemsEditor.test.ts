@@ -30,7 +30,21 @@ describe('SkillItemsEditor', () => {
     await wrapper.findAll('input.name')[0]!.setValue('Z')
     expect(last(wrapper)).toEqual([{ name: 'Z' }, { name: 'B' }])
 
+    // With no parent bound, defineModel keeps the rename locally, as a v-model parent would.
     await wrapper.findAll('button.remove')[1]!.trigger('click')
-    expect(last(wrapper)).toEqual([{ name: 'A' }])
+    expect(last(wrapper)).toEqual([{ name: 'Z' }])
+  })
+
+  it('keeps each row on its own element when a row above it is removed (spec 028)', async () => {
+    const wrapper = mount(SkillItemsEditor, {
+      props: {
+        modelValue: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
+        'onUpdate:modelValue': (value: unknown) => void wrapper.setProps({ modelValue: value as never }),
+      },
+    })
+    const rowB = wrapper.findAll('.row')[1]!.element
+    await wrapper.findAll('button.remove')[0]!.trigger('click')
+    expect(wrapper.findAll('.row')[0]!.element).toBe(rowB)
+    expect((wrapper.findAll('input.name')[0]!.element as HTMLInputElement).value).toBe('B')
   })
 })

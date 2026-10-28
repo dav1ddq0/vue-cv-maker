@@ -40,6 +40,11 @@ const orderItems = computed(() =>
 const BUILTIN = ['summary', 'experience', 'education', 'skills', 'languages']
 const isBuiltin = (id: string) => BUILTIN.includes(id)
 
+/** The order list hands back its rows; the CV stores only their ids. */
+function reorderSections(rows: { id: string }[]) {
+  cv.data.sectionOrder = rows.map((row) => row.id)
+}
+
 function addPreset(id: (typeof SECTION_PRESET_IDS)[number]) {
   cv.addCustomSection(createSectionFromPreset(id, cv.data.meta.language || 'es'))
   pickerOpen.value = false
@@ -134,7 +139,7 @@ function addBlank() {
       <h3 class="subtitle">{{ t('custom.order') }}</h3>
       <SortableList
         :items="orderItems"
-        @reorder="cv.data.sectionOrder = $event.map((entry) => entry.id)"
+        @reorder="reorderSections"
       >
         <template #default="{ item, index }">
           <span class="order-row">

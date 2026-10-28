@@ -3,35 +3,51 @@
  * Skill names with an optional 1–5 level each. Replaces the chip input where a
  * per-item level is needed; adding works the same way (Enter or comma).
  */
-import { ref } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import type { SkillItem } from '@/types/cv'
 import { useI18n } from '@/i18n'
 
-const props = defineProps<{ modelValue: SkillItem[]; id?: string; levelsDisabled?: boolean }>()
-const emit = defineEmits<{ 'update:modelValue': [value: SkillItem[]] }>()
+defineProps<{ id?: string; levelsDisabled?: boolean }>()
+const items = defineModel<SkillItem[]>({ required: true })
 const { t } = useI18n()
 
 const draft = ref('')
+
+/**
+ * A key per row that follows it when a row above is removed, so focus and field state stay on the
+ * row they belong to (spec 028). Items carry no id; a change of length from outside (undo, a new
+ * group) starts a fresh set.
+ */
+let nextKey = 0
+const freshKeys = (count: number) => Array.from({ length: count }, () => nextKey++)
+const rowKeys = shallowRef<number[]>([])
+watch(
+  () => items.value.length,
+  (length) => {
+    if (rowKeys.value.length !== length) rowKeys.value = freshKeys(length)
+  },
+  { immediate: true },
+)
 
 function commit() {
   const names = draft.value
     .split(',')
     .map((part) => part.trim())
     .filter(Boolean)
-  if (names.length) emit('update:modelValue', [...props.modelValue, ...names.map((name) => ({ name }))])
+  if (names.length) {
+    rowKeys.value = [...rowKeys.value, ...freshKeys(names.length)]
+    items.value = [...items.value, ...names.map((name) => ({ name }))]
+  }
   draft.value = ''
 }
 
 function update(index: number, patch: Partial<SkillItem>) {
-  emit(
-    'update:modelValue',
-    props.modelValue.map((item, i) => {
-      if (i !== index) return item
-      const next = { ...item, ...patch }
-      if (next.level === undefined) delete next.level
-      return next
-    }),
-  )
+  items.value = items.value.map((item, i) => {
+    if (i !== index) return item
+    const next = { ...item, ...patch }
+    if (next.level === undefined) delete next.level
+    return next
+  })
 }
 
 function setLevel(index: number, value: string) {
@@ -39,7 +55,8 @@ function setLevel(index: number, value: string) {
 }
 
 function remove(index: number) {
-  emit('update:modelValue', props.modelValue.filter((_, i) => i !== index))
+  rowKeys.value = rowKeys.value.filter((_, i) => i !== index)
+  items.value = items.value.filter((_, i) => i !== index)
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -52,7 +69,7 @@ function onKeydown(event: KeyboardEvent) {
 
 <template>
   <div class="items">
-    <div v-for="(item, index) in modelValue" :key="index" class="row">
+    <div v-for="(item, index) in items" :key="rowKeys[index]" class="row">
       <input
         class="name"
         :value="item.name"

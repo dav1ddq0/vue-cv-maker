@@ -6,7 +6,7 @@
  * imperatively and paged.js rewrites it freely. Vue never diffs those nodes, so
  * the library's DOM surgery and Vue's reactivity cannot collide.
  */
-import { onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import type { CVData } from '@/types/cv'
 import { exportCss, paginateInto, releasePagination, renderTemplateHtml, resolvePhoto } from '@/services/export'
 import { useI18n } from '@/i18n'
@@ -15,7 +15,7 @@ import { debounce } from '@/core/debounce'
 const props = defineProps<{ data: CVData; templateId: string }>()
 const { t } = useI18n()
 
-const host = shallowRef<HTMLElement | null>(null)
+const host = useTemplateRef<HTMLElement>('host')
 const pages = ref(0)
 const busy = ref(false)
 const failed = ref(false)

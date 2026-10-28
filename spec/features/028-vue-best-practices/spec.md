@@ -34,12 +34,12 @@ fixes in A.
 
 ### D · Vue 3.5 idioms
 
-7. [ ] Template refs with `useTemplateRef()` instead of `ref<HTMLElement | null>(null)`.
-8. [ ] `v-model` components (`TagInput`, `SkillItemsEditor`, `LanguageLevelPicker`) with
+7. [x] Template refs with `useTemplateRef()` instead of `ref<HTMLElement | null>(null)`.
+8. [x] `v-model` components (`TagInput`, `SkillItemsEditor`, `LanguageLevelPicker`) with
        `defineModel()`.
-9. [ ] `SkillItemsEditor` rows keyed by a stable per-row key, not the index: removing a middle row
+9. [x] `SkillItemsEditor` rows keyed by a stable per-row key, not the index: removing a middle row
        does not move focus or field state to its neighbour.
-10. [ ] No branching or list derivation inline in component templates (`PdfReview` nested ternary,
+10. [x] No branching or list derivation inline in component templates (`PdfReview` nested ternary,
         `ExportSheet` ternary, `StepCustom` reorder `map`).
 
 ## Out of scope
