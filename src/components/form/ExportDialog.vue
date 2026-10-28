@@ -18,15 +18,16 @@ const emit = defineEmits<{ close: [] }>()
 const ui = useUiStore()
 const cv = useCvStore()
 const { t } = useI18n()
-const { busy, run } = useCvExport()
+const { busy, failed, systemFont, run } = useCvExport()
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const titleId = useId()
-const kind = ref<ExportKind>('pdf')
+const kind = ref<ExportKind>('pdfFile')
 
 useModalDialog(dialog, () => props.open)
 
 const FORMATS: { kind: ExportKind; title: string; hint: string }[] = [
+  { kind: 'pdfFile', title: 'exportView.pdfFile', hint: 'exportView.pdfFileHint' },
   { kind: 'pdf', title: 'exportView.pdf', hint: 'exportView.pdfHint' },
   { kind: 'html', title: 'exportView.html', hint: 'exportView.htmlHint' },
   { kind: 'json', title: 'exportView.json', hint: 'exportView.jsonHint' },
@@ -35,13 +36,13 @@ const FORMATS: { kind: ExportKind; title: string; hint: string }[] = [
 /** Core steps still empty; advisory, never blocking (spec §5). */
 const missing = computed(() => ui.steps.filter((id) => stepStatus(cv.data, id).state === 'incomplete'))
 
-const action = computed(() =>
-  kind.value === 'pdf'
-    ? t('exportView.print')
-    : kind.value === 'html'
-      ? t('exportDialog.downloadHtml')
-      : t('exportDialog.downloadJson'),
-)
+const ACTIONS: Record<ExportKind, string> = {
+  pdfFile: 'exportView.downloadPdf',
+  pdf: 'exportView.print',
+  html: 'exportDialog.downloadHtml',
+  json: 'exportDialog.downloadJson',
+}
+const action = computed(() => t(ACTIONS[kind.value]))
 
 function goFix(id: StepId) {
   ui.goTo(id)
@@ -49,9 +50,19 @@ function goFix(id: StepId) {
 }
 
 async function confirm() {
+  // A direct download keeps the dialog open while it is built, so a failure can be shown here.
+  if (kind.value === 'pdfFile') {
+    if (await run('pdfFile')) dialog.value?.close()
+    return
+  }
   // The print dialog must not open on top of a modal that is still showing.
   dialog.value?.close()
   await run(kind.value)
+}
+
+function printInstead() {
+  kind.value = 'pdf'
+  void confirm()
 }
 </script>
 
@@ -70,13 +81,18 @@ async function confirm() {
         <span class="format-text">
           <span class="format-title">
             {{ t(format.title) }}
-            <span v-if="format.kind === 'pdf'" class="badge">{{ t('exportDialog.recommended') }}</span>
+            <span v-if="format.kind === 'pdfFile'" class="badge">{{ t('exportDialog.recommended') }}</span>
           </span>
           <span class="format-hint">{{ t(format.hint) }}</span>
         </span>
       </label>
     </div>
     <p v-if="kind === 'pdf'" class="note">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</p>
+    <p v-if="kind === 'pdfFile' && systemFont" class="note">{{ t('exportView.systemFontNote', { font: systemFont }) }}</p>
+    <div v-if="failed === 'pdfFile'" class="failed" role="alert">
+      <p class="failed-text">{{ t('exportView.pdfFileFailed') }}</p>
+      <button type="button" class="secondary" @click="printInstead">{{ t('exportView.printInstead') }}</button>
+    </div>
 
     <section class="check" :aria-label="t('exportDialog.checkTitle')">
       <h3 class="check-title">{{ t('exportDialog.checkTitle') }}</h3>
@@ -263,5 +279,22 @@ async function confirm() {
 .primary:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+.failed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 16px;
+  border-radius: var(--shape-md);
+  background: var(--md-error-container);
+  color: var(--md-on-error-container);
+}
+
+.failed-text {
+  flex: 1 1 16em;
+  margin: 0;
+  font: var(--type-body-medium);
 }
 </style>

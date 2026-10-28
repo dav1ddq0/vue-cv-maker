@@ -13,7 +13,7 @@ const cv = useCvStore()
 const { t } = useI18n()
 
 const showPaginated = ref(false)
-const { busy, run } = useCvExport()
+const { busy, failed, systemFont, run } = useCvExport()
 </script>
 
 <template>
@@ -25,11 +25,26 @@ const { busy, run } = useCvExport()
     <ul class="options">
       <li class="option">
         <div>
+          <h3 class="option-title">{{ t('exportView.pdfFile') }}</h3>
+          <p class="option-hint">{{ t('exportView.pdfFileHint') }}</p>
+          <p v-if="systemFont" class="option-hint">{{ t('exportView.systemFontNote', { font: systemFont }) }}</p>
+        </div>
+        <BaseButton variant="primary" :disabled="busy !== null" @click="run('pdfFile')">
+          {{ busy === 'pdfFile' ? t('exportView.preparing') : t('exportView.downloadPdf') }}
+        </BaseButton>
+        <div v-if="failed === 'pdfFile'" class="failed" role="alert">
+          <NoticeBar tone="warning">{{ t('exportView.pdfFileFailed') }}</NoticeBar>
+          <BaseButton variant="tonal" :disabled="busy !== null" @click="run('pdf')">{{ t('exportView.printInstead') }}</BaseButton>
+        </div>
+      </li>
+
+      <li class="option">
+        <div>
           <h3 class="option-title">{{ t('exportView.pdf') }}</h3>
           <p class="option-hint">{{ t('exportView.pdfHint') }}</p>
           <p class="option-hint">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</p>
         </div>
-        <BaseButton variant="primary" :disabled="busy !== null" @click="run('pdf')">
+        <BaseButton variant="tonal" :disabled="busy !== null" @click="run('pdf')">
           {{ busy === 'pdf' ? t('exportView.preparing') : t('exportView.print') }}
         </BaseButton>
       </li>
@@ -113,6 +128,19 @@ const { busy, run } = useCvExport()
     flex: 1 1 100%;
     justify-content: center;
   }
+}
+
+/* The direct PDF failed: the message and the way out take the card's full width. */
+.failed {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.failed > :first-child {
+  flex: 1 1 16em;
 }
 
 .option-title {

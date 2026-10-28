@@ -394,6 +394,12 @@ export default {
   },
   exportView: {
     title: 'Exportar',
+    pdfFile: 'PDF (descargar)',
+    pdfFileHint: 'Se descarga al momento, sin diálogo de impresión. Texto seleccionable y enlaces clicables, legible por sistemas ATS.',
+    downloadPdf: 'Descargar PDF',
+    pdfFileFailed: 'No se pudo generar el PDF. Tu CV no ha cambiado: puedes guardarlo desde el diálogo de impresión.',
+    printInstead: 'Imprimir en su lugar',
+    systemFontNote: 'La fuente {font} depende de cada equipo y no se puede incrustar: la descarga usa una estándar parecida. Imprimir la conserva.',
     pdf: 'PDF (imprimir)',
     pdfHint: 'Texto seleccionable y enlaces clicables, legible por sistemas ATS.',
     html: 'HTML autocontenido',

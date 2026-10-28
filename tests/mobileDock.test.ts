@@ -57,12 +57,14 @@ describe('MobileDock', () => {
 })
 
 describe('MobileDock in preview mode', () => {
-  it('opens one export sheet with PDF, HTML and JSON', async () => {
+  it('opens one export sheet with both PDFs, HTML and JSON', async () => {
     const ui = useUiStore()
     ui.previewOpen = true
     const wrapper = mount(MobileDock)
     await wrapper.find('.action').trigger('click')
-    expect(wrapper.findAll('dialog li')).toHaveLength(3)
-    expect(wrapper.find('dialog li').text()).toContain('PDF')
+    expect(wrapper.findAll('dialog li')).toHaveLength(4)
+    // The direct download comes first (spec 031), printing next to it.
+    expect(wrapper.findAll('dialog li')[0]!.text()).toContain('PDF (descargar)')
+    expect(wrapper.findAll('dialog li')[1]!.text()).toContain('PDF (imprimir)')
   })
 })

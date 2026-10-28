@@ -393,6 +393,12 @@ const en: typeof es = {
   },
   exportView: {
     title: 'Export',
+    pdfFile: 'PDF (download)',
+    pdfFileHint: 'Downloads at once, with no print dialog. Selectable text and clickable links, readable by ATS.',
+    downloadPdf: 'Download PDF',
+    pdfFileFailed: 'The PDF could not be built. Your CV is unchanged: you can save it from the print dialog.',
+    printInstead: 'Print instead',
+    systemFontNote: 'The {font} font depends on each computer and cannot be embedded: the download uses a similar standard one. Printing keeps it.',
     pdf: 'PDF (print)',
     pdfHint: 'Selectable text and clickable links, readable by ATS systems.',
     html: 'Self-contained HTML',

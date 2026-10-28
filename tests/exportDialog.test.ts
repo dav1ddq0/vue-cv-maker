@@ -7,10 +7,16 @@ vi.mock('@/services/export', () => ({
   exportHtml: vi.fn(async () => {}),
   exportJson: vi.fn(async () => {}),
   printCv: vi.fn(async () => {}),
+  downloadBlob: vi.fn(),
   printTitle: () => 'Ana – CV',
 }))
 
+vi.mock('@/services/export/pdfDirect', () => ({
+  buildDirectPdf: vi.fn(async () => new Blob(['%PDF'], { type: 'application/pdf' })),
+}))
+
 import * as exporters from '@/services/export'
+import { buildDirectPdf } from '@/services/export/pdfDirect'
 import ExportDialog from '@/components/form/ExportDialog.vue'
 import { useUiStore } from '@/stores/ui'
 import { useCvStore } from '@/stores/cv'
@@ -47,12 +53,57 @@ describe('ExportDialog', () => {
     useCvStore()
     const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
     await wrapper.setProps({ open: true })
-    expect(wrapper.find('button.primary').text()).toBe('Imprimir / Guardar como PDF')
+    expect(wrapper.find('button.primary').text()).toBe('Descargar PDF')
 
     await wrapper.find('input[value="json"]').setValue(true)
     expect(wrapper.find('button.primary').text()).toBe('Descargar JSON')
     await wrapper.find('button.primary').trigger('click')
     await vi.waitFor(() => expect(exporters.exportJson).toHaveBeenCalledTimes(1))
     expect(exporters.printCv).not.toHaveBeenCalled()
+  })
+})
+
+describe('ExportDialog direct PDF (spec 031)', () => {
+  beforeEach(() => {
+    vi.mocked(exporters.downloadBlob).mockClear()
+    vi.mocked(exporters.printCv).mockClear()
+    vi.mocked(buildDirectPdf).mockClear()
+  })
+
+  it('downloads "<name> – CV.pdf" by default and closes once it is saved', async () => {
+    useCvStore()
+    const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
+    await wrapper.setProps({ open: true })
+    expect(wrapper.find('input[value="pdfFile"]').element).toHaveProperty('checked', true)
+    await wrapper.find('button.primary').trigger('click')
+    await vi.waitFor(() => expect(exporters.downloadBlob).toHaveBeenCalledTimes(1))
+    expect(vi.mocked(exporters.downloadBlob).mock.calls[0]![1]).toBe('Ana – CV.pdf')
+    expect(wrapper.emitted('close')).toBeTruthy()
+    expect(exporters.printCv).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('stays open when the PDF cannot be built, and offers printing instead', async () => {
+    vi.mocked(buildDirectPdf).mockRejectedValueOnce(new Error('boom'))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    useCvStore()
+    const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
+    await wrapper.setProps({ open: true })
+    await wrapper.find('button.primary').trigger('click')
+    await vi.waitFor(() => expect(wrapper.find('[role="alert"]').exists()).toBe(true))
+    expect(wrapper.emitted('close')).toBeFalsy()
+    expect(exporters.downloadBlob).not.toHaveBeenCalled()
+    await wrapper.find('[role="alert"] button').trigger('click')
+    await vi.waitFor(() => expect(exporters.printCv).toHaveBeenCalledTimes(1))
+    wrapper.unmount()
+  })
+
+  it('says when the CV font cannot be embedded', async () => {
+    const cv = useCvStore()
+    cv.data.style.fontFamily = "Georgia, 'Times New Roman', serif"
+    const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
+    await wrapper.setProps({ open: true })
+    expect(wrapper.text()).toContain('La fuente Georgia depende de cada equipo')
+    wrapper.unmount()
   })
 })
