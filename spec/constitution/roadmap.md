@@ -38,6 +38,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **025** · Photo crop and zoom (frame before storing: drag, zoom, rotate; 800 px JPEG; preview refreshes on replace)
 - **026** · Bundled fonts (Fontsource, served from the app; PDF and HTML export use them)
 - **027** · Fixes from the functional review (blank CV stored, phone export on the last step, Fit ≤ 100 %, screen-reader names)
+- **028** · Vue best-practices pass (async races in the preview and crop dialog, custom-section store actions, `DateRangeFields`, `useModalDialog`, Vue 3.5 idioms)
 
 ## Next 🔜
 

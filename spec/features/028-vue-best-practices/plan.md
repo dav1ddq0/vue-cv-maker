@@ -9,8 +9,9 @@
 
 ## Decisions
 
-- **Races**: a request counter per watcher, as `usePhotoThumb` and `PaginatedPreview` already do;
-  the watcher's `onCleanup` marks the run stale. Object URLs created by a stale run are revoked.
+- **Races**: each async watcher run marks itself stale in `onCleanup` (the next run or unmount), the
+  same idea as the request counters in `usePhotoThumb` and `PaginatedPreview`. Object URLs created by a
+  stale run are revoked.
 - **Store actions** keep the existing model: plain field edits still go through `v-model` on
   `cv.data` (the deep watcher makes them undoable). Only changes that must keep several fields in
   step become actions.

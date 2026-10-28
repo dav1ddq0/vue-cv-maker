@@ -1,6 +1,6 @@
 # 028 · Vue best-practices pass
 
-**Status:** in progress 🚧
+**Status:** implemented ✅
 
 ## What it does
 
@@ -48,3 +48,19 @@ fixes in A.
 - `shallowRef` for every primitive and a shared `matchMedia` listener: negligible gain for the churn.
 - `immediate: true` instead of `onMounted` + `watch` in `BottomSheet`/`WizardNav`: the immediate run
   happens during setup, before the template ref exists.
+
+## Verification
+
+- 457 unit tests. New: the three races (each fails on the previous code), the custom-section store
+  actions, `DateRangeFields`, `useModalDialog`, stable skill-row keys (fails with index keys). One
+  expectation changed: with `defineModel` and no parent bound, `SkillItemsEditor` keeps an edit locally,
+  as a real `v-model` parent does.
+- The functional review re-run on the built site (Chromium): main flow 19, custom sections 17, style/
+  export/import 16, phone 10, overflow sweep 6 and wide-screen Fit 3 checks pass, with no console
+  errors. The one failure on the first run was the script's "+" locator hitting "Undo (Ctrl+Z)"; it now
+  clicks "Acercar" by name (70 % → 80 %).
+- The browser-print PDF (`printCv` with paged.js, then Chromium's print-to-PDF): 14 templates × sample,
+  long CV and a manual page break, 42 runs: paged.js and PDF page counts agree, no blank pages, the
+  break lands where set, no errors.
+- Photo crop flow (desktop and phone): dialog opens, stores a 750 × 750 JPEG, "Adjust photo" replaces
+  the reference, no errors.
