@@ -201,3 +201,35 @@ describe('per-CV template (spec 021)', () => {
     expect(saved.get(copy)?.meta.templateId).toBe('meridian')
   })
 })
+
+describe('cv store custom sections (spec 028)', () => {
+  beforeEach(() => {
+    saved.clear()
+    setActivePinia(createPinia())
+  })
+
+  it('adds a section to the order and removes it from order and page breaks alike', () => {
+    const cv = useCvStore()
+    cv.addCustomSection()
+    const id = cv.data.customSections.at(-1)!.id
+    expect(cv.data.sectionOrder.at(-1)).toBe(id)
+
+    cv.setPageBreak(id, true)
+    expect(cv.data.pageBreaks).toEqual([id])
+
+    cv.removeCustomSection(id)
+    expect(cv.data.customSections.some((section) => section.id === id)).toBe(false)
+    expect(cv.data.sectionOrder).not.toContain(id)
+    expect(cv.data.pageBreaks).toEqual([])
+  })
+
+  it('keeps page breaks in section order whatever order they are set in', () => {
+    const cv = useCvStore()
+    const [first, second] = cv.data.sectionOrder.slice(1, 3) as [string, string]
+    cv.setPageBreak(second, true)
+    cv.setPageBreak(first, true)
+    expect(cv.data.pageBreaks).toEqual([first, second])
+    cv.setPageBreak(second, false)
+    expect(cv.data.pageBreaks).toEqual([first])
+  })
+})

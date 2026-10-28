@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import type { CVData, CVSummary } from '@/types/cv'
+import type { CustomSection, CVData, CVSummary } from '@/types/cv'
 import { SECTION_IDS } from '@/types/cv'
-import { createEmptyCV } from '@/core/factory'
+import { createCustomSection, createEmptyCV } from '@/core/factory'
 import { uid } from '@/core/id'
 import { History } from '@/core/history'
 import { debounce } from '@/core/debounce'
@@ -215,6 +215,31 @@ export const useCvStore = defineStore('cv', () => {
     writePrefs({ lastTemplateId: id })
   }
 
+  /* ---- custom sections ------------------------------------------------- */
+
+  // `sectionOrder` and `pageBreaks` list custom sections by id, so adding or removing one has to touch
+  // all three fields at once (spec 028). Field edits inside a section stay plain `v-model`s.
+
+  function addCustomSection(section: CustomSection = createCustomSection('')) {
+    data.value.customSections.push(section)
+    data.value.sectionOrder = reconcileOrder(data.value.sectionOrder, data.value)
+  }
+
+  function removeCustomSection(id: string) {
+    const d = data.value
+    d.customSections = d.customSections.filter((section) => section.id !== id)
+    d.sectionOrder = d.sectionOrder.filter((sectionId) => sectionId !== id)
+    d.pageBreaks = d.pageBreaks.filter((sectionId) => sectionId !== id)
+  }
+
+  /** Kept in section order, like `sectionOrder` itself (spec 022). */
+  function setPageBreak(id: string, on: boolean) {
+    const breaks = new Set(data.value.pageBreaks)
+    if (on) breaks.add(id)
+    else breaks.delete(id)
+    data.value.pageBreaks = data.value.sectionOrder.filter((sectionId) => breaks.has(sectionId))
+  }
+
   /* ---- undo / redo ----------------------------------------------------- */
 
   function undo() {
@@ -277,6 +302,9 @@ export const useCvStore = defineStore('cv', () => {
     totalSections,
     templateId,
     setTemplate,
+    addCustomSection,
+    removeCustomSection,
+    setPageBreak,
     init,
     open,
     createNew,

@@ -21,7 +21,7 @@ fixes in A.
 
 ### B · CV invariants in the store
 
-4. [ ] Adding or removing a custom section and toggling a page break are `cv` store actions
+4. [x] Adding or removing a custom section and toggling a page break are `cv` store actions
        (`addCustomSection`, `removeCustomSection`, `setPageBreak`): `sectionOrder` and `pageBreaks`
        stay consistent with `customSections` wherever the change comes from. `StepCustom` calls them.
 

@@ -3,10 +3,8 @@
 import { computed, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
-import { createCustomEntry, createCustomSection } from '@/core/factory'
-import { reconcileOrder } from '@/core/migrations'
+import { createCustomEntry } from '@/core/factory'
 import { SECTION_PRESET_IDS, createSectionFromPreset } from '@/core/sectionPresets'
-import type { CustomSection } from '@/types/cv'
 import BaseField from '@/components/ui/BaseField.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import SortableList from '@/components/ui/SortableList.vue'
@@ -42,33 +40,14 @@ const orderItems = computed(() =>
 const BUILTIN = ['summary', 'experience', 'education', 'skills', 'languages']
 const isBuiltin = (id: string) => BUILTIN.includes(id)
 
-function addSection(section: CustomSection = createCustomSection('')) {
-  cv.data.customSections.push(section)
-  cv.data.sectionOrder = reconcileOrder(cv.data.sectionOrder, cv.data)
-}
-
 function addPreset(id: (typeof SECTION_PRESET_IDS)[number]) {
-  addSection(createSectionFromPreset(id, cv.data.meta.language || 'es'))
+  cv.addCustomSection(createSectionFromPreset(id, cv.data.meta.language || 'es'))
   pickerOpen.value = false
 }
 
 function addBlank() {
-  addSection()
+  cv.addCustomSection()
   pickerOpen.value = false
-}
-
-/** Kept in section order, like `sectionOrder` itself (spec 022). */
-function setPageBreak(id: string, on: boolean) {
-  const breaks = new Set(cv.data.pageBreaks)
-  if (on) breaks.add(id)
-  else breaks.delete(id)
-  cv.data.pageBreaks = cv.data.sectionOrder.filter((sectionId) => breaks.has(sectionId))
-}
-
-function removeSection(index: number) {
-  const [removed] = cv.data.customSections.splice(index, 1)
-  cv.data.sectionOrder = cv.data.sectionOrder.filter((id) => id !== removed.id)
-  cv.data.pageBreaks = cv.data.pageBreaks.filter((id) => id !== removed.id)
 }
 </script>
 
@@ -78,13 +57,13 @@ function removeSection(index: number) {
       <p v-if="!cv.data.customSections.length" class="empty">{{ t('custom.empty') }}</p>
 
       <SortableList :items="cv.data.customSections" @reorder="cv.data.customSections = $event">
-        <template #default="{ item, index }">
+        <template #default="{ item }">
           <div class="section">
             <div class="section-head">
               <BaseField v-slot="{ id }" :label="t('custom.title')" :hint="t('custom.titleHint')">
                 <input :id="id" v-model="item.title" />
               </BaseField>
-              <BaseButton size="sm" variant="danger" :aria-label="t('actions.removeNamed', { name: item.title || t('custom.untitled') })" @click="removeSection(index)">
+              <BaseButton size="sm" variant="danger" :aria-label="t('actions.removeNamed', { name: item.title || t('custom.untitled') })" @click="cv.removeCustomSection(item.id)">
                 {{ t('actions.remove') }}
               </BaseButton>
             </div>
@@ -131,7 +110,7 @@ function removeSection(index: number) {
           <BaseButton v-for="id in SECTION_PRESET_IDS" :key="id" size="sm" @click="addPreset(id)">
             + {{ t(`custom.presets.${id}`) }}
           </BaseButton>
-          <BaseButton size="sm" variant="primary" @click="addSection()">+ {{ t('custom.blank') }}</BaseButton>
+          <BaseButton size="sm" variant="primary" @click="cv.addCustomSection()">+ {{ t('custom.blank') }}</BaseButton>
         </div>
       </div>
 
@@ -166,7 +145,7 @@ function removeSection(index: number) {
                 type="checkbox"
                 :checked="cv.data.pageBreaks.includes(item.id)"
                 :aria-label="t('custom.newPageFor', { section: item.label })"
-                @change="setPageBreak(item.id, ($event.target as HTMLInputElement).checked)"
+                @change="cv.setPageBreak(item.id, ($event.target as HTMLInputElement).checked)"
               />
               {{ t('custom.newPage') }}
             </label>
