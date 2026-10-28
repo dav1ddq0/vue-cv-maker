@@ -43,6 +43,8 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 
 ## Next 🔜
 
+- **030** · Expand the preview (desktop) — in progress
+
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
 
