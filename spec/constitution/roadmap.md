@@ -42,6 +42,8 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 
 ## Next 🔜
 
+- **029** · Material 3 interface (dark mode and Android) — planned
+
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
 
