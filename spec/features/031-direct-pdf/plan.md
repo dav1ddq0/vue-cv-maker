@@ -1,6 +1,6 @@
 # 031 · Plan
 
-1. Spec, plan, tasks. The user installs `pdf-lib@1.17.1` and `@pdf-lib/fontkit@1.1.1`.
+1. Spec, plan, tasks. `pdfkit@0.20.2` installed (exact).
 2. **Spike** on Classic: text lines, fonts, colours, rules. Compare with the printed PDF (page count,
    `pdftotext`, pixel difference). Go / no-go with numbers before going further.
 3. **Converter**: backgrounds and borders (rounded), images (photo), SVG marks, links, letter-spacing
@@ -15,10 +15,27 @@
 
 - **Source of truth is the paginated DOM**, not the CV data: one layout engine (the browser +
   paged.js) for screen, print and download, so templates are written once.
-- **pdf-lib** (MIT, no native dependencies). Last release 2022: stable and widely used, but
-  unmaintained — the converter isolates it in `services/export/pdfDirect/` behind one function, so it
-  can be swapped (jsPDF 4 is the fallback candidate).
-- **Fonts from the `.woff` files** Fontsource ships (`@pdf-lib/fontkit` reads WOFF, not WOFF2); one
-  embedded font per subset file, and each text run is split by which file covers its characters.
+- **PDFKit 0.20** (MIT, maintained, 2026), chosen by the user over pdf-lib (unmaintained since
+  2022), its fork `@cantoo/pdf-lib` and jsPDF (TTF only). Its browser ESM build imports no Node
+  modules; it is isolated in `services/export/pdfDirect.ts` behind `buildDirectPdf`.
+- **Fonts from the `.woff` files** Fontsource ships next to each WOFF2: fontkit's subsetter fails on
+  every WOFF2 we bundle ("Offset is outside the bounds of the DataView", checked on all four
+  families) and subsets WOFF to 3–4 KB. `pdfFonts.ts` imports them as URLs, generated from
+  `fonts.css`. One embedded font per subset file; each run is split by the file covering it.
+- **Baselines are measured**, not derived from font metrics: a zero-size inline-block probe gives
+  each element's baseline. **Each run is scaled to the width the browser gave it** (±15 %), so
+  glyph-advance differences between engines cannot open gaps between words.
+- **Generated content** (`::before`/`::after`) becomes real spans with the same computed style on a
+  private copy of the pages (a copy, because paged.js re-lays out pages whose size changes).
+- **List bullets** are drawn as Chrome draws them, not as "•": round(ascent/3) px across, d + 6 px
+  before the text, centred d − 0.5 px above the baseline (measured at 10–100 px and on the PDF).
+
+## Spike result (Classic, then all templates, sample CV)
+
+- Same page count as the print for all 13; `pdftotext` of the download contains every character the
+  printed PDF does (0 missing); 0.2–3 % of pixels differ at 50 dpi, except Chevron (14 %: its
+  clip-path header). 230–530 ms per CV; 20–30 KB per PDF.
+- Still missing: clip-path shapes (Chevron header, Facet corners), glyphs no bundled font has (★ in
+  Harbor's levels), the photo, SVG marks, gradients.
 - **Visual comparison** with `pdftoppm` renders of both PDFs and a per-pixel difference, in the
   scratch QA tooling (not a unit test): it needs Chromium's print to PDF as the reference.

@@ -1,6 +1,6 @@
 # 031 · Direct PDF download
 
-**Status:** planned 📝
+**Status:** in progress 🚧
 
 ## What it does
 
