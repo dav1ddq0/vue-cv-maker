@@ -44,6 +44,8 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 
 ## Next 🔜
 
+- **031** · Direct PDF download (no print dialog; text PDF built in the browser from the paginated pages) — planned
+
 <!-- Add the next feature as `XXX · <Name>` once its features/XXX-.../spec.md exists. -->
 
 
