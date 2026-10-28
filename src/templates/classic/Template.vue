@@ -7,6 +7,7 @@
  */
 import { computed } from 'vue'
 import type { CVData } from '@/types/cv'
+import Breakable from '@/templates/Breakable.vue'
 import {
   absoluteUrl,
   displayUrl,
@@ -33,11 +34,11 @@ const contactLine = computed(() =>
       <h1 class="name">{{ data.personal.fullName }}</h1>
       <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
       <p v-if="contactLine.length" class="contact">
-        <span v-for="(item, i) in contactLine" :key="i">{{ item }}</span>
+        <span v-for="(item, i) in contactLine" :key="i"><Breakable :text="item" /></span>
       </p>
       <p v-if="data.personal.links.length" class="contact">
         <a v-for="link in data.personal.links" :key="link.id" :href="absoluteUrl(link.url)">
-          {{ link.label || displayUrl(link.url) }}
+          <Breakable :text="link.label || displayUrl(link.url)" />
         </a>
       </p>
     </header>

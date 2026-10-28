@@ -13,6 +13,7 @@
  */
 import { computed } from 'vue'
 import type { CVData } from '@/types/cv'
+import Breakable from '@/templates/Breakable.vue'
 import {
   absoluteUrl,
   displayUrl,
@@ -41,14 +42,14 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
 
 <template>
   <article class="aurora" :style="vars">
-    <aside class="sidebar">
+    <aside class="sidebar" data-side>
       <img v-if="data.personal.photo" class="photo" :src="data.personal.photo" alt="" />
 
       <section v-if="contactItems.length || data.personal.links.length" class="side-section">
         <h2 class="side-title">{{ contactTitle }}</h2>
-        <p v-for="(item, i) in contactItems" :key="i" class="side-item">{{ item }}</p>
+        <p v-for="(item, i) in contactItems" :key="i" class="side-item"><Breakable :text="item" /></p>
         <p v-for="link in data.personal.links" :key="link.id" class="side-item">
-          <a :href="absoluteUrl(link.url)">{{ link.label || displayUrl(link.url) }}</a>
+          <a :href="absoluteUrl(link.url)"><Breakable :text="link.label || displayUrl(link.url)" /></a>
         </p>
       </section>
 
@@ -126,6 +127,8 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
 
 <style scoped>
 .aurora {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 33% 1fr;
   font-family: var(--cv-font);
@@ -134,6 +137,32 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
   color: #1a1a1a;
   min-height: 100%;
   --gap: calc(1em * var(--cv-spacing-scale));
+}
+
+/*
+ * The sidebar's band, the full height of the sheet on every page (spec 033). Paginated, each page
+ * starts this article's fragment at the top of the sheet, but the sidebar itself ends with its
+ * content and is only on page 1. Behind the content; on screen it sits under the sidebar's own
+ * background, which already reaches the bottom.
+ */
+.aurora::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 33%;
+  height: 297mm;
+  background: color-mix(in srgb, var(--cv-accent) 8%, #fff);
+  border-right: 1px solid var(--cv-accent);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* paged.js unsets ::before on continuation fragments (so text decorations do not repeat); the band
+   must repeat on every page. */
+.aurora[data-split-from]::before {
+  content: '' !important;
 }
 
 /* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */

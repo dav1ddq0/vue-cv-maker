@@ -11,6 +11,7 @@ import { useI18n } from '@/i18n'
 import { stepStatus } from '@/core/stepStatus'
 import { useCvExport, type ExportKind } from '@/composables/useCvExport'
 import { printTitle } from '@/services/export'
+import { useSideColumnFit } from '@/composables/useSideColumnFit'
 
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: [] }>()
@@ -19,6 +20,7 @@ const ui = useUiStore()
 const cv = useCvStore()
 const { t } = useI18n()
 const { busy, failed, systemFont, run } = useCvExport()
+const { overflows: sideTooLong } = useSideColumnFit()
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const titleId = useId()
@@ -96,6 +98,7 @@ function printInstead() {
 
     <section class="check" :aria-label="t('exportDialog.checkTitle')">
       <h3 class="check-title">{{ t('exportDialog.checkTitle') }}</h3>
+      <p v-if="sideTooLong" class="side-warning">{{ t('exportView.sideTooLong') }}</p>
       <p v-if="!missing.length" class="ok">{{ t('exportDialog.allGood') }}</p>
       <ul v-else class="missing">
         <li v-for="id in missing" :key="id">
@@ -295,6 +298,15 @@ function printInstead() {
 .failed-text {
   flex: 1 1 16em;
   margin: 0;
+  font: var(--type-body-medium);
+}
+
+.side-warning {
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: var(--shape-sm);
+  background: var(--md-warning-container);
+  color: var(--md-on-warning-container);
   font: var(--type-body-medium);
 }
 </style>

@@ -43,6 +43,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **030** · Expand the preview on desktop (the rail folds to a navigation rail, Esc to return) and zoom no longer cuts the page
 - **031** · Direct PDF download (no print dialog: the paginated pages redrawn as a text PDF with PDFKit, fonts embedded; print stays)
 - **032** · The side column stays on page one (Banner, Harbor, Facet, Chevron: side column first in the markup)
+- **033** · Side bands to the foot of every page, a warning when the side column cannot fit page one, e-mails and URLs wrap at sensible points
 
 ## Next 🔜
 

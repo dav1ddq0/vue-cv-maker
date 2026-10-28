@@ -10,6 +10,7 @@
 import { computed } from 'vue'
 import type { CVData } from '@/types/cv'
 import LevelDots from '@/templates/LevelDots.vue'
+import Breakable from '@/templates/Breakable.vue'
 import {
   absoluteUrl,
   displayUrl,
@@ -48,14 +49,14 @@ const languages = computed(() => resolveLanguages(props.data))
       <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
     </header>
 
-    <aside class="sidebar">
+    <aside class="sidebar" data-side>
       <img v-if="data.personal.photo" class="photo" :src="data.personal.photo" alt="" />
 
       <section v-if="contactItems.length || data.personal.links.length" class="side-section">
         <h2 class="side-title">{{ contactTitle }}</h2>
-        <p v-for="(item, i) in contactItems" :key="i" class="side-item">{{ item }}</p>
+        <p v-for="(item, i) in contactItems" :key="i" class="side-item"><Breakable :text="item" /></p>
         <p v-for="link in data.personal.links" :key="link.id" class="side-item">
-          <a :href="absoluteUrl(link.url)">{{ link.label || displayUrl(link.url) }}</a>
+          <a :href="absoluteUrl(link.url)"><Breakable :text="link.label || displayUrl(link.url)" /></a>
         </p>
       </section>
 
@@ -140,6 +141,8 @@ const languages = computed(() => resolveLanguages(props.data))
 
 <style scoped>
 .harbor {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 1fr 31%;
   /* Name, then the sidebar, then the main column, in the markup: paged.js splits in DOM order, so
@@ -152,6 +155,31 @@ const languages = computed(() => resolveLanguages(props.data))
   color: #1a1a1a;
   min-height: 100%;
   --gap: calc(1em * var(--cv-spacing-scale));
+}
+
+/*
+ * The sidebar's band, the full height of the sheet on every page (spec 033). Paginated, each page
+ * starts this article's fragment at the top of the sheet, but the sidebar itself ends with its
+ * content and is only on page 1. Behind the content; on screen it sits under the sidebar's own
+ * background, which already reaches the bottom.
+ */
+.harbor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  width: 31%;
+  height: 297mm;
+  background: #1f2937;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* paged.js unsets ::before on continuation fragments (so text decorations do not repeat); the band
+   must repeat on every page. */
+.harbor[data-split-from]::before {
+  content: '' !important;
 }
 
 .sidebar {

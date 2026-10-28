@@ -12,6 +12,11 @@ import { blobToDataUrl } from './json'
  * from the same `.vue` component. Nothing here knows a template's markup.
  */
 export async function renderTemplateHtml(data: CVData, templateId: string): Promise<string> {
+  return withMountedTemplate(data, templateId, (host) => host.innerHTML)
+}
+
+/** Mounts the template off-screen at A4 width, laid out with its fonts, for `use`; then removes it. */
+async function withMountedTemplate<T>(data: CVData, templateId: string, use: (host: HTMLElement) => T): Promise<T> {
   const component = await getTemplate(templateId).component()
   const host = document.createElement('div')
   // Off-screen rather than `display: none`: hidden subtrees skip layout, and
@@ -21,13 +26,45 @@ export async function renderTemplateHtml(data: CVData, templateId: string): Prom
 
   const app = createApp({ render: () => h(component, { data }) })
   app.mount(host)
-  await nextFrame()
-  // Laying the CV out requests its fonts; paged.js measures text, so it must see the real ones (spec 026).
-  await document.fonts?.ready
-  const html = host.innerHTML
-  app.unmount()
-  host.remove()
-  return html
+  try {
+    await nextFrame()
+    // Laying the CV out requests its fonts; paged.js measures text, so it must see the real ones (spec 026).
+    await document.fonts?.ready
+    return use(host)
+  } finally {
+    app.unmount()
+    host.remove()
+  }
+}
+
+const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
+/**
+ * Whether the template's side column (`[data-side]`) is taller than what page 1 leaves it (spec 033).
+ * The side column comes first in the markup, so paged.js puts it on page 1 whole; if it does not fit,
+ * the main column can only start on page 2. Measured on the column's content, not its box, which the
+ * grid stretches to the main column's height.
+ */
+export async function sideColumnOverflows(data: CVData, templateId: string): Promise<boolean> {
+  // The stored photo is a `photo:{id}` reference, not a loadable URL; templates size the photo
+  // with CSS, so a transparent pixel keeps the column's height without requesting anything.
+  const measured = data.personal.photo ? { ...data, personal: { ...data.personal, photo: TRANSPARENT_PIXEL } } : data
+  return withMountedTemplate(measured, templateId, (host) => {
+    const side = host.querySelector<HTMLElement>('[data-side]')
+    const article = host.firstElementChild
+    if (!side || !article) return false
+    const sheet = document.createElement('div')
+    sheet.style.cssText = 'height:297mm'
+    host.appendChild(sheet)
+    const pageHeight = sheet.getBoundingClientRect().height
+    sheet.remove()
+    const top = side.getBoundingClientRect().top - article.getBoundingClientRect().top
+    const children = Array.from(side.children)
+    const contentBottom = children.length ? Math.max(...children.map((c) => c.getBoundingClientRect().bottom)) : side.getBoundingClientRect().top
+    const style = getComputedStyle(side)
+    const height = contentBottom - side.getBoundingClientRect().top + (parseFloat(style.paddingBottom) || 0) + (parseFloat(style.borderBottomWidth) || 0)
+    return top + height > pageHeight + 0.5
+  })
 }
 
 /**

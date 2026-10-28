@@ -8,6 +8,7 @@ vi.mock('@/services/export', () => ({
   exportJson: vi.fn(async () => {}),
   printCv: vi.fn(async () => {}),
   downloadBlob: vi.fn(),
+  sideColumnOverflows: vi.fn(async () => false),
   printTitle: () => 'Ana – CV',
 }))
 
@@ -104,6 +105,21 @@ describe('ExportDialog direct PDF (spec 031)', () => {
     const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
     await wrapper.setProps({ open: true })
     expect(wrapper.text()).toContain('La fuente Georgia depende de cada equipo')
+    wrapper.unmount()
+  })
+})
+
+describe('ExportDialog side column check (spec 033)', () => {
+  it('warns when the side column does not fit on page one', async () => {
+    vi.useFakeTimers()
+    vi.mocked(exporters.sideColumnOverflows).mockResolvedValue(true)
+    useCvStore()
+    const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
+    await wrapper.setProps({ open: true })
+    await vi.advanceTimersByTimeAsync(600)
+    expect(wrapper.find('.side-warning').text()).toContain('La columna lateral no cabe en una página')
+    vi.mocked(exporters.sideColumnOverflows).mockResolvedValue(false)
+    vi.useRealTimers()
     wrapper.unmount()
   })
 })

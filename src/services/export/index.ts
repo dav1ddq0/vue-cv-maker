@@ -2,4 +2,4 @@ export { printCv, printTitle, paginateInto, releasePagination, exportCss } from 
 export { exportHtml, buildStandaloneHtml } from './html'
 export { exportJson, importJsonFile, toExportableJson, blobToDataUrl, dataUrlToBlob } from './json'
 export { downloadBlob, slugify } from './download'
-export { renderTemplateHtml, resolvePhoto, collectDocumentCss } from './render'
+export { renderTemplateHtml, resolvePhoto, collectDocumentCss, sideColumnOverflows } from './render'

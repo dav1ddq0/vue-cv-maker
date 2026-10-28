@@ -202,6 +202,28 @@ export function resolveSections(data: CVData): ResolvedSection[] {
 }
 
 /** Strips the protocol so links read as "github.com/nadia" rather than the full URL. */
+/**
+ * An e-mail or URL cut into pieces that may end a line (spec 033): after "@", and before ".", "/",
+ * "?", "#", "&" or "=" (but not inside "://"). Templates join them with <wbr>, so a narrow column
+ * breaks "ana.ortega@ / example.com" rather than "ana.ortega@example.co / m". Text with none of
+ * these characters comes back whole.
+ */
+export function breakParts(text: string): string[] {
+  const parts: string[] = []
+  let start = 0
+  for (let i = 1; i < text.length; i++) {
+    const ch = text[i]!
+    const prev = text[i - 1]!
+    const before = '.?#&='.includes(ch) || (ch === '/' && prev !== '/' && prev !== ':')
+    if (before || prev === '@') {
+      parts.push(text.slice(start, i))
+      start = i
+    }
+  }
+  parts.push(text.slice(start))
+  return parts
+}
+
 export function displayUrl(url: string): string {
   return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 }

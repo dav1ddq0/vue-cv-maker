@@ -9,6 +9,7 @@
 import { computed } from 'vue'
 import type { CVData } from '@/types/cv'
 import LevelDots from '@/templates/LevelDots.vue'
+import Breakable from '@/templates/Breakable.vue'
 import {
   absoluteUrl,
   displayUrl,
@@ -48,14 +49,14 @@ const languages = computed(() => resolveLanguages(props.data))
         <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
       </div>
       <div v-if="contactItems.length || data.personal.links.length" class="contact">
-        <p v-for="(item, i) in contactItems" :key="i">{{ item }}</p>
+        <p v-for="(item, i) in contactItems" :key="i"><Breakable :text="item" /></p>
         <p v-for="link in data.personal.links" :key="link.id">
-          <a :href="absoluteUrl(link.url)">{{ link.label || displayUrl(link.url) }}</a>
+          <a :href="absoluteUrl(link.url)"><Breakable :text="link.label || displayUrl(link.url)" /></a>
         </p>
       </div>
     </header>
 
-    <aside class="aside">
+    <aside class="aside" data-side>
       <section v-for="section in asideSections" :key="section.id" :data-section="section.kind" class="section">
         <h2 class="section-title">{{ section.title }}</h2>
 

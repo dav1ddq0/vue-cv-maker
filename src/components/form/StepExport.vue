@@ -8,12 +8,14 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
 import PaginatedPreview from '@/components/preview/PaginatedPreview.vue'
 import ReviewCard from './ReviewCard.vue'
+import { useSideColumnFit } from '@/composables/useSideColumnFit'
 
 const cv = useCvStore()
 const { t } = useI18n()
 
 const showPaginated = ref(false)
 const { busy, failed, systemFont, run } = useCvExport()
+const { overflows: sideTooLong } = useSideColumnFit()
 </script>
 
 <template>
@@ -21,6 +23,8 @@ const { busy, failed, systemFont, run } = useCvExport()
     <NoticeBar tone="warning">{{ t('notices.localOnly') }}</NoticeBar>
 
     <ReviewCard />
+
+    <NoticeBar v-if="sideTooLong" tone="warning">{{ t('exportView.sideTooLong') }}</NoticeBar>
 
     <ul class="options">
       <li class="option">
