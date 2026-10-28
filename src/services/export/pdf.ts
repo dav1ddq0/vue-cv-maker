@@ -37,7 +37,13 @@ export interface PrintOptions {
  * "Nadia Martín Reyes – CV"; the document title when there is no name; "CV" when there is neither.
  */
 export function printTitle(data: CVData): string {
-  const clean = (value: string) => value.replace(/[/\\:*?"<>|]/g, '').replace(/\s+/g, ' ').trim()
+  // Path characters, control characters and bidi overrides (U+202E could make "…exe.pdf" read as
+  // something else) never reach the file name or the PDF's title (spec 034).
+  const clean = (value: string) =>
+    value
+      .replace(/[/\\:*?"<>|\u0000-\u001f\u007f\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
   const name = clean(data.personal.fullName)
   if (name) return `${name} – CV`
   return clean(data.meta.title) || 'CV'

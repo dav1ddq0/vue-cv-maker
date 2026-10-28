@@ -44,6 +44,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **031** · Direct PDF download (no print dialog: the paginated pages redrawn as a text PDF with PDFKit, fonts embedded; print stays)
 - **032** · The side column stays on page one (Banner, Harbor, Facet, Chevron: side column first in the markup)
 - **033** · Side bands to the foot of every page, a warning when the side column cannot fit page one, e-mails and URLs wrap at sensible points
+- **034** · Import hardening from a security review (typed import, education `null` kept, no control/bidi characters in PDF names, pdf.js without eval)
 
 ## Next 🔜
 

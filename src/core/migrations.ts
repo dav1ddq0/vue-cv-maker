@@ -2,7 +2,7 @@ import { MARITAL_STATUSES, SCHEMA_VERSION, SECTION_IDS } from '@/types/cv'
 import type { CVData, MaritalStatus, SkillItem, StyleTokens } from '@/types/cv'
 import { createEmptyCV, DEFAULT_STYLE, DEFAULT_TEMPLATE_ID } from './factory'
 import { uid } from './id'
-import { isAccentColor, isFontOption, isPageMargin } from './stylePresets'
+import { CV_LANGUAGES, isAccentColor, isFontOption, isPageMargin } from './stylePresets'
 
 /**
  * Migration steps, keyed by the version they upgrade *from*. A file at version N
@@ -81,9 +81,15 @@ export function normalize(input: any, options: MigrateOptions = {}): CVData {
   const base = createEmptyCV()
   const out: CVData = {
     schemaVersion: SCHEMA_VERSION,
+    // Every field typed: a file with an object where a string belongs broke the editor (spec 034).
     meta: {
       ...base.meta,
       ...(input.meta ?? {}),
+      id: str(input.meta?.id) || base.meta.id,
+      title: str(input.meta?.title) || base.meta.title,
+      createdAt: str(input.meta?.createdAt) || base.meta.createdAt,
+      updatedAt: str(input.meta?.updatedAt) || base.meta.updatedAt,
+      language: toCvLanguage(input.meta?.language),
       templateId: str(input.meta?.templateId) || options.fallbackTemplateId || DEFAULT_TEMPLATE_ID,
     },
     personal: {
@@ -109,23 +115,40 @@ export function normalize(input: any, options: MigrateOptions = {}): CVData {
     summary: str(input.summary),
     experience: withIds(input.experience, 'exp').map((e: any) => ({
       ...e,
-      endDate: e.endDate ?? null,
+      position: str(e.position),
+      company: str(e.company),
+      location: str(e.location),
+      startDate: str(e.startDate),
+      endDate: e.endDate === undefined || e.endDate === null ? null : str(e.endDate),
       highlights: Array.isArray(e.highlights) ? e.highlights.map(str) : [],
       description: str(e.description),
     })),
+    // `null` is "currently studying" and must survive a JSON round trip; only a missing end is empty.
     education: withIds(input.education, 'edu').map((e: any) => ({
       ...e,
-      endDate: e.endDate ?? '',
+      degree: str(e.degree),
+      institution: str(e.institution),
+      location: str(e.location),
+      startDate: str(e.startDate),
+      endDate: e.endDate === null ? null : str(e.endDate),
+      description: str(e.description),
     })),
     skills: withIds(input.skills, 'skg').map((g: any) => ({
       ...g,
+      category: str(g.category),
       items: Array.isArray(g.items) ? g.items.map(toSkillItem) : [],
     })),
-    languages: withIds(input.languages, 'lng'),
+    languages: withIds(input.languages, 'lng').map((l: any) => ({ ...l, name: str(l.name), level: str(l.level) })),
     customSections: withIds(input.customSections, 'cus').map((s: any) => ({
       ...s,
       title: str(s.title),
-      entries: withIds(s.entries, 'cen'),
+      entries: withIds(s.entries, 'cen').map((e: any) => ({
+        ...e,
+        title: str(e.title),
+        subtitle: str(e.subtitle),
+        date: str(e.date),
+        description: str(e.description),
+      })),
     })),
     sectionOrder: [],
     pageBreaks: [],
@@ -179,6 +202,11 @@ function toPhoto(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined
   if (value.startsWith('photo:')) return value
   return /^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(value) ? value : undefined
+}
+
+/** The CV's language: one the templates have words for, else Spanish (the app's default). */
+function toCvLanguage(value: unknown): string {
+  return CV_LANGUAGES.some((option) => option.code === value) ? (value as string) : 'es'
 }
 
 /** Anything that is not one of the known codes (a typo, a label from elsewhere) becomes empty. */

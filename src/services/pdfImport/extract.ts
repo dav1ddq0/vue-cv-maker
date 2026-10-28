@@ -32,7 +32,8 @@ const Y_TOLERANCE = 2.5
 
 export async function extractDocument(file: File | ArrayBuffer): Promise<ExtractedDocument> {
   const source = file instanceof File ? await file.arrayBuffer() : file
-  const doc = await pdfjs.getDocument({ data: new Uint8Array(source) }).promise
+  // A user's PDF is untrusted input: no eval-compiled font code, even where a CSP would allow it (spec 034).
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(source), isEvalSupported: false }).promise
 
   const lines: ExtractedLine[] = []
   try {
