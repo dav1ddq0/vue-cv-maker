@@ -67,7 +67,7 @@ async function pick(kind: ExportKind) {
   min-height: 64px;
   padding: 0.7em 1em;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--shape-lg);
   background: var(--surface);
   color: inherit;
   font: inherit;

@@ -36,7 +36,7 @@ const { t } = useI18n()
   display: flex;
   justify-content: center;
   padding: 0.6em;
-  border-radius: 18px;
+  border-radius: var(--shape-lg);
   background: var(--surface-2);
   /* The first shadow paints over the form's top padding, where scrolled content would peek out
      above the pinned strip. */
@@ -68,7 +68,7 @@ const { t } = useI18n()
   width: 48px;
   height: 48px;
   border: 0;
-  border-radius: 24px;
+  border-radius: var(--shape-xl);
   background: var(--surface);
   color: var(--text);
   box-shadow: var(--shadow);

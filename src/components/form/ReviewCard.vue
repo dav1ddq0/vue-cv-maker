@@ -112,7 +112,7 @@ meter {
 
 .level {
   padding: 0.1em 0.5em;
-  border-radius: 999px;
+  border-radius: var(--shape-full);
   font-size: 0.75em;
   font-weight: 600;
   white-space: nowrap;

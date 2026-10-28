@@ -47,20 +47,13 @@ meter {
 }
 
 .verdict--good {
-  color: #166534;
+  color: var(--md-success);
 }
 
 .verdict--short,
 .verdict--long {
-  color: #92400e;
+  color: var(--md-warning);
 }
 
-:root[data-theme='dark'] .verdict--good {
-  color: #6ee7a0;
-}
 
-:root[data-theme='dark'] .verdict--short,
-:root[data-theme='dark'] .verdict--long {
-  color: #f0c36d;
-}
 </style>

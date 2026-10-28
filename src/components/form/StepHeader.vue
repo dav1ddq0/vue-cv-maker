@@ -17,12 +17,12 @@ const nextName = computed(() => {
 
 <template>
   <div class="header">
-    <button type="button" class="arrow" :aria-label="t('stepSheet.prev')" :disabled="ui.stepIndex === 0" @click="ui.prevStep()">
+    <button type="button" class="arrow m3-icon-btn m3-state" :aria-label="t('stepSheet.prev')" :disabled="ui.stepIndex === 0" @click="ui.prevStep()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
     </button>
 
     <h2 class="heading">
-      <button type="button" class="trigger" aria-haspopup="dialog" @click="open = true">
+      <button type="button" class="trigger m3-state" aria-haspopup="dialog" @click="open = true">
         <span class="line">
           <span class="name">{{ t(`steps.${ui.step}`) }}</span>
           <span class="position">{{ t('stepSheet.short', { n: ui.stepIndex + 1, total: ui.steps.length }) }}</span>
@@ -36,7 +36,7 @@ const nextName = computed(() => {
 
     <button
       type="button"
-      class="arrow"
+      class="arrow m3-icon-btn m3-state"
       :aria-label="nextName ? t('stepSheet.next', { step: nextName }) : t('actions.next')"
       :disabled="ui.stepIndex === ui.steps.length - 1"
       @click="ui.nextStep()"
@@ -50,12 +50,13 @@ const nextName = computed(() => {
 <style scoped>
 .header {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
   align-items: center;
-  min-height: 60px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface);
+  gap: 4px;
+  min-height: 64px;
+  padding: 0 4px;
+  border-radius: var(--shape-lg);
+  background: var(--md-surface-container-high);
 }
 
 .heading {
@@ -65,32 +66,22 @@ const nextName = computed(() => {
 }
 
 .arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 44px;
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.arrow:disabled {
-  color: var(--text-muted);
-  opacity: 0.5;
-  cursor: default;
+  width: 48px;
+  height: 48px;
+  color: var(--md-on-surface);
 }
 
 .trigger {
+  --container: transparent;
   display: flex;
   flex-direction: column;
-  gap: 0.4em;
+  gap: 8px;
   width: 100%;
-  min-height: 44px;
-  padding: 0.4em 0;
+  min-height: 48px;
+  padding: 8px;
   border: 0;
-  background: transparent;
-  color: inherit;
+  border-radius: var(--shape-md);
+  color: var(--md-on-surface);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -106,31 +97,32 @@ const nextName = computed(() => {
 .name {
   min-width: 0;
   overflow: hidden;
-  font-size: 1.05em;
-  font-weight: 700;
+  font: var(--type-title-medium);
+  letter-spacing: var(--tracking-title-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .position {
   flex-shrink: 0;
-  font-size: 0.8em;
-  color: var(--text-muted);
+  font: var(--type-label-medium);
+  letter-spacing: var(--tracking-label);
+  color: var(--md-on-surface-variant);
 }
 
 .segments {
   display: grid;
   grid-template-columns: repeat(v-bind('ui.steps.length'), minmax(0, 1fr));
-  gap: 3px;
+  gap: 4px;
 }
 
 .segment {
   height: 4px;
-  border-radius: 2px;
-  background: var(--border);
+  border-radius: var(--shape-full);
+  background: var(--md-secondary-container);
 }
 
 .segment--on {
-  background: var(--accent);
+  background: var(--md-primary);
 }
 </style>

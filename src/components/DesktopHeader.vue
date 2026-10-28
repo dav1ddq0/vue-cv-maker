@@ -38,7 +38,7 @@ const saveText = computed(() => {
     </button>
 
     <nav v-if="ui.view === 'editor'" class="crumbs" :aria-label="t('header.breadcrumb')">
-      <button type="button" class="crumb" @click="ui.view = 'documents'">{{ t('nav.documents') }}</button>
+      <button type="button" class="crumb m3-state" @click="ui.view = 'documents'">{{ t('nav.documents') }}</button>
       <span class="sep" aria-hidden="true">/</span>
       <input v-model="cv.data.meta.title" class="doc-title" :aria-label="t('header.docTitle')" :placeholder="t('documents.untitled')" />
       <span class="state" :class="{ 'state--error': cv.saveState === 'error' }" role="status">
@@ -50,7 +50,7 @@ const saveText = computed(() => {
         v-for="target in VIEWS"
         :key="target"
         type="button"
-        class="view"
+        class="view m3-state"
         :aria-current="ui.view === target ? 'page' : undefined"
         @click="ui.view = target"
       >
@@ -61,14 +61,14 @@ const saveText = computed(() => {
     <span class="spacer" />
 
     <template v-if="ui.view === 'editor'">
-      <button type="button" class="icon" :aria-label="t('header.undo')" :title="t('header.undo')" :disabled="!cv.canUndo" @click="cv.undo()">
+      <button type="button" class="icon m3-icon-btn m3-state" :aria-label="t('header.undo')" :title="t('header.undo')" :disabled="!cv.canUndo" @click="cv.undo()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5" /><path d="M4 9h10a6 6 0 010 12h-3" /></svg>
       </button>
-      <button type="button" class="icon" :aria-label="t('header.redo')" :title="t('header.redo')" :disabled="!cv.canRedo" @click="cv.redo()">
+      <button type="button" class="icon m3-icon-btn m3-state" :aria-label="t('header.redo')" :title="t('header.redo')" :disabled="!cv.canRedo" @click="cv.redo()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5" /><path d="M20 9H10a6 6 0 000 12h3" /></svg>
       </button>
       <span class="divider" aria-hidden="true" />
-      <button type="button" class="ghost" @click="ui.view = 'import'">
+      <button type="button" class="ghost m3-state" @click="ui.view = 'import'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4l4 4" /><path d="M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4" /></svg>
         {{ t('nav.import') }}
       </button>
@@ -76,7 +76,7 @@ const saveText = computed(() => {
 
     <PreferencesPopover />
 
-    <button v-if="ui.view === 'editor'" type="button" class="primary" aria-haspopup="dialog" @click="emit('export')">
+    <button v-if="ui.view === 'editor'" type="button" class="primary m3-state" aria-haspopup="dialog" @click="emit('export')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0l-4-4m4 4l4-4" /><path d="M4 20h16" /></svg>
       {{ t('header.export') }}
     </button>
@@ -87,23 +87,22 @@ const saveText = computed(() => {
 .header {
   display: flex;
   align-items: center;
-  gap: 0.75em;
-  min-height: 56px;
-  padding: 0 1em 0 1.25em;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  gap: 12px;
+  min-height: 64px;
+  padding: 0 16px 0 20px;
+  border-bottom: 1px solid var(--md-outline-variant);
+  background: var(--bg);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.6em;
+  gap: 12px;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--text);
-  font: inherit;
-  font-weight: 700;
+  color: var(--md-on-surface);
+  font: var(--type-title-large);
   cursor: pointer;
 }
 
@@ -111,12 +110,12 @@ const saveText = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 0.72em;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--shape-sm);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font: var(--type-label-medium);
 }
 
 .crumbs,
@@ -129,19 +128,17 @@ const saveText = computed(() => {
 }
 
 .crumb {
-  padding: 0.4em 0.3em;
+  --container: transparent;
+  min-height: 40px;
+  padding: 0 12px;
   border: 0;
-  background: none;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.9em;
-  font-weight: 500;
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
   cursor: pointer;
 }
 
-.crumb:hover {
-  color: var(--text);
-}
 
 .sep {
   color: var(--text-muted);
@@ -152,26 +149,28 @@ const saveText = computed(() => {
   field-sizing: content;
   min-width: 6ch;
   max-width: 28ch;
-  padding: 0.35em 0.5em;
+  min-height: 40px;
+  padding: 0 12px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--shape-sm);
   background: transparent;
-  color: var(--text);
-  font: inherit;
-  font-size: 0.9em;
-  font-weight: 600;
+  color: var(--md-on-surface);
+  font: var(--type-title-medium);
+  letter-spacing: var(--tracking-title-medium);
 }
 
-.doc-title:hover {
-  border-color: var(--border);
+.doc-title:hover,
+.doc-title:focus-visible {
+  border-color: var(--md-outline);
 }
 
 .state {
   display: flex;
   align-items: center;
-  gap: 0.4em;
-  font-size: 0.8em;
-  color: var(--text-muted);
+  gap: 8px;
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
   white-space: nowrap;
 }
 
@@ -183,25 +182,24 @@ const saveText = computed(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #15803d;
+  background: var(--md-success);
 }
 
 .view {
+  --container: transparent;
   min-height: 40px;
-  padding: 0 0.9em;
+  padding: 0 16px;
   border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.9em;
-  font-weight: 600;
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
   cursor: pointer;
 }
 
 .view[aria-current='page'] {
-  background: var(--accent-soft);
-  color: var(--text);
+  --container: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
 }
 
 .spacer {
@@ -209,57 +207,38 @@ const saveText = computed(() => {
 }
 
 .icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
+  color: var(--md-on-surface-variant);
 }
 
-.icon:hover:not(:disabled),
-.ghost:hover {
-  background: var(--surface-2);
-}
-
-.icon:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
 
 .divider {
   width: 1px;
   height: 24px;
-  background: var(--border);
+  background: var(--md-outline-variant);
 }
 
 .ghost,
 .primary {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 8px;
   min-height: 40px;
-  padding: 0 0.9em;
-  border-radius: 10px;
-  font: inherit;
-  font-size: 0.9em;
-  font-weight: 600;
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--shape-full);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
   cursor: pointer;
 }
 
 .ghost {
-  border: 0;
-  background: transparent;
-  color: var(--text);
+  --container: transparent;
+  padding: 0 12px;
+  color: var(--md-primary);
 }
 
 .primary {
-  border: 0;
-  background: var(--accent);
-  color: var(--on-accent);
+  --container: var(--md-primary);
+  color: var(--md-on-primary);
 }
 </style>

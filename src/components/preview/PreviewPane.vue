@@ -159,7 +159,7 @@ const scaleStyle = computed(() => ({
   min-height: 34px;
   padding: 0 0.7em;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--shape-sm);
   background: var(--surface);
   color: var(--text);
   font: inherit;
@@ -196,7 +196,7 @@ const scaleStyle = computed(() => ({
   min-width: 32px;
   min-height: 32px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--shape-sm);
   background: transparent;
   color: var(--text);
   font: inherit;
@@ -256,7 +256,7 @@ const scaleStyle = computed(() => ({
 .page-wrap[data-highlight='custom'] :deep([data-section='custom']) {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
-  border-radius: 2px;
+  border-radius: var(--shape-xs);
   background: color-mix(in srgb, var(--accent) 6%, transparent);
   transition: outline-color 0.2s ease;
 }

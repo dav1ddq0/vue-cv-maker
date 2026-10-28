@@ -186,20 +186,17 @@ async function confirm() {
 .badge {
   margin-left: 0.4em;
   padding: 0.1em 0.55em;
-  border-radius: 10px;
-  background: color-mix(in srgb, #15803d 16%, var(--surface));
-  color: #166534;
+  border-radius: var(--shape-md);
+  background: var(--md-success-container);
+  color: var(--md-on-success-container);
   font-size: 0.72em;
   font-weight: 700;
 }
 
-:root[data-theme='dark'] .badge {
-  color: #6ee7a0;
-}
 
 .check {
   padding: 0.9em 1em;
-  border-radius: 12px;
+  border-radius: var(--shape-md);
   background: var(--surface-2);
 }
 
@@ -227,16 +224,13 @@ async function confirm() {
   padding: 0.2em 0;
   border: 0;
   background: none;
-  color: #92400e;
+  color: var(--md-warning);
   font: inherit;
   font-size: 0.85em;
   text-decoration: underline;
   cursor: pointer;
 }
 
-:root[data-theme='dark'] .fix {
-  color: #f0c36d;
-}
 
 .foot {
   display: flex;
@@ -248,7 +242,7 @@ async function confirm() {
 .primary {
   min-height: 42px;
   padding: 0 1.1em;
-  border-radius: 10px;
+  border-radius: var(--shape-md);
   font: inherit;
   font-weight: 600;
   cursor: pointer;

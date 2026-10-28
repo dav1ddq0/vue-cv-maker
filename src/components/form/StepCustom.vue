@@ -286,7 +286,7 @@ function addBlank() {
   min-height: 64px;
   padding: 0 0.9em;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--shape-lg);
   background: var(--surface);
   color: inherit;
   font: inherit;
@@ -302,7 +302,7 @@ function addBlank() {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--shape-md);
   background: var(--accent-soft);
   color: var(--accent);
 }

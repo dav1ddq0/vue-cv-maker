@@ -24,7 +24,7 @@ function go(id: StepId) {
       <li v-for="(id, index) in ui.steps" :key="id">
         <button
           type="button"
-          class="row"
+          class="row m3-state"
           :class="{ 'row--current': id === ui.step }"
           :aria-current="id === ui.step ? 'step' : undefined"
           @click="go(id)"
@@ -54,23 +54,25 @@ function go(id: StepId) {
 }
 
 .row {
+  --container: transparent;
   display: flex;
   align-items: center;
-  gap: 0.9em;
+  gap: 12px;
   width: 100%;
   min-height: 56px;
-  padding: 0 0.8em;
+  padding: 0 16px 0 12px;
   border: 0;
-  border-radius: 14px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
   text-align: left;
   cursor: pointer;
 }
 
 .row--current {
-  background: var(--accent-soft);
+  --container: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
 }
 
 .badge {
@@ -81,36 +83,27 @@ function go(id: StepId) {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 2px solid var(--border);
+  border: 2px solid var(--md-outline);
   font-size: 0.9em;
   font-weight: 700;
   color: var(--text-muted);
 }
 
 .badge--current {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
+  border-color: var(--md-primary);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
 }
 
 .badge--complete {
   border-color: transparent;
-  background: color-mix(in srgb, #15803d 16%, var(--surface));
-  color: #15803d;
+  background: var(--md-success-container);
+  color: var(--md-on-success-container);
 }
 
 .badge--incomplete {
-  border-color: #b45309;
-  color: #92400e;
-}
-
-:root[data-theme='dark'] .badge--complete {
-  color: #6ee7a0;
-}
-
-:root[data-theme='dark'] .badge--incomplete {
-  border-color: #f0c36d;
-  color: #f0c36d;
+  border-color: var(--md-warning);
+  color: var(--md-warning);
 }
 
 .text {
@@ -120,11 +113,13 @@ function go(id: StepId) {
 }
 
 .name {
-  font-weight: 600;
+  font: var(--type-title-small);
+  letter-spacing: var(--tracking-title-small);
 }
 
 .detail {
-  font-size: 0.85em;
-  color: var(--text-muted);
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
 }
 </style>

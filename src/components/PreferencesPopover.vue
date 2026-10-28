@@ -109,7 +109,7 @@ function toggleFallback() {
   width: 40px;
   height: 40px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--shape-md);
   background: transparent;
   color: var(--text);
   cursor: pointer;
@@ -124,7 +124,7 @@ function toggleFallback() {
   margin: 0;
   padding: 1.1em;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--shape-md);
   background: var(--surface);
   color: var(--text);
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
@@ -182,7 +182,7 @@ function toggleFallback() {
   min-height: 36px;
   padding: 0 0.8em;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--shape-sm);
   background: var(--surface);
   color: var(--text);
   font: inherit;
@@ -206,7 +206,7 @@ function toggleFallback() {
 kbd {
   padding: 0.1em 0.45em;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: var(--shape-xs);
   font: inherit;
   font-size: 0.85em;
   font-weight: 600;

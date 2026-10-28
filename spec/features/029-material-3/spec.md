@@ -34,7 +34,7 @@ The Android audit of 2026-10-28 (Pixel 7, Chrome, dark and light):
        Every pairing meets WCAG AA (M3's own requirement). Existing variable names keep working.
 2. [x] **Typography**: Roboto Flex for the interface (CV fonts unchanged) and M3's type scale
        (display → label) as tokens.
-3. [ ] **Shape, elevation, state**: M3 shape scale (none, xs 4, sm 8, md 12, lg 16, xl 28, full)
+3. [x] **Shape, elevation, state**: M3 shape scale (none, xs 4, sm 8, md 12, lg 16, xl 28, full)
        replaces the 20 ad-hoc radii; tonal elevation levels; hover/focus/pressed state layers
        (8 / 10 / 10 % of the content colour).
 4. [x] **Fonts load by need**: every bundled `@font-face` has its `unicode-range`; a Latin-only page
@@ -50,7 +50,7 @@ The Android audit of 2026-10-28 (Pixel 7, Chrome, dark and light):
        checkbox. (No switch exists in the interface.)
 8. [x] Cards (entry, document, export option), bottom sheets (drag handle, xl top corners,
        surface-container-low), dialogs (xl corners, surface-container-high), notices.
-9. [ ] App chrome: top app bar, the phone dock as an M3 bottom app bar, step navigation, the desktop
+9. [x] App chrome: top app bar, the phone dock as an M3 bottom app bar, step navigation, the desktop
        header and step rail.
 
 ### Dark mode and Android

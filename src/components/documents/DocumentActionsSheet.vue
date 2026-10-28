@@ -53,7 +53,7 @@ watch(() => props.open, () => (confirming.value = false))
 .row {
   min-height: 56px;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--shape-lg);
   background: var(--surface);
   color: inherit;
   font: inherit;
@@ -66,8 +66,8 @@ watch(() => props.open, () => (confirming.value = false))
 }
 
 .row--solid {
-  border-color: var(--danger);
-  background: var(--danger);
-  color: #fff;
+  border-color: var(--md-error);
+  background: var(--md-error);
+  color: var(--md-on-error);
 }
 </style>

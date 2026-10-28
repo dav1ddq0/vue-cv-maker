@@ -153,7 +153,7 @@ const shown = computed(() =>
   font-size: 0.68em;
   letter-spacing: 0.02em;
   padding: 0.1em 0.45em;
-  border-radius: 999px;
+  border-radius: var(--shape-full);
   background: var(--surface-2);
   color: var(--text-muted);
   white-space: nowrap;

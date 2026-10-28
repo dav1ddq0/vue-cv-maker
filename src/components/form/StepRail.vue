@@ -35,7 +35,7 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
       <li v-for="(id, index) in ui.steps" :key="id">
         <button
           type="button"
-          class="row"
+          class="row m3-state"
           :class="{ 'row--current': id === ui.step }"
           :aria-current="id === ui.step ? 'step' : undefined"
           @click="ui.goTo(id)"
@@ -52,7 +52,7 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
       </li>
     </ol>
 
-    <button type="button" class="add" @click="ui.goTo('custom')">+ {{ t('rail.addSection') }}</button>
+    <button type="button" class="add m3-state" @click="ui.goTo('custom')">+ {{ t('rail.addSection') }}</button>
     <p class="note">
       {{ t('rail.storage') }}
       <button type="button" class="link" :disabled="busy !== null" @click="run('json')">{{ t('rail.backup') }}</button>
@@ -64,12 +64,11 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
 .rail {
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
+  gap: 4px;
   min-height: 0;
-  padding: 1.2em 0.75em;
+  padding: 16px 12px;
   overflow: auto;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--md-surface-container-low);
 }
 
 .progress {
@@ -82,28 +81,28 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
 .progress-line {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8em;
-  color: var(--text-muted);
+  font: var(--type-label-medium);
+  letter-spacing: var(--tracking-label);
+  color: var(--md-on-surface-variant);
 }
 
 .progress-title {
-  font-weight: 600;
-  color: var(--text);
+  color: var(--md-on-surface);
 }
 
 .track {
   display: block;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border);
+  height: 4px;
+  border-radius: var(--shape-full);
+  background: var(--md-secondary-container);
 }
 
 .bar {
   display: block;
   height: 100%;
-  border-radius: 3px;
-  background: var(--accent);
-  transition: width 0.2s ease;
+  border-radius: var(--shape-full);
+  background: var(--md-primary);
+  transition: width var(--duration-medium) var(--motion-standard);
 }
 
 .list {
@@ -116,28 +115,25 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
 }
 
 .row {
+  --container: transparent;
   display: flex;
   align-items: center;
-  gap: 0.75em;
+  gap: 12px;
   width: 100%;
-  min-height: 48px;
-  padding: 0.25em 0.5em;
+  min-height: 56px;
+  padding: 0 16px 0 12px;
   border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  font: inherit;
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
   text-align: left;
   cursor: pointer;
 }
 
-.row:hover {
-  background: var(--surface-2);
-}
-
-.row--current,
-.row--current:hover {
-  background: var(--accent-soft);
+.row--current {
+  --container: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
 }
 
 .badge {
@@ -148,7 +144,7 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
   width: 26px;
   height: 26px;
   box-sizing: border-box;
-  border: 2px solid var(--border);
+  border: 2px solid var(--md-outline);
   border-radius: 50%;
   font-size: 0.75em;
   font-weight: 700;
@@ -156,29 +152,20 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
 }
 
 .badge--current {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
+  border-color: var(--md-primary);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
 }
 
 .badge--complete {
   border-color: transparent;
-  background: color-mix(in srgb, #15803d 16%, var(--surface));
-  color: #15803d;
+  background: var(--md-success-container);
+  color: var(--md-on-success-container);
 }
 
 .badge--incomplete {
-  border-color: #b45309;
-  color: #92400e;
-}
-
-:root[data-theme='dark'] .badge--complete {
-  color: #6ee7a0;
-}
-
-:root[data-theme='dark'] .badge--incomplete {
-  border-color: #f0c36d;
-  color: #f0c36d;
+  border-color: var(--md-warning);
+  color: var(--md-warning);
 }
 
 .text {
@@ -188,37 +175,34 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
 }
 
 .name {
-  font-size: 0.9em;
-  font-weight: 600;
+  font: var(--type-title-small);
+  letter-spacing: var(--tracking-title-small);
 }
 
 .detail {
   overflow: hidden;
-  font-size: 0.75em;
-  color: var(--text-muted);
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .row--current .detail {
-  color: var(--accent-text, var(--accent));
+  color: var(--md-on-secondary-container);
 }
 
 .detail--warn {
-  color: #92400e;
-}
-
-:root[data-theme='dark'] .detail--warn {
-  color: #f0c36d;
+  color: var(--md-warning);
 }
 
 .add {
   margin: 0.8em 0.25em 0;
   min-height: 40px;
-  border: 1px dashed var(--border-strong, var(--border));
-  border-radius: 10px;
-  background: transparent;
-  color: var(--accent-text, var(--accent));
+  --container: transparent;
+  border: 1px dashed var(--md-outline);
+  border-radius: var(--shape-full);
+  color: var(--md-primary);
   font: inherit;
   font-size: 0.85em;
   font-weight: 600;

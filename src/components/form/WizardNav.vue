@@ -36,7 +36,7 @@ onMounted(revealActive)
       <li v-for="(id, index) in ui.steps" :key="id">
         <button
           type="button"
-          class="step"
+          class="step m3-state"
           :class="{ 'step--active': ui.step === id }"
           :aria-current="ui.step === id ? 'step' : undefined"
           @click="ui.goTo(id)"
@@ -85,62 +85,58 @@ onMounted(revealActive)
 }
 
 .step {
+  --container: transparent;
   display: flex;
   align-items: center;
-  gap: 0.4em;
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: 999px;
-  padding: 0.3em 0.7em;
-  color: var(--text-muted);
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px 0 8px;
+  border: 0;
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
   white-space: nowrap;
-  font-size: 0.86em;
-}
-
-.step:hover {
-  background: var(--surface-2);
-  color: var(--text);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
 }
 
 .step--active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--text);
-  font-weight: 600;
+  --container: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
 }
 
 .index {
   display: inline-grid;
   place-items: center;
-  width: 1.5em;
-  height: 1.5em;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--surface-2);
-  font-size: 0.85em;
+  background: var(--md-surface-container-highest);
+  font: var(--type-label-medium);
 }
 
 .step--active .index {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
 }
 
 .track {
   height: 4px;
-  background: var(--surface-2);
-  border-radius: 999px;
+  background: var(--md-secondary-container);
+  border-radius: var(--shape-full);
 }
 
 .bar {
   height: 100%;
-  background: var(--accent);
-  border-radius: 999px;
-  transition: width 0.2s ease;
+  background: var(--md-primary);
+  border-radius: var(--shape-full);
+  transition: width var(--duration-medium) var(--motion-standard);
 }
 
 .progress-label {
-  margin: 0.5em 0 0;
-  font-size: 0.78em;
-  color: var(--text-muted);
+  margin: 8px 0 0;
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
@@ -149,9 +145,4 @@ onMounted(revealActive)
   }
 }
 
-@media (pointer: coarse) {
-  .step {
-    min-height: 44px;
-  }
-}
 </style>

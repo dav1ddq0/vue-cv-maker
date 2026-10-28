@@ -46,7 +46,7 @@ const initials = computed(
   display: flex;
   align-items: stretch;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--shape-lg);
   background: var(--surface);
 }
 
@@ -64,7 +64,7 @@ const initials = computed(
   min-height: 96px;
   padding: 0.7em 0.5em 0.7em 0.8em;
   border: 0;
-  border-radius: 18px 0 0 18px;
+  border-radius: var(--shape-lg) 0 0 var(--shape-lg);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -116,7 +116,7 @@ const initials = computed(
   flex-shrink: 0;
   width: 52px;
   border: 0;
-  border-radius: 0 18px 18px 0;
+  border-radius: 0 var(--shape-lg) var(--shape-lg) 0;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;

@@ -193,17 +193,17 @@ async function confirmDelete(id: string) {
   gap: 0.6em;
 }
 
+/* M3 search bar: 56 dp, full shape, surface-container-high. */
 .search {
   display: flex;
   align-items: center;
-  gap: 0.6em;
+  gap: 16px;
   max-width: 520px;
-  min-height: 40px;
-  padding: 0 0.8em;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text-muted);
+  min-height: 56px;
+  padding: 0 16px;
+  border-radius: var(--shape-full);
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface-variant);
 }
 
 .search input {
@@ -212,16 +212,18 @@ async function confirmDelete(id: string) {
   border: 0;
   outline: none;
   background: transparent;
-  color: var(--text);
-  font: inherit;
+  color: var(--md-on-surface);
+  font: var(--type-body-large);
+  letter-spacing: var(--tracking-body-large);
 }
 
 .search:focus-within {
-  border-color: var(--accent);
+  box-shadow: inset 0 0 0 2px var(--md-primary);
 }
 
 .count {
-  font-size: 0.8em;
+  font: var(--type-label-medium);
+  letter-spacing: var(--tracking-label);
   white-space: nowrap;
 }
 
@@ -242,7 +244,7 @@ async function confirmDelete(id: string) {
   min-height: 150px;
   padding: 1em;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--shape-md);
   background: var(--surface);
 }
 
@@ -338,7 +340,7 @@ async function confirmDelete(id: string) {
 .big {
   min-height: 52px;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: var(--shape-md);
 }
 
 .confirm-text {

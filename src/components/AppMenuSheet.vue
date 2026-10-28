@@ -83,7 +83,7 @@ function go(view: (typeof VIEWS)[number]) {
   min-height: 52px;
   padding: 0 0.8em;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--shape-md);
   background: transparent;
   color: var(--text);
   font: inherit;

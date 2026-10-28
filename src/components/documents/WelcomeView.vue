@@ -111,7 +111,7 @@ async function startFromSample() {
   gap: 0.6em;
   padding: 1.4em;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--shape-lg);
   background: var(--surface);
   color: var(--text);
   font: inherit;
@@ -133,22 +133,22 @@ async function startFromSample() {
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--shape-md);
 }
 
 .icon--blue {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
 }
 
 .icon--green {
-  background: color-mix(in srgb, #15803d 16%, var(--surface));
-  color: #15803d;
+  background: var(--md-success-container);
+  color: var(--md-on-success-container);
 }
 
 .icon--amber {
-  background: color-mix(in srgb, #b45309 16%, var(--surface));
-  color: #b45309;
+  background: var(--md-warning-container);
+  color: var(--md-on-warning-container);
 }
 
 .choice-title {
@@ -181,7 +181,7 @@ async function startFromSample() {
 .points li::before {
   content: '✓';
   margin-right: 0.5em;
-  color: #15803d;
+  color: var(--md-success);
   font-weight: 700;
 }
 </style>

@@ -53,13 +53,13 @@ const phoneState = computed(() => {
     </div>
 
     <div class="tools">
-      <button type="button" class="icon-btn" :aria-label="t('actions.undo')" :disabled="!cv.canUndo" @click="cv.undo()">
+      <button type="button" class="icon-btn m3-icon-btn m3-state m3-target" :aria-label="t('actions.undo')" :disabled="!cv.canUndo" @click="cv.undo()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5" /><path d="M4 9h10a6 6 0 010 12h-3" /></svg>
       </button>
-      <button type="button" class="icon-btn" :aria-label="t('actions.redo')" :disabled="!cv.canRedo" @click="cv.redo()">
+      <button type="button" class="icon-btn m3-icon-btn m3-state m3-target" :aria-label="t('actions.redo')" :disabled="!cv.canRedo" @click="cv.redo()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5" /><path d="M20 9H10a6 6 0 000 12h3" /></svg>
       </button>
-      <button type="button" class="icon-btn" :aria-label="t('menu.open')" aria-haspopup="dialog" @click="menuOpen = true">
+      <button type="button" class="icon-btn m3-icon-btn m3-state m3-target" :aria-label="t('menu.open')" aria-haspopup="dialog" @click="menuOpen = true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" /></svg>
       </button>
     </div>
@@ -82,7 +82,7 @@ const phoneState = computed(() => {
         v-for="target in (['editor', 'documents', 'import'] as const)"
         :key="target"
         type="button"
-        class="view-btn"
+        class="view-btn m3-state"
         :class="{ 'view-btn--active': ui.view === target }"
         @click="ui.view = target"
       >
@@ -123,17 +123,22 @@ const phoneState = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: 16px;
   flex-wrap: wrap;
-  padding: 0.55em 1em;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--md-outline-variant);
+  background: var(--bg);
 }
 
 .brand {
   display: flex;
   align-items: baseline;
-  gap: 0.6em;
+  gap: 8px;
+  font: var(--type-title-large);
+}
+
+.brand strong {
+  font-weight: 500;
 }
 
 .tagline {
@@ -147,23 +152,19 @@ const phoneState = computed(() => {
 }
 
 .view-btn {
+  --container: transparent;
+  min-height: 40px;
+  padding: 0 16px;
   border: 0;
-  background: transparent;
-  color: var(--text-muted);
-  padding: 0.35em 0.7em;
-  border-radius: var(--radius-sm);
-  font-size: 0.9em;
-}
-
-.view-btn:hover {
-  background: var(--surface-2);
-  color: var(--text);
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
 }
 
 .view-btn--active {
-  background: var(--accent-soft);
-  color: var(--text);
-  font-weight: 600;
+  --container: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
 }
 
 .tools {
@@ -184,23 +185,26 @@ const phoneState = computed(() => {
 }
 
 .select {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  padding: 0.25em 0.4em;
-  font-size: 0.82em;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--md-on-surface);
+  font: var(--type-label-large);
 }
 
 .header--phone {
   flex-wrap: nowrap;
-  gap: 0.4em;
-  padding: 0 0.25em 0 1em;
-  min-height: 52px;
+  gap: 4px;
+  min-height: 64px;
+  padding: 0 4px 0 16px;
 }
 
 .state {
-  font-size: 0.75em;
-  color: var(--text-muted);
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
 }
 
 .state--error {
@@ -208,22 +212,9 @@ const phoneState = computed(() => {
 }
 
 .icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 22px;
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.icon-btn:disabled {
-  color: var(--text-muted);
-  opacity: 0.5;
-  cursor: default;
+  width: 48px;
+  height: 48px;
+  color: var(--md-on-surface-variant);
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
