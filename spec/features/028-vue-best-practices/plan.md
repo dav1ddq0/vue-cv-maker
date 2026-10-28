@@ -14,7 +14,7 @@
 - **Store actions** keep the existing model: plain field edits still go through `v-model` on
   `cv.data` (the deep watcher makes them undoable). Only changes that must keep several fields in
   step become actions.
-- **`useModalDialog(el, open, { onMountedSync })`** owns `showModal`/`close`; the components keep their
+- **`useModalDialog(el, open)`** owns `showModal`/`close`; the components keep their
   own close handling (backdrop, confirm vs cancel).
 - **Skill row keys**: `SkillItem` stays `{ name, level? }` (no schema change); the editor keeps a
   local array of keys parallel to the items, updated on add and remove.

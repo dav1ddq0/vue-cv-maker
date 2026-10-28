@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /** Modal bottom sheet on a native <dialog>: focus trap, Esc, top layer and focus return come free. */
-import { onMounted, ref, useId, watch } from 'vue'
+import { ref, useId } from 'vue'
 import { useI18n } from '@/i18n'
+import { useModalDialog } from '@/composables/useModalDialog'
 
 const props = defineProps<{ open: boolean; title: string }>()
 const emit = defineEmits<{ close: [] }>()
@@ -10,15 +11,7 @@ const { t } = useI18n()
 const dialog = ref<HTMLDialogElement | null>(null)
 const titleId = useId()
 
-function sync(open: boolean) {
-  const el = dialog.value
-  if (!el) return
-  if (open && !el.open) el.showModal()
-  else if (!open && el.open) el.close()
-}
-
-watch(() => props.open, sync, { flush: 'post' })
-onMounted(() => sync(props.open))
+useModalDialog(dialog, () => props.open)
 
 /**
  * `closedby="any"` handles the backdrop tap where it exists. Elsewhere (Safari) a click whose

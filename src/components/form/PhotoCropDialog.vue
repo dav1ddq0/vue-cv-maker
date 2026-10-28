@@ -4,8 +4,9 @@
  * `+`/`-` to zoom, a quarter-turn button. The preview canvas and the stored file are drawn by the same
  * `drawCrop`, so what the user frames is what gets saved. A modal native <dialog>, like ExportDialog.
  */
-import { computed, nextTick, ref, shallowRef, useId, watch } from 'vue'
+import { computed, ref, shallowRef, useId, watch } from 'vue'
 import { useI18n } from '@/i18n'
+import { useModalDialog } from '@/composables/useModalDialog'
 import { clampOffset, clampZoom, cropRect, ZOOM_MAX, ZOOM_MIN, type Offset } from '@/core/photoCrop'
 import { decodePhoto, drawCrop, encodeCrop, rotate, sizeOf, type CropSource } from '@/services/photoCrop'
 
@@ -34,24 +35,21 @@ let confirmed = false
 
 const source = computed(() => (decoded.value ? rotate(decoded.value, turns.value) : null))
 
+useModalDialog(dialog, () => props.photo !== null)
+
 watch(
   () => props.photo,
   async (photo, _previous, onCleanup) => {
     // A decode still running when another photo arrives (or the dialog unmounts) is dropped.
     let stale = false
     onCleanup(() => (stale = true))
-    if (!photo) {
-      if (dialog.value?.open) dialog.value.close()
-      return
-    }
+    if (!photo) return
     confirmed = false
     failed.value = false
     decoded.value = null
     turns.value = 0
     zoom.value = 1
     offset.value = { x: 0, y: 0 }
-    await nextTick()
-    if (dialog.value && !dialog.value.open) dialog.value.showModal()
     try {
       const image = await decodePhoto(photo)
       if (!stale) decoded.value = image

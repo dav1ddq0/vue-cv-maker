@@ -27,9 +27,9 @@ fixes in A.
 
 ### C · Shared pieces
 
-5. [ ] **`DateRangeFields`**: start, end and "currently here" fields, used by Experience and Education
+5. [x] **`DateRangeFields`**: start, end and "currently here" fields, used by Experience and Education
        instead of two copies.
-6. [ ] **`useModalDialog`**: the `open` prop ↔ native `<dialog>` sync, used by `BottomSheet`,
+6. [x] **`useModalDialog`**: the `open` prop ↔ native `<dialog>` sync, used by `BottomSheet`,
        `ExportDialog` and `PhotoCropDialog`.
 
 ### D · Vue 3.5 idioms
