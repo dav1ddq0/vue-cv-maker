@@ -53,6 +53,46 @@ const languages = computed(() => resolveLanguages(props.data))
       </div>
     </header>
 
+    <aside class="aside">
+      <section v-if="contactItems.length || data.personal.links.length" class="section">
+        <h2 class="section-title">{{ contactTitle }}</h2>
+        <p v-for="(item, i) in contactItems" :key="i" class="contact-item">{{ item }}</p>
+        <p v-for="link in data.personal.links" :key="link.id" class="contact-item">
+          <a :href="absoluteUrl(link.url)">{{ link.label || displayUrl(link.url) }}</a>
+        </p>
+      </section>
+
+      <section v-for="section in asideSections" :key="section.id" :data-section="section.kind" class="section">
+        <h2 class="section-title">{{ section.title }}</h2>
+
+        <template v-if="section.kind === 'skills'">
+          <div v-for="group in data.skills" :key="group.id" class="skill-group">
+            <p v-if="group.category" class="skill-category">{{ group.category }}</p>
+            <template v-if="groupHasLevels(group)">
+              <div v-for="(item, i) in group.items" :key="i" class="row">
+                <span>{{ item.name }}</span>
+                <LevelDots
+                  v-if="item.level"
+                  :score="item.level"
+                  :label="levelAccessibleLabel(item.level, language)"
+                />
+              </div>
+            </template>
+            <p v-else class="skill-items">{{ skillNames(group).join(', ') }}</p>
+          </div>
+        </template>
+
+        <template v-else>
+          <div v-for="lang in languages" :key="lang.id" class="row">
+            <span>
+              {{ lang.name }}<template v-if="lang.level && lang.score === null"> — {{ lang.level }}</template>
+            </span>
+            <LevelDots v-if="lang.score !== null" :score="lang.score" :label="lang.label" />
+          </div>
+        </template>
+      </section>
+    </aside>
+
     <div class="main">
       <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" :data-page-break="section.breakBefore" class="section">
         <h2 class="section-title">{{ section.title }}</h2>
@@ -97,52 +137,15 @@ const languages = computed(() => resolveLanguages(props.data))
         </template>
       </section>
     </div>
-
-    <aside class="aside">
-      <section v-if="contactItems.length || data.personal.links.length" class="section">
-        <h2 class="section-title">{{ contactTitle }}</h2>
-        <p v-for="(item, i) in contactItems" :key="i" class="contact-item">{{ item }}</p>
-        <p v-for="link in data.personal.links" :key="link.id" class="contact-item">
-          <a :href="absoluteUrl(link.url)">{{ link.label || displayUrl(link.url) }}</a>
-        </p>
-      </section>
-
-      <section v-for="section in asideSections" :key="section.id" :data-section="section.kind" class="section">
-        <h2 class="section-title">{{ section.title }}</h2>
-
-        <template v-if="section.kind === 'skills'">
-          <div v-for="group in data.skills" :key="group.id" class="skill-group">
-            <p v-if="group.category" class="skill-category">{{ group.category }}</p>
-            <template v-if="groupHasLevels(group)">
-              <div v-for="(item, i) in group.items" :key="i" class="row">
-                <span>{{ item.name }}</span>
-                <LevelDots
-                  v-if="item.level"
-                  :score="item.level"
-                  :label="levelAccessibleLabel(item.level, language)"
-                />
-              </div>
-            </template>
-            <p v-else class="skill-items">{{ skillNames(group).join(', ') }}</p>
-          </div>
-        </template>
-
-        <template v-else>
-          <div v-for="lang in languages" :key="lang.id" class="row">
-            <span>
-              {{ lang.name }}<template v-if="lang.level && lang.score === null"> — {{ lang.level }}</template>
-            </span>
-            <LevelDots v-if="lang.score !== null" :score="lang.score" :label="lang.label" />
-          </div>
-        </template>
-      </section>
-    </aside>
   </article>
 </template>
 
 <style scoped>
 .facet {
   display: grid;
+  /* The side column comes first in the markup, so paged.js keeps it on page 1 (spec 032); dense
+     packing puts the main column back in the free track beside it. */
+  grid-auto-flow: row dense;
   grid-template-columns: 1fr 33%;
   align-content: start;
   font-family: var(--cv-font);

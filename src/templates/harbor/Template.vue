@@ -43,55 +43,10 @@ const languages = computed(() => resolveLanguages(props.data))
 
 <template>
   <article class="harbor" :style="vars">
-    <main class="main">
-      <header class="head">
-        <h1 class="name">{{ data.personal.fullName }}</h1>
-        <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
-      </header>
-
-      <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" :data-page-break="section.breakBefore" class="section">
-        <h2 class="section-title">{{ section.title }}</h2>
-
-        <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>
-
-        <template v-else-if="section.kind === 'experience'">
-          <div v-for="item in data.experience" :key="item.id" class="entry">
-            <h3 class="entry-title">{{ item.position }}</h3>
-            <p class="entry-meta">
-              <span v-if="item.company" class="company">{{ item.company }}</span>
-              <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
-              <span v-if="item.location">{{ item.location }}</span>
-            </p>
-            <p v-if="item.description" class="entry-text">{{ item.description }}</p>
-            <ul v-if="item.highlights.length" class="highlights">
-              <li v-for="(highlight, i) in item.highlights" :key="i">{{ highlight }}</li>
-            </ul>
-          </div>
-        </template>
-
-        <template v-else-if="section.kind === 'education'">
-          <div v-for="item in data.education" :key="item.id" class="entry">
-            <h3 class="entry-title">{{ item.degree }}</h3>
-            <p class="entry-meta">
-              <span v-if="item.institution" class="company">{{ item.institution }}</span>
-              <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
-            </p>
-            <p v-if="item.description" class="entry-text">{{ item.description }}</p>
-          </div>
-        </template>
-
-        <template v-else-if="section.custom">
-          <div v-for="entry in section.custom.entries" :key="entry.id" class="entry">
-            <h3 class="entry-title">{{ entry.title }}</h3>
-            <p v-if="entry.subtitle || entry.date" class="entry-meta">
-              <span v-if="entry.subtitle" class="company">{{ entry.subtitle }}</span>
-              <span v-if="entry.date">{{ entry.date }}</span>
-            </p>
-            <p v-if="entry.description" class="entry-text">{{ entry.description }}</p>
-          </div>
-        </template>
-      </section>
-    </main>
+    <header class="head">
+      <h1 class="name">{{ data.personal.fullName }}</h1>
+      <p v-if="data.personal.headline" class="headline">{{ data.personal.headline }}</p>
+    </header>
 
     <aside class="sidebar">
       <img v-if="data.personal.photo" class="photo" :src="data.personal.photo" alt="" />
@@ -135,6 +90,51 @@ const languages = computed(() => resolveLanguages(props.data))
         </template>
       </section>
     </aside>
+
+    <main class="main">
+      <section v-for="section in mainSections" :key="section.id" :data-section="section.kind" :data-page-break="section.breakBefore" class="section">
+        <h2 class="section-title">{{ section.title }}</h2>
+
+        <p v-if="section.kind === 'summary'" class="summary">{{ data.summary }}</p>
+
+        <template v-else-if="section.kind === 'experience'">
+          <div v-for="item in data.experience" :key="item.id" class="entry">
+            <h3 class="entry-title">{{ item.position }}</h3>
+            <p class="entry-meta">
+              <span v-if="item.company" class="company">{{ item.company }}</span>
+              <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
+              <span v-if="item.location">{{ item.location }}</span>
+            </p>
+            <p v-if="item.description" class="entry-text">{{ item.description }}</p>
+            <ul v-if="item.highlights.length" class="highlights">
+              <li v-for="(highlight, i) in item.highlights" :key="i">{{ highlight }}</li>
+            </ul>
+          </div>
+        </template>
+
+        <template v-else-if="section.kind === 'education'">
+          <div v-for="item in data.education" :key="item.id" class="entry">
+            <h3 class="entry-title">{{ item.degree }}</h3>
+            <p class="entry-meta">
+              <span v-if="item.institution" class="company">{{ item.institution }}</span>
+              <span>{{ formatDateRange(item.startDate, item.endDate, language) }}</span>
+            </p>
+            <p v-if="item.description" class="entry-text">{{ item.description }}</p>
+          </div>
+        </template>
+
+        <template v-else-if="section.custom">
+          <div v-for="entry in section.custom.entries" :key="entry.id" class="entry">
+            <h3 class="entry-title">{{ entry.title }}</h3>
+            <p v-if="entry.subtitle || entry.date" class="entry-meta">
+              <span v-if="entry.subtitle" class="company">{{ entry.subtitle }}</span>
+              <span v-if="entry.date">{{ entry.date }}</span>
+            </p>
+            <p v-if="entry.description" class="entry-text">{{ entry.description }}</p>
+          </div>
+        </template>
+      </section>
+    </main>
   </article>
 </template>
 
@@ -142,6 +142,10 @@ const languages = computed(() => resolveLanguages(props.data))
 .harbor {
   display: grid;
   grid-template-columns: 1fr 31%;
+  /* Name, then the sidebar, then the main column, in the markup: paged.js splits in DOM order, so
+     the sidebar stays on page 1 and only the main column flows on (spec 032). The name row comes
+     first so text extraction still reads the name before the contact details. */
+  grid-template-rows: auto 1fr;
   font-family: var(--cv-font);
   font-size: calc(10pt * var(--cv-font-scale));
   line-height: 1.45;
@@ -152,6 +156,7 @@ const languages = computed(() => resolveLanguages(props.data))
 
 .sidebar {
   grid-column: 2;
+  grid-row: 1 / span 2;
   background: #1f2937;
   color: #fff;
   border-top: 0.45em solid var(--cv-accent);
@@ -226,9 +231,16 @@ const languages = computed(() => resolveLanguages(props.data))
 }
 
 /* Explicit column: on a continuation page holding only this column, auto-placement would move it to the other track (spec 022). */
+.head {
+  grid-column: 1;
+  grid-row: 1;
+  padding: var(--cv-page-margin) var(--cv-page-margin) 0;
+}
+
 .main {
   grid-column: 1;
-  padding: var(--cv-page-margin);
+  grid-row: 2;
+  padding: 0 var(--cv-page-margin) var(--cv-page-margin);
 }
 
 .name {
