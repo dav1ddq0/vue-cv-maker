@@ -16,7 +16,7 @@ import { WOFF } from './pdfFonts'
 /** A4 in PDF points. */
 const PAGE_PT: [number, number] = [595.28, 841.89]
 
-interface Face {
+export interface Face {
   family: string
   weight: number
   italic: boolean
@@ -26,7 +26,7 @@ interface Face {
 
 type Rgba = { r: number; g: number; b: number; a: number }
 
-function parseColor(value: string): Rgba | null {
+export function parseColor(value: string): Rgba | null {
   const srgb = /color\(srgb ([^)]+)\)/.exec(value)
   if (srgb) {
     const [r, g, b, a = 1] = srgb[1]!.replace('/', ' ').split(/\s+/).filter(Boolean).map(Number)
@@ -43,7 +43,7 @@ const rgbOf = (c: Rgba): [number, number, number] => [c.r, c.g, c.b]
 
 /* ---- fonts ------------------------------------------------------------------------------------ */
 
-function parseRanges(value: string): [number, number][] {
+export function parseRanges(value: string): [number, number][] {
   if (!value) return [[0, 0x10ffff]]
   return value.split(',').map((part) => {
     const [from, to] = part.trim().replace(/^U\+/i, '').split('-')
@@ -83,7 +83,7 @@ function documentFaces(): Face[] {
  * The face the browser would use for one character: the first family of the stack that has a face
  * covering it, then the closest style and weight. `null` when only a system font could draw it.
  */
-function pickFace(faces: Face[], stack: string[], weight: number, italic: boolean, code: number): Face | null {
+export function pickFace(faces: Face[], stack: string[], weight: number, italic: boolean, code: number): Face | null {
   for (const family of stack) {
     const candidates = faces.filter((f) => f.family === family && f.ranges.some(([a, b]) => code >= a && code <= b))
     if (!candidates.length) continue
@@ -94,8 +94,22 @@ function pickFace(faces: Face[], stack: string[], weight: number, italic: boolea
   return null
 }
 
+/** Characters the PDF standard fonts can draw (WinAnsi). */
+const WIN_ANSI = /[\u0000-\u00ff\u20ac\u2013\u2014\u2018\u2019\u201c\u201d\u2022\u2026]/
+
+/**
+ * The face for one character. A system-font stack (Georgia, Arial…) has no file the page can read:
+ * its text goes out in a PDF standard font, except characters those cannot draw (Ł, ř…), which take
+ * the bundled family of the same kind rather than disappearing.
+ */
+export function faceFor(faces: Face[], stack: string[], weight: number, italic: boolean, code: number): Face | null {
+  const face = pickFace(faces, stack, weight, italic, code)
+  if (face || WIN_ANSI.test(String.fromCodePoint(code))) return face
+  return pickFace(faces, [stack.includes('serif') ? 'eb garamond' : 'source sans 3'], weight, italic, code)
+}
+
 /** A PDF standard font for system-font stacks the page cannot read (Georgia, Arial…). */
-function standardFont(stack: string[], weight: number, italic: boolean): string {
+export function standardFont(stack: string[], weight: number, italic: boolean): string {
   const bold = weight >= 600
   if (stack.includes('monospace')) return `Courier${bold ? '-Bold' : ''}${italic ? (bold ? 'Oblique' : '-Oblique') : ''}`
   if (stack.includes('serif')) return bold ? (italic ? 'Times-BoldItalic' : 'Times-Bold') : italic ? 'Times-Italic' : 'Times-Roman'
@@ -103,7 +117,7 @@ function standardFont(stack: string[], weight: number, italic: boolean): string 
 }
 
 /** `…/inter-latin-400-normal-C38fXH4l.woff2` (built) or `…/inter-latin-400-normal.woff2` (dev) → its WOFF URL. */
-function woffFor(woff2Url: string): string {
+export function woffFor(woff2Url: string): string {
   const file = woff2Url.split('/').pop()!.replace(/\.woff2$/, '')
   return WOFF[file] ?? WOFF[file.replace(/-[\w-]{8}$/, '')] ?? woff2Url
 }
@@ -130,14 +144,41 @@ interface Ctx {
   doc: Doc
   faces: Face[]
   registered: Set<string>
+  /** The page being drawn: its top-left is the PDF origin, and opacity is accumulated up to it. */
+  page: Element
   origin: DOMRect
   k: number
+}
+
+/** The opacity an element is painted with: its own times every ancestor's, up to the page. */
+const opacityCache = new WeakMap<Element, number>()
+function opacityOf(c: Ctx, el: Element): number {
+  const cached = opacityCache.get(el)
+  if (cached !== undefined) return cached
+  const own = parseFloat(getComputedStyle(el).opacity)
+  const value = (Number.isNaN(own) ? 1 : own) * (el === c.page || !el.parentElement ? 1 : opacityOf(c, el.parentElement))
+  opacityCache.set(el, value)
+  return value
+}
+
+/** A CSS length that may be a percentage of `basis` (border radii, clip-path points). */
+const lengthOf = (value: string, basis: number) => (value.trim().endsWith('%') ? (parseFloat(value) / 100) * basis : parseFloat(value) || 0)
+
+/** `clip-path: polygon(…)` as an SVG path in PDF units over the box at x, y, w × h (CSS px sizes). */
+export function clipPolygon(value: string, c: Ctx, r: DOMRect): string | null {
+  const m = /^polygon\((?:(?:nonzero|evenodd),\s*)?(.+)\)$/.exec(value.trim())
+  if (!m) return null
+  const points = m[1]!.split(',').map((pair) => {
+    const [px, py] = pair.trim().split(/\s+/) as [string, string]
+    return [X(c, r.left + lengthOf(px, r.width)), Y(c, r.top + lengthOf(py, r.height))]
+  })
+  return `M${points.map(([x, y]) => `${x} ${y}`).join(' L')} Z`
 }
 
 const X = (c: Ctx, px: number) => (px - c.origin.left) * c.k
 const Y = (c: Ctx, px: number) => (px - c.origin.top) * c.k
 
-function transformText(text: string, transform: string): string {
+export function transformText(text: string, transform: string): string {
   if (transform === 'uppercase') return text.toUpperCase()
   if (transform === 'lowercase') return text.toLowerCase()
   if (transform === 'capitalize') return text.replace(/(^|\s)(\S)/g, (_, s, ch: string) => s + ch.toUpperCase())
@@ -148,13 +189,16 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
   const r = el.getBoundingClientRect()
   if (r.width < 0.5 || r.height < 0.5) return
   const x = X(c, r.left), y = Y(c, r.top), w = r.width * c.k, h = r.height * c.k
-  const radius = Math.min(parseFloat(style.borderTopLeftRadius) || 0, r.width / 2, r.height / 2) * c.k
+  const radius = Math.min(lengthOf(style.borderTopLeftRadius, Math.min(r.width, r.height)), r.width / 2, r.height / 2) * c.k
+  const alpha = opacityOf(c, el)
   const bg = parseColor(style.backgroundColor)
   if (visibleColor(bg)) {
     c.doc.save()
-    if (radius > 0) c.doc.roundedRect(x, y, w, h, radius)
+    const clip = style.clipPath !== 'none' ? clipPolygon(style.clipPath, c, r) : null
+    if (clip) c.doc.path(clip)
+    else if (radius > 0) c.doc.roundedRect(x, y, w, h, radius)
     else c.doc.rect(x, y, w, h)
-    c.doc.fillColor(rgbOf(bg), bg.a).fill()
+    c.doc.fillColor(rgbOf(bg), bg.a * alpha).fill()
     c.doc.restore()
   }
   const sides = [
@@ -170,7 +214,7 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
     const bw = widths[0]! * c.k
     c.doc.save().lineWidth(bw)
     c.doc.roundedRect(x + bw / 2, y + bw / 2, w - bw, h - bw, Math.max(0, radius - bw / 2))
-    c.doc.strokeColor(rgbOf(colors[0]!), colors[0]!.a).stroke()
+    c.doc.strokeColor(rgbOf(colors[0]!), colors[0]!.a * alpha).stroke()
     c.doc.restore()
     return
   }
@@ -183,8 +227,102 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
     const dx = i === 1 ? -inset : i === 3 ? inset : 0
     const dy = i === 0 ? inset : i === 2 ? -inset : 0
     c.doc.save().lineWidth(bw).moveTo(x1 + dx, y1 + dy).lineTo(x2 + dx, y2 + dy)
-    c.doc.strokeColor(rgbOf(color), color.a).stroke().restore()
+    c.doc.strokeColor(rgbOf(color), color.a * alpha).stroke().restore()
   })
+}
+
+/* ---- images and SVG --------------------------------------------------------------------------- */
+
+/** The image as JPEG or PNG bytes (what PDF can embed); anything else is re-encoded through a canvas. */
+async function imageBytes(img: HTMLImageElement): Promise<Uint8Array | null> {
+  try {
+    const blob = await (await fetch(img.currentSrc || img.src)).blob()
+    if (blob.type === 'image/jpeg' || blob.type === 'image/png') return new Uint8Array(await blob.arrayBuffer())
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    canvas.getContext('2d')!.drawImage(img, 0, 0)
+    const png = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+    return png ? new Uint8Array(await png.arrayBuffer()) : null
+  } catch {
+    return null
+  }
+}
+
+/** The photo: its content box, cropped like `object-fit: cover`, clipped to its rounded corners. */
+async function drawImage(c: Ctx, img: HTMLImageElement, style: CSSStyleDeclaration) {
+  const bytes = await imageBytes(img)
+  if (!bytes) return
+  const r = img.getBoundingClientRect()
+  const inset = (side: string) => (parseFloat(style.getPropertyValue(`border-${side}-width`)) || 0) + (parseFloat(style.getPropertyValue(`padding-${side}`)) || 0)
+  const left = r.left + inset('left'), top = r.top + inset('top')
+  const width = r.width - inset('left') - inset('right'), height = r.height - inset('top') - inset('bottom')
+  if (width <= 0 || height <= 0) return
+  const radius = Math.min(lengthOf(style.borderTopLeftRadius, Math.min(r.width, r.height)), width / 2, height / 2) * c.k
+  const x = X(c, left), y = Y(c, top), w = width * c.k, h = height * c.k
+  c.doc.save()
+  if (radius > 0) c.doc.roundedRect(x, y, w, h, radius).clip()
+  else c.doc.rect(x, y, w, h).clip()
+  const fit = style.objectFit
+  if (fit === 'cover' || fit === 'contain') c.doc.image(bytes, x, y, { [fit === 'cover' ? 'cover' : 'fit']: [w, h], align: 'center', valign: 'center' })
+  else c.doc.image(bytes, x, y, { width: w, height: h })
+  c.doc.restore()
+}
+
+/** An SVG shape's geometry as path data in its own user units. */
+export function shapePath(shape: SVGElement): string | null {
+  const n = (name: string) => parseFloat(shape.getAttribute(name) ?? '0') || 0
+  switch (shape.tagName.toLowerCase()) {
+    case 'path':
+      return shape.getAttribute('d')
+    case 'polygon':
+    case 'polyline': {
+      const nums = (shape.getAttribute('points') ?? '').trim().split(/[\s,]+/).map(Number)
+      const pts: string[] = []
+      for (let i = 0; i + 1 < nums.length; i += 2) pts.push(`${nums[i]} ${nums[i + 1]}`)
+      return pts.length ? `M${pts.join(' L')}${shape.tagName.toLowerCase() === 'polygon' ? ' Z' : ''}` : null
+    }
+    case 'rect': {
+      const [x, y, w, h] = [n('x'), n('y'), n('width'), n('height')]
+      return `M${x} ${y} H${x + w} V${y + h} H${x} Z`
+    }
+    case 'circle':
+    case 'ellipse': {
+      const cx = n('cx'), cy = n('cy')
+      const rx = shape.tagName.toLowerCase() === 'circle' ? n('r') : n('rx')
+      const ry = shape.tagName.toLowerCase() === 'circle' ? n('r') : n('ry')
+      return `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`
+    }
+    case 'line':
+      return `M${n('x1')} ${n('y1')} L${n('x2')} ${n('y2')}`
+    default:
+      return null
+  }
+}
+
+/** Inline SVG (Chevron's header, Facet's corners): each shape under the exact matrix the browser used. */
+function drawSvg(c: Ctx, svg: SVGSVGElement) {
+  for (const shape of Array.from(svg.querySelectorAll<SVGGraphicsElement>('path, polygon, polyline, rect, circle, ellipse, line'))) {
+    const style = getComputedStyle(shape)
+    if (style.display === 'none' || style.visibility === 'hidden') continue
+    const d = shapePath(shape)
+    const m = shape.getScreenCTM()
+    if (!d || !m) continue
+    const alpha = opacityOf(c, shape)
+    const fill = parseColor(style.fill)
+    const stroke = parseColor(style.stroke)
+    c.doc.save()
+    // Screen matrix, then CSS px on the page → PDF points.
+    c.doc.transform(c.k * m.a, c.k * m.b, c.k * m.c, c.k * m.d, c.k * (m.e - c.origin.left), c.k * (m.f - c.origin.top))
+    if (visibleColor(fill) && !/^(line|polyline)$/i.test(shape.tagName)) {
+      c.doc.path(d).fillColor(rgbOf(fill), fill.a * (parseFloat(style.fillOpacity) || 1) * alpha).fill(style.fillRule === 'evenodd' ? 'even-odd' : 'nonzero')
+    }
+    const strokeWidth = parseFloat(style.strokeWidth) || 0
+    if (visibleColor(stroke) && strokeWidth > 0) {
+      c.doc.path(d).lineWidth(strokeWidth).strokeColor(rgbOf(stroke), stroke.a * (parseFloat(style.strokeOpacity) || 1) * alpha).stroke()
+    }
+    c.doc.restore()
+  }
 }
 
 /** Where the baseline of `el`'s text sits under its line box, measured, not guessed from metrics. */
@@ -206,8 +344,9 @@ function descentOf(el: Element, firstRect: DOMRect): number {
 async function drawText(c: Ctx, node: Text, style: CSSStyleDeclaration, el: Element) {
   const raw = node.textContent ?? ''
   if (!raw.trim()) return
-  const color = parseColor(style.color)
-  if (!visibleColor(color)) return
+  const parsed = parseColor(style.color)
+  if (!visibleColor(parsed)) return
+  const color = { ...parsed, a: parsed.a * opacityOf(c, el) }
   const stack = familyNames(style.fontFamily)
   const weight = Number(style.fontWeight) || 400
   const italic = style.fontStyle !== 'normal'
@@ -242,7 +381,7 @@ async function drawText(c: Ctx, node: Text, style: CSSStyleDeclaration, el: Elem
     }
     for (let i = start; i < start + match[0].length; ) {
       const code = raw.codePointAt(i)!
-      const face = pickFace(c.faces, stack, weight, italic, code)
+      const face = faceFor(c.faces, stack, weight, italic, code)
       if (segFace !== undefined && face?.url !== segFace?.url) {
         await flush(i)
         segStart = i
@@ -275,8 +414,8 @@ async function drawRun(
     fontName = face.url
   } else {
     fontName = standardFont(stack, weight, italic)
-    // Standard fonts only have WinAnsi glyphs; anything else (emoji, CJK) is left out.
-    text = text.replace(/[^\u0000-ÿ€–—‘’“”•…]/g, '')
+    // Only what no bundled font covers either reaches here outside WinAnsi (emoji, CJK): left out.
+    text = [...text].filter((ch) => WIN_ANSI.test(ch)).join('')
     if (!text) return
   }
   c.doc.font(fontName).fontSize(size).fillColor(rgbOf(color), color.a)
@@ -392,13 +531,21 @@ async function drawPage(c: Ctx, page: Element) {
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (node.nodeType === Node.TEXT_NODE) {
       const el = node.parentElement!
+      if (el.closest('svg')) continue
       await drawText(c, node as Text, getComputedStyle(el), el)
       continue
     }
     const el = node as Element
+    // An SVG is drawn whole by drawSvg; its inner nodes are not CSS boxes.
+    if (el.parentElement?.closest('svg')) continue
     const style = getComputedStyle(el)
-    if (style.display === 'none' || style.opacity === '0') continue
+    if (style.display === 'none' || style.visibility === 'hidden' || opacityOf(c, el) === 0) continue
+    if (el instanceof SVGSVGElement) {
+      drawSvg(c, el)
+      continue
+    }
     drawBox(c, el, style)
+    if (el instanceof HTMLImageElement) await drawImage(c, el, style)
     if (el.hasAttribute(MARKER_ATTR)) drawMarker(c, el)
   }
   drawLinks(c, page)
@@ -453,7 +600,7 @@ export async function buildDirectPdf(data: CVData, templateId: string, title: st
       doc.addPage({ size: PAGE_PT, margin: 0 })
       materializeGenerated(page)
       const origin = page.getBoundingClientRect()
-      await drawPage({ doc, faces, registered, origin, k: PAGE_PT[0] / origin.width }, page)
+      await drawPage({ doc, faces, registered, page, origin, k: PAGE_PT[0] / origin.width }, page)
     }
     doc.end()
     await done

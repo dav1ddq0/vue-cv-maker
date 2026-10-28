@@ -50,7 +50,12 @@ declare module 'pdfkit' {
     translate(x: number, y: number): this
     scale(x: number, y?: number): this
     transform(a: number, b: number, c: number, d: number, e: number, f: number): this
-    image(src: ArrayBuffer | Uint8Array | string, x: number, y: number, options?: { width?: number; height?: number }): this
+    image(
+      src: ArrayBuffer | Uint8Array | string,
+      x: number,
+      y: number,
+      options?: { width?: number; height?: number; cover?: [number, number]; fit?: [number, number]; align?: 'center'; valign?: 'center' },
+    ): this
     link(x: number, y: number, w: number, h: number, url: string): this
     on(event: 'data', listener: (chunk: Uint8Array) => void): this
     on(event: 'end', listener: () => void): this
