@@ -36,7 +36,10 @@ const source = computed(() => (decoded.value ? rotate(decoded.value, turns.value
 
 watch(
   () => props.photo,
-  async (photo) => {
+  async (photo, _previous, onCleanup) => {
+    // A decode still running when another photo arrives (or the dialog unmounts) is dropped.
+    let stale = false
+    onCleanup(() => (stale = true))
     if (!photo) {
       if (dialog.value?.open) dialog.value.close()
       return
@@ -50,9 +53,10 @@ watch(
     await nextTick()
     if (dialog.value && !dialog.value.open) dialog.value.showModal()
     try {
-      decoded.value = await decodePhoto(photo)
+      const image = await decodePhoto(photo)
+      if (!stale) decoded.value = image
     } catch {
-      failed.value = true
+      if (!stale) failed.value = true
     }
   },
   { flush: 'post' },

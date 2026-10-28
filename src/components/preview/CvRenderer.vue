@@ -17,21 +17,31 @@ const props = defineProps<{ data: CVData; templateId: string }>()
 const templateComponent = shallowRef<Component | null>(null)
 const photoUrl = ref<string | null>(null)
 
+// Each load is marked stale when the next one starts or the renderer unmounts: a slow, older template
+// chunk or photo read resolving late must not replace the newer one (spec 028).
 watch(
   () => props.templateId,
-  async (id) => {
-    templateComponent.value = await getTemplate(id).component()
+  async (id, _previous, onCleanup) => {
+    let stale = false
+    onCleanup(() => (stale = true))
+    const component = await getTemplate(id).component()
+    if (!stale) templateComponent.value = component
   },
   { immediate: true },
 )
 
 watch(
   () => props.data.personal.photo,
-  async (reference) => {
+  async (reference, _previous, onCleanup) => {
+    let stale = false
+    onCleanup(() => (stale = true))
     revokePhoto()
     if (!reference?.startsWith('photo:')) return
     const blob = await loadPhoto(reference)
-    if (blob) photoUrl.value = URL.createObjectURL(blob)
+    if (!blob) return
+    const url = URL.createObjectURL(blob)
+    if (stale) URL.revokeObjectURL(url)
+    else photoUrl.value = url
   },
   { immediate: true },
 )

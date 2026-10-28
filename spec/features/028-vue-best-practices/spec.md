@@ -12,11 +12,11 @@ fixes in A.
 
 ### A · Async races
 
-1. [ ] **The preview shows the template last picked.** `CvRenderer` keeps only the latest template
+1. [x] **The preview shows the template last picked.** `CvRenderer` keeps only the latest template
        load: an older, slower load resolving later no longer replaces it.
-2. [ ] **No photo URL outlives the renderer.** A photo load still pending when the photo changes or the
+2. [x] **No photo URL outlives the renderer.** A photo load still pending when the photo changes or the
        renderer unmounts revokes its object URL instead of showing or leaking it.
-3. [ ] **The crop dialog frames the photo last given.** A decode still pending when another photo
+3. [x] **The crop dialog frames the photo last given.** A decode still pending when another photo
        arrives is dropped.
 
 ### B · CV invariants in the store
