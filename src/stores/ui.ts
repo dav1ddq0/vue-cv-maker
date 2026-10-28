@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { readPrefs, writePrefs } from '@/services/prefs'
 import { isStorageAvailable, requestPersistence } from '@/services/storage'
 import { DARK_QUERY, resolveTheme, systemPrefersDark, type ThemeChoice } from '@/core/theme'
@@ -35,6 +35,11 @@ export const useUiStore = defineStore('ui', () => {
   }
   const resolvedTheme = computed(() => resolveTheme(theme.value, systemDark.value))
   const previewOpen = ref(false)
+  /** Desktop: the preview takes the whole editor (spec 030). Session state, never stored. */
+  const previewExpanded = ref(false)
+  watch(view, (next) => {
+    if (next !== 'editor') previewExpanded.value = false
+  })
   const dismissedNotices = ref<string[]>(prefs.dismissedNotices)
 
   /** Environment facts surfaced as notices (spec §8.2). */
@@ -46,6 +51,8 @@ export const useUiStore = defineStore('ui', () => {
   function goTo(next: StepId) {
     step.value = next
     view.value = 'editor'
+    // Going to a step means editing it: its form comes back.
+    previewExpanded.value = false
   }
 
   function nextStep() {
@@ -92,6 +99,7 @@ export const useUiStore = defineStore('ui', () => {
     theme,
     resolvedTheme,
     previewOpen,
+    previewExpanded,
     storageAvailable,
     storagePersisted,
     goTo,

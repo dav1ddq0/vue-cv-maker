@@ -495,6 +495,8 @@ export default {
     fitLabel: 'Ajustar la página al panel',
     change: 'Cambiar',
     changeTemplate: 'Plantilla {name}: cambiar',
+    expand: 'Ampliar vista previa',
+    collapse: 'Reducir vista previa',
   },
   cv: {
     present: 'Actualidad',

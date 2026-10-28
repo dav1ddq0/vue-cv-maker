@@ -1,12 +1,17 @@
 <script setup lang="ts">
-/** Desktop step list (spec 018): every step with its state, overall progress and the storage note. */
+/**
+ * Desktop step list (spec 018): every step with its state, overall progress and the storage note.
+ * `compact` folds it to an M3 navigation rail, badges only, while the preview is expanded (spec 030).
+ */
 import { computed } from 'vue'
-import { useUiStore } from '@/stores/ui'
+import { useUiStore, type StepId } from '@/stores/ui'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { stepStatus } from '@/core/stepStatus'
 import { useStepDetail } from '@/composables/useStepDetail'
 import { useCvExport } from '@/composables/useCvExport'
+
+defineProps<{ compact?: boolean }>()
 
 const ui = useUiStore()
 const cv = useCvStore()
@@ -17,11 +22,16 @@ const { busy, run } = useCvExport()
 /** Export holds no data, so it never counts towards progress. */
 const counted = computed(() => ui.steps.filter((id) => id !== 'export'))
 const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id).state === 'complete').length)
+
+/** What a folded row says without its text: the step, then its state. */
+function rowLabel(id: StepId): string {
+  return [t(`steps.${id}`), detail(id)].filter(Boolean).join(' · ')
+}
 </script>
 
 <template>
-  <nav class="rail" :aria-label="t('rail.label')">
-    <div class="progress">
+  <nav class="rail" :class="{ 'rail--compact': compact }" :aria-label="t('rail.label')">
+    <div v-if="!compact" class="progress">
       <span class="progress-line">
         <span class="progress-title">{{ t('rail.progress') }}</span>
         {{ t('rail.done', { done, total: counted.length }) }}
@@ -38,13 +48,15 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
           class="row m3-state"
           :class="{ 'row--current': id === ui.step }"
           :aria-current="id === ui.step ? 'step' : undefined"
+          :aria-label="compact ? rowLabel(id) : undefined"
+          :title="compact ? rowLabel(id) : undefined"
           @click="ui.goTo(id)"
         >
           <span class="badge" :class="`badge--${badge(id)}`">
             <svg v-if="badge(id) === 'complete'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>
             <template v-else>{{ index + 1 }}</template>
           </span>
-          <span class="text">
+          <span v-if="!compact" class="text">
             <span class="name">{{ t(`steps.${id}`) }}</span>
             <span v-if="detail(id)" class="detail" :class="{ 'detail--warn': badge(id) === 'incomplete' }">{{ detail(id) }}</span>
           </span>
@@ -52,11 +64,13 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
       </li>
     </ol>
 
-    <button type="button" class="add m3-state" @click="ui.goTo('custom')">+ {{ t('rail.addSection') }}</button>
-    <p class="note">
-      {{ t('rail.storage') }}
-      <button type="button" class="link" :disabled="busy !== null" @click="run('json')">{{ t('rail.backup') }}</button>
-    </p>
+    <template v-if="!compact">
+      <button type="button" class="add m3-state" @click="ui.goTo('custom')">+ {{ t('rail.addSection') }}</button>
+      <p class="note">
+        {{ t('rail.storage') }}
+        <button type="button" class="link" :disabled="busy !== null" @click="run('json')">{{ t('rail.backup') }}</button>
+      </p>
+    </template>
   </nav>
 </template>
 
@@ -225,5 +239,18 @@ const done = computed(() => counted.value.filter((id) => stepStatus(cv.data, id)
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
+}
+
+/* Navigation rail (spec 030): 56 dp items, the badge in the middle, the active indicator around it. */
+.rail--compact {
+  align-items: center;
+  padding: 12px 0;
+}
+
+.rail--compact .row {
+  justify-content: center;
+  width: 56px;
+  min-height: 48px;
+  padding: 0;
 }
 </style>

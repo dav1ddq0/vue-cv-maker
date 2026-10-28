@@ -44,6 +44,11 @@ function flushPending() {
 }
 
 function onKeydown(event: KeyboardEvent) {
+  // Esc collapses the expanded preview, unless it is closing a dialog (spec 030).
+  if (event.key === 'Escape' && ui.previewExpanded && !document.querySelector('dialog[open]')) {
+    ui.previewExpanded = false
+    return
+  }
   const mod = event.ctrlKey || event.metaKey
   if (!mod || event.key.toLowerCase() !== 'z') return
   // Don't hijack the browser's own undo inside a text field.
@@ -79,9 +84,9 @@ function onKeydown(event: KeyboardEvent) {
     <main
       v-if="ui.view === 'editor'"
       class="editor"
-      :class="{ 'editor--preview-open': ui.previewOpen, 'editor--rail': isDesktop }"
+      :class="{ 'editor--preview-open': ui.previewOpen, 'editor--rail': isDesktop, 'editor--expanded': isDesktop && ui.previewExpanded }"
     >
-      <StepRail v-if="isDesktop" class="editor-rail" />
+      <StepRail v-if="isDesktop" class="editor-rail" :compact="ui.previewExpanded" />
       <CvWizard class="editor-form" />
       <PreviewPane class="editor-preview" />
     </main>
@@ -147,6 +152,15 @@ function onKeydown(event: KeyboardEvent) {
   .editor--rail {
     grid-template-columns: 248px minmax(0, 1fr) minmax(0, 1fr);
   }
+}
+
+/* Expanded preview (spec 030): the rail folds to a navigation rail, the form steps aside. */
+.editor--rail.editor--expanded {
+  grid-template-columns: 88px minmax(0, 1fr);
+}
+
+.editor--expanded .editor-form {
+  display: none;
 }
 
 .scroll-view {

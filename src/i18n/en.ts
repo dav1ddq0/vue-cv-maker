@@ -494,6 +494,8 @@ const en: typeof es = {
     fitLabel: 'Fit the page to the panel',
     change: 'Change',
     changeTemplate: 'Template {name}: change',
+    expand: 'Expand preview',
+    collapse: 'Collapse preview',
   },
   cv: {
     present: 'Present',
