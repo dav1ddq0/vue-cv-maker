@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * Labelled control wrapper. `warning` renders a non-blocking hint: validation
- * never prevents the user from moving on (spec §5).
+ * Labelled control wrapper, drawn as a Material 3 filled text field (spec 029): the label sits inside
+ * the container above the value, an active indicator underlines it. `warning` renders a non-blocking
+ * hint: validation never prevents the user from moving on (spec §5).
  */
 import { useId } from 'vue'
 
@@ -17,12 +18,14 @@ const id = useId()
 </script>
 
 <template>
-  <div class="field" :class="{ 'field--disabled': disabled }">
-    <label class="label" :for="id">{{ label }}</label>
-    <slot :id="id" :disabled="disabled" />
-    <p v-if="warning" class="warning">{{ warning }}</p>
-    <p v-else-if="disabled && disabledReason" class="hint">{{ disabledReason }}</p>
-    <p v-else-if="hint" class="hint">{{ hint }}</p>
+  <div class="field" :class="{ 'field--disabled': disabled, 'field--warning': warning }">
+    <div class="box">
+      <label class="label" :for="id">{{ label }}</label>
+      <slot :id="id" :disabled="disabled" />
+    </div>
+    <p v-if="warning" class="supporting warning">{{ warning }}</p>
+    <p v-else-if="disabled && disabledReason" class="supporting">{{ disabledReason }}</p>
+    <p v-else-if="hint" class="supporting">{{ hint }}</p>
   </div>
 </template>
 
@@ -30,58 +33,98 @@ const id = useId()
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.3em;
+  gap: 4px;
   min-width: 0;
 }
 
-/*
- * Only the control is dimmed. Dimming the whole field also dimmed the label and
- * the sentence explaining the disabled state — the one text the user most needs
- * to read at that moment — down to 2.25:1.
- */
-.field--disabled :deep(input),
-.field--disabled :deep(select),
-.field--disabled :deep(textarea) {
-  opacity: 0.55;
+/* Container: surface-container-highest, rounded on top, an active indicator along the bottom. */
+.box {
+  --indicator: var(--md-on-surface-variant);
+  display: flex;
+  flex-direction: column;
+  min-height: 56px;
+  padding: 8px 16px 0;
+  border-radius: var(--shape-xs) var(--shape-xs) 0 0;
+  background: var(--md-surface-container-highest);
+  box-shadow: inset 0 -1px 0 var(--indicator);
+  cursor: text;
+  transition: box-shadow var(--duration-short) var(--motion-standard);
+}
+
+.box:hover {
+  background: color-mix(in srgb, var(--md-on-surface) calc(var(--state-hover) * 100%), var(--md-surface-container-highest));
+}
+
+.box:focus-within {
+  --indicator: var(--md-primary);
+  box-shadow: inset 0 -2px 0 var(--indicator);
 }
 
 .label {
-  font-size: 0.82em;
-  font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 0.01em;
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
 }
 
-.hint,
+.box:focus-within .label {
+  color: var(--md-primary);
+}
+
+.field--warning .box {
+  --indicator: var(--md-error);
+}
+
+.field--warning .label,
 .warning {
+  color: var(--md-error);
+}
+
+.supporting {
   margin: 0;
-  font-size: 0.8em;
-  color: var(--text-muted);
+  padding: 0 16px;
+  font: var(--type-body-small);
+  letter-spacing: var(--tracking-body-small);
+  color: var(--md-on-surface-variant);
 }
 
-.warning {
-  color: var(--danger);
-}
-
-.field :deep(input),
-.field :deep(textarea),
-.field :deep(select) {
+/*
+ * A plain control fills the container: no border or background of its own. Composite controls
+ * (chip inputs, skill rows) are not direct children and style themselves.
+ */
+.box > :deep(input:not([type='checkbox'], [type='radio'])),
+.box > :deep(textarea),
+.box > :deep(select) {
   width: 100%;
-  padding: 0.5em 0.65em;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  min-height: 0;
+  padding: 2px 0 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--md-on-surface);
+  font: var(--type-body-large);
+  letter-spacing: var(--tracking-body-large);
+  outline: none;
 }
 
-.field :deep(textarea) {
+.box > :deep(textarea) {
   resize: vertical;
   min-height: 5em;
-  line-height: 1.5;
 }
 
-.field :deep(input:disabled),
-.field :deep(textarea:disabled) {
-  background: var(--surface-2);
+/*
+ * Disabled: M3 dims the value to 38 % and the container to 4 %. The label and the supporting text keep
+ * full contrast: they say what the field is and why it is off, what the user most needs to read.
+ */
+.field--disabled .box {
+  --indicator: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
+  background: color-mix(in srgb, var(--md-on-surface) 4%, transparent);
+  cursor: not-allowed;
+}
+
+.field--disabled .box :deep(input),
+.field--disabled .box :deep(select),
+.field--disabled .box :deep(textarea) {
+  color: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
   cursor: not-allowed;
 }
 </style>

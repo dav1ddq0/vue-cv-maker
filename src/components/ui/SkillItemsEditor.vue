@@ -86,7 +86,7 @@ function onKeydown(event: KeyboardEvent) {
         <option value="">{{ t('skills.noLevel') }}</option>
         <option v-for="n in 5" :key="n" :value="n">{{ n }} / 5</option>
       </select>
-      <button type="button" class="remove" :aria-label="t('skills.removeItem', { name: item.name })" @click="remove(index)">
+      <button type="button" class="remove m3-icon-btn m3-state m3-target" :aria-label="t('skills.removeItem', { name: item.name })" @click="remove(index)">
         ✕
       </button>
     </div>
@@ -103,40 +103,72 @@ function onKeydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
+/* Inside a filled text field (spec 029): each skill is a row on the field's container, divided by
+   the outline-variant; the level is a compact select and removing is an icon button. */
 .items {
   display: flex;
   flex-direction: column;
-  gap: 0.4em;
+  padding-bottom: 8px;
 }
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 7.5em auto;
-  gap: 0.4em;
+  grid-template-columns: minmax(0, 1fr) 8em auto;
+  gap: 8px;
   align-items: center;
+  min-height: 48px;
+  border-bottom: 1px solid var(--md-outline-variant);
 }
 
-.name {
+.name,
+.add {
   min-width: 0;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--md-on-surface);
+  font: var(--type-body-large);
+  letter-spacing: var(--tracking-body-large);
+  outline: none;
 }
 
-@media (pointer: coarse) {
-  .remove,
-  .level,
-  .name {
-    min-height: 44px;
-  }
+.name:focus-visible,
+.add:focus-visible {
+  box-shadow: inset 0 -2px 0 var(--md-primary);
+}
 
-  .remove {
-    min-width: 44px;
-  }
+.level {
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+}
+
+.level:disabled {
+  color: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
+}
+
+.add {
+  margin-top: 4px;
+}
+
+.remove {
+  color: var(--md-on-surface-variant);
+}
+
+.remove:hover:not(:disabled) {
+  color: var(--md-error);
 }
 
 /* Phones: name and remove share the first line; the level select gets its own, so the name is
-   not squeezed to a few letters next to a 7.5em select. */
+   not squeezed to a few letters next to the select. */
 @media (max-width: 480px) {
   .row {
     grid-template-columns: minmax(0, 1fr) auto;
+    padding-bottom: 8px;
   }
 
   .name {
@@ -149,18 +181,7 @@ function onKeydown(event: KeyboardEvent) {
 
   .level {
     grid-area: 2 / 1 / 3 / -1;
+    justify-self: start;
   }
-}
-
-.remove {
-  padding: 0.3em 0.55em;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text-muted);
-}
-
-.remove:hover {
-  color: var(--danger);
 }
 </style>

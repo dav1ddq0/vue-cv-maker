@@ -41,7 +41,7 @@ function onBackdropClick(event: MouseEvent) {
     <div class="grabber" aria-hidden="true" />
     <header class="head">
       <h2 :id="titleId" class="title">{{ title }}</h2>
-      <button type="button" class="close" :aria-label="t('actions.close')" @click="dialog?.close()">
+      <button type="button" class="close m3-icon-btn m3-state" :aria-label="t('actions.close')" @click="dialog?.close()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>
     </header>
@@ -59,9 +59,9 @@ function onBackdropClick(event: MouseEvent) {
   max-height: min(88dvh, 760px);
   padding: 0;
   border: 0;
-  border-radius: 24px 24px 0 0;
-  background: var(--surface);
-  color: var(--text);
+  border-radius: var(--shape-xl) var(--shape-xl) 0 0;
+  background: var(--md-surface-container-low);
+  color: var(--md-on-surface);
   overscroll-behavior: contain;
   flex-direction: column;
 }
@@ -71,7 +71,7 @@ function onBackdropClick(event: MouseEvent) {
 }
 
 .sheet::backdrop {
-  background: rgba(15, 23, 42, 0.5);
+  background: rgb(0 0 0 / 0.32);
 }
 
 /* Keep the page still behind the sheet. */
@@ -82,11 +82,11 @@ function onBackdropClick(event: MouseEvent) {
 .grabber {
   align-self: center;
   flex-shrink: 0;
-  width: 40px;
-  height: 5px;
-  margin-top: 10px;
-  border-radius: 3px;
-  background: var(--border);
+  width: 32px;
+  height: 4px;
+  margin-top: 16px;
+  border-radius: var(--shape-full);
+  background: color-mix(in srgb, var(--md-on-surface-variant) 40%, transparent);
 }
 
 .head {
@@ -99,21 +99,13 @@ function onBackdropClick(event: MouseEvent) {
 
 .title {
   margin: 0;
-  font-size: 1.2em;
-  font-weight: 700;
+  font: var(--type-title-large);
 }
 
 .close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 48px;
   height: 48px;
-  border: 0;
-  border-radius: 24px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+  color: var(--md-on-surface-variant);
 }
 
 .content {
@@ -144,7 +136,7 @@ function onBackdropClick(event: MouseEvent) {
     transition: background-color 0.28s ease-out;
 
     @starting-style {
-      background-color: rgba(15, 23, 42, 0);
+      background-color: rgb(0 0 0 / 0);
     }
   }
 }

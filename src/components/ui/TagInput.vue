@@ -37,7 +37,7 @@ function onKeydown(event: KeyboardEvent) {
   <div class="tags">
     <span v-for="(tag, index) in tags" :key="`${tag}-${index}`" class="tag">
       {{ tag }}
-      <button type="button" class="remove" :aria-label="`${tag} ✕`" @click="removeAt(index)">✕</button>
+      <button type="button" class="remove m3-icon-btn m3-state m3-target" :aria-label="`${tag} ✕`" @click="removeAt(index)">✕</button>
     </span>
     <input
       :id="id"
@@ -51,59 +51,45 @@ function onKeydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
+/* Inside a filled text field: the chips and the entry share the field's container (spec 029). */
 .tags {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35em;
-  padding: 0.35em;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  gap: 8px;
+  padding: 4px 0 8px;
 }
 
+/* M3 input chip: 32 dp, outlined, trailing remove icon. */
 .tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.3em;
-  background: var(--accent-soft);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 0.15em 0.5em;
-  font-size: 0.86em;
+  gap: 4px;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 0 4px 0 12px;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--shape-sm);
+  color: var(--md-on-surface-variant);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
 }
 
 .remove {
-  border: 0;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 0.8em;
-  padding: 0;
-  line-height: 1;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
 }
 
 .entry {
   flex: 1;
   min-width: 8em;
-  border: 0 !important;
-  background: transparent !important;
-  padding: 0.25em !important;
-}
-
-.entry:focus {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--md-on-surface);
+  font: var(--type-body-large);
+  letter-spacing: var(--tracking-body-large);
   outline: none;
-}
-
-/* Touch: taller chips so the remove button is a full-size target without overlapping its neighbours. */
-@media (pointer: coarse) {
-  .tag {
-    min-height: 44px;
-    padding: 0 0.2em 0 0.9em;
-  }
-
-  .remove {
-    min-width: 44px;
-    min-height: 44px;
-  }
 }
 </style>

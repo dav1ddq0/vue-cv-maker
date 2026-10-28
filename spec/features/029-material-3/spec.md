@@ -42,10 +42,13 @@ The Android audit of 2026-10-28 (Pixel 7, Chrome, dark and light):
 
 ### Components (M3 equivalents)
 
-5. [ ] Buttons: filled, tonal, outlined, text and icon buttons, 40 dp tall with 48 dp targets.
-6. [ ] Text fields: outlined, with the label, supporting text and error/warning in M3 style.
-7. [ ] Chips (filter, with check when selected), segmented buttons, checkbox and switch.
-8. [ ] Cards (entry, document, export option), bottom sheets (drag handle, xl top corners,
+5. [x] Buttons: filled, tonal, outlined, text and icon buttons, 40 dp tall with 48 dp targets.
+6. [x] Text fields: M3 *filled* text fields (label inside the container, active indicator), with
+       supporting text and the warning in the error colour. Filled rather than outlined: the outlined
+       field's label notch must match the background behind it, which varies here (page or card).
+7. [x] Chips (filter, with check when selected; input chips for highlights), segmented buttons and
+       checkbox. (No switch exists in the interface.)
+8. [x] Cards (entry, document, export option), bottom sheets (drag handle, xl top corners,
        surface-container-low), dialogs (xl corners, surface-container-high), notices.
 9. [ ] App chrome: top app bar, the phone dock as an M3 bottom app bar, step navigation, the desktop
        header and step rail.

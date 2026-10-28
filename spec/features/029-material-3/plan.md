@@ -5,7 +5,9 @@
    `unicode-range` on every face. Existing variables (`--bg`, `--surface`, `--accent`…) become aliases
    of the M3 roles, so components keep working before they are restyled.
 3. **Base components** (items 5–8): `BaseButton`, `BaseField`, chips/segmented/checkbox, `EntryCard`,
-   `BottomSheet`, dialogs, `NoticeBar`.
+   `BottomSheet`, dialogs, `NoticeBar`. Shared pieces in `src/styles/m3.css`: state layers through
+   `color-mix` on the background (`::before` stays free for icons), a 48 dp `::after` touch target,
+   icon button, filter chip, segmented button.
 4. **Screens** (item 9): top app bar, dock, step navigation, desktop header and rail, welcome,
    My CVs, import, export, style gallery.
 5. **Dark mode and Android** (items 10–13): System default, `theme-color`, tonal frame for the CV

@@ -13,7 +13,7 @@ const bodyId = useId()
   <div class="entry-card">
     <button
       type="button"
-      class="summary"
+      class="summary m3-state"
       :aria-expanded="open"
       :aria-controls="bodyId"
       :aria-label="t(open ? 'entry.collapse' : 'entry.expand', { title })"
@@ -39,24 +39,21 @@ const bodyId = useId()
 }
 
 .summary {
+  --container: transparent;
   display: flex;
   align-items: center;
-  gap: 0.75em;
+  gap: 12px;
   width: 100%;
-  min-height: 44px;
-  padding: 0.2em 0.25em;
+  min-height: 48px;
+  padding: 4px 8px;
   border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
+  border-radius: var(--shape-sm);
+  color: var(--md-on-surface);
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.summary:hover {
-  background: var(--surface-2);
-}
 
 .text {
   display: flex;
@@ -68,19 +65,21 @@ const bodyId = useId()
 
 .title {
   overflow: hidden;
-  font-weight: 600;
+  font: var(--type-title-medium);
+  letter-spacing: var(--tracking-title-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .subtitle {
-  font-size: 0.85em;
-  color: var(--text-muted);
+  font: var(--type-body-medium);
+  letter-spacing: var(--tracking-body-medium);
+  color: var(--md-on-surface-variant);
 }
 
 .chevron {
   flex-shrink: 0;
-  transition: transform 0.15s ease;
+  transition: transform var(--duration-short) var(--motion-standard);
 }
 
 .chevron--open {

@@ -258,15 +258,10 @@ textarea {
  * or an iPad in landscape gets them too and a narrow desktop window does not.
  */
 @media (pointer: coarse) {
-  .btn,
+  /* Buttons keep their M3 40 dp look; .m3-target gives them the 48 dp target (spec 029). */
   .view-btn,
   .select {
     min-height: 44px;
-  }
-
-  .btn {
-    min-width: 44px;
-    justify-content: center;
   }
 
   /* Text-like form controls; range, checkbox, radio and the hidden file input keep their own size. */

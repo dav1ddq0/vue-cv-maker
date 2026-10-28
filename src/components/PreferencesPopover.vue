@@ -54,13 +54,13 @@ function toggleFallback() {
 
       <div class="group">
         <span :id="`${id}-lang`" class="label">{{ t('prefs.language') }}</span>
-        <div class="segments" role="radiogroup" :aria-labelledby="`${id}-lang`">
+        <div class="segments m3-segmented" role="radiogroup" :aria-labelledby="`${id}-lang`">
           <button
             v-for="code in availableLocales"
             :key="code"
             type="button"
             role="radio"
-            class="segment"
+            class="segment m3-segment m3-state m3-target"
             :aria-checked="locale === code"
             :lang="code"
             @click="locale = code as Locale"
@@ -73,10 +73,10 @@ function toggleFallback() {
 
       <div class="group">
         <span :id="`${id}-theme`" class="label">{{ t('prefs.theme') }}</span>
-        <div class="segments" role="radiogroup" :aria-labelledby="`${id}-theme`">
-          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'light'" @click="ui.setTheme('light')">{{ t('menu.light') }}</button>
-          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'dark'" @click="ui.setTheme('dark')">{{ t('menu.dark') }}</button>
-          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'system'" @click="ui.setTheme('system')">{{ t('menu.system') }}</button>
+        <div class="segments m3-segmented" role="radiogroup" :aria-labelledby="`${id}-theme`">
+          <button type="button" role="radio" class="segment m3-segment m3-state m3-target" :aria-checked="ui.theme === 'light'" @click="ui.setTheme('light')">{{ t('menu.light') }}</button>
+          <button type="button" role="radio" class="segment m3-segment m3-state m3-target" :aria-checked="ui.theme === 'dark'" @click="ui.setTheme('dark')">{{ t('menu.dark') }}</button>
+          <button type="button" role="radio" class="segment m3-segment m3-state m3-target" :aria-checked="ui.theme === 'system'" @click="ui.setTheme('system')">{{ t('menu.system') }}</button>
         </div>
       </div>
 
@@ -174,33 +174,8 @@ function toggleFallback() {
   color: var(--text-muted);
 }
 
-.segments {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 2px;
-  padding: 3px;
-  border-radius: 10px;
-  background: var(--surface-2);
-}
 
-.segment {
-  min-height: 32px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.85em;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.segment[aria-checked='true'] {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
-}
 
 .action {
   align-self: flex-start;

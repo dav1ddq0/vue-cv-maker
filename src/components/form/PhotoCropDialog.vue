@@ -215,10 +215,10 @@ function onClose() {
   width: min(400px, calc(100vw - 32px));
   padding: 1.3em 1.4em;
   border: 0;
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+  border-radius: var(--shape-xl);
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface);
+  box-shadow: var(--elevation-3);
 }
 
 .crop[open] {
@@ -228,12 +228,12 @@ function onClose() {
 }
 
 .crop::backdrop {
-  background: rgba(15, 23, 42, 0.45);
+  background: rgb(0 0 0 / 0.32);
 }
 
 .title {
   margin: 0;
-  font-size: 1.1em;
+  font: var(--type-headline-small);
 }
 
 .frame {

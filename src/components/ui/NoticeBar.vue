@@ -21,17 +21,18 @@ const { t } = useI18n()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
-  padding: 0.6em 0.9em;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  font-size: 0.88em;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: var(--shape-md);
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface);
+  font: var(--type-body-medium);
+  letter-spacing: var(--tracking-body-medium);
 }
 
 .notice--warning {
-  background: var(--warning-bg);
-  border-color: var(--warning-border);
+  background: var(--md-warning-container);
+  color: var(--md-on-warning-container);
 }
 
 .text {
@@ -41,10 +42,10 @@ const { t } = useI18n()
 /* On phones the banner competes with the form for a very short viewport. */
 @media (max-width: 640px) {
   .notice {
-    gap: 0.5em;
-    padding: 0.4em 0.6em;
-    font-size: 0.82em;
-    line-height: 1.35;
+    gap: 8px;
+    padding: 8px 12px;
+    font: var(--type-body-small);
+    letter-spacing: var(--tracking-body-small);
   }
 
   .notice :deep(button) {

@@ -37,13 +37,13 @@ function go(view: (typeof VIEWS)[number]) {
     <div class="prefs">
       <div class="pref">
         <span :id="'menu-lang'" class="pref-label">{{ t('nav.language') }}</span>
-        <div class="segments" role="radiogroup" aria-labelledby="menu-lang">
+        <div class="segments m3-segmented" role="radiogroup" aria-labelledby="menu-lang">
           <button
             v-for="code in availableLocales"
             :key="code"
             type="button"
             role="radio"
-            class="segment"
+            class="segment m3-segment m3-state m3-target"
             :aria-checked="locale === code"
             :lang="code"
             @click="locale = code as Locale"
@@ -54,14 +54,14 @@ function go(view: (typeof VIEWS)[number]) {
       </div>
       <div class="pref">
         <span :id="'menu-theme'" class="pref-label">{{ t('nav.theme') }}</span>
-        <div class="segments" role="radiogroup" aria-labelledby="menu-theme">
-          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'light'" @click="ui.setTheme('light')">
+        <div class="segments m3-segmented" role="radiogroup" aria-labelledby="menu-theme">
+          <button type="button" role="radio" class="segment m3-segment m3-state m3-target" :aria-checked="ui.theme === 'light'" @click="ui.setTheme('light')">
             {{ t('menu.light') }}
           </button>
-          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'dark'" @click="ui.setTheme('dark')">
+          <button type="button" role="radio" class="segment m3-segment m3-state m3-target" :aria-checked="ui.theme === 'dark'" @click="ui.setTheme('dark')">
             {{ t('menu.dark') }}
           </button>
-          <button type="button" role="radio" class="segment" :aria-checked="ui.theme === 'system'" @click="ui.setTheme('system')">
+          <button type="button" role="radio" class="segment m3-segment m3-state m3-target" :aria-checked="ui.theme === 'system'" @click="ui.setTheme('system')">
             {{ t('menu.system') }}
           </button>
         </div>
@@ -116,32 +116,8 @@ function go(view: (typeof VIEWS)[number]) {
   font-weight: 600;
 }
 
-.segments {
-  display: flex;
-  gap: 3px;
-  padding: 3px;
-  border-radius: 12px;
-  background: var(--surface-2);
-}
 
-.segment {
-  min-width: 56px;
-  min-height: 40px;
-  padding: 0 0.9em;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--text-muted);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.segment[aria-checked='true'] {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
-}
 
 .note {
   margin: 0.8em 1em 0;

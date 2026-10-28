@@ -33,14 +33,14 @@ const shown = computed(() =>
   <section class="block">
     <h3 class="subtitle">{{ t('style.template') }}</h3>
     <div class="filters" role="group" :aria-label="t('style.filterLabel')">
-      <button type="button" class="filter" :aria-pressed="filter === null" @click="filter = null">
+      <button type="button" class="filter m3-chip m3-state m3-target" :aria-pressed="filter === null" @click="filter = null">
         {{ t('style.filterAll') }} · {{ templates.length }}
       </button>
       <button
         v-for="tag in available"
         :key="tag"
         type="button"
-        class="filter"
+        class="filter m3-chip m3-state m3-target"
         :aria-pressed="filter === tag"
         @click="filter = filter === tag ? null : tag"
       >
@@ -91,33 +91,11 @@ const shown = computed(() =>
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4em;
+  gap: 8px;
 }
 
-.filter {
-  min-height: 32px;
-  padding: 0 0.8em;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.82em;
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.filter[aria-pressed='true'] {
-  border-color: var(--text);
-  background: var(--text);
-  color: var(--bg);
-}
 
-@media (pointer: coarse) {
-  .filter {
-    min-height: 44px;
-  }
-}
 
 .templates {
   list-style: none;

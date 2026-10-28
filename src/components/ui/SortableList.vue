@@ -62,7 +62,7 @@ function move(from: number, to: number) {
       <div class="move">
         <button
           type="button"
-          class="move-btn"
+          class="move-btn m3-state m3-target"
           :disabled="index === 0"
           :aria-label="t('actions.moveUp')"
           @click="move(index, index - 1)"
@@ -71,7 +71,7 @@ function move(from: number, to: number) {
         </button>
         <button
           type="button"
-          class="move-btn"
+          class="move-btn m3-state m3-target"
           :disabled="index === items.length - 1"
           :aria-label="t('actions.moveDown')"
           @click="move(index, index + 1)"
@@ -96,17 +96,17 @@ function move(from: number, to: number) {
 .item {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 0.5em;
+  gap: 8px;
   align-items: start;
-  padding: 0.7em;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 12px;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--shape-md);
   background: var(--surface);
 }
 
 .item--over {
-  border-color: var(--accent);
-  box-shadow: inset 0 2px 0 var(--accent);
+  border-color: var(--md-primary);
+  box-shadow: inset 0 2px 0 var(--md-primary);
 }
 
 .item--dragging {
@@ -130,35 +130,24 @@ function move(from: number, to: number) {
   gap: 0.15em;
 }
 
-/* 32px: these are the only keyboard and touch alternative to dragging, so
-   they have to clear the WCAG 2.2 target minimum comfortably. */
+/* The only keyboard and touch alternative to dragging: 32 dp icon buttons with a 48 dp target. */
 .move-btn {
+  --container: transparent;
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  line-height: 1;
   padding: 0;
+  border: 0;
+  border-radius: var(--shape-full);
+  color: var(--md-on-surface-variant);
+  line-height: 1;
 }
 
-@media (pointer: coarse) {
-  .move-btn {
-    width: 44px;
-    height: 44px;
-  }
-}
 
-.move-btn:hover:not(:disabled) {
-  background: var(--surface-2);
-  color: var(--text);
-}
 
 .move-btn:disabled {
-  opacity: 0.3;
+  color: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
   cursor: not-allowed;
 }
 </style>

@@ -59,7 +59,7 @@ async function confirm() {
   <dialog ref="dialog" class="export" :aria-labelledby="titleId" @close="emit('close')">
     <header class="head">
       <h2 :id="titleId" class="title">{{ t('exportView.title') }}</h2>
-      <button type="button" class="close" :aria-label="t('actions.close')" @click="dialog?.close()">
+      <button type="button" class="close m3-icon-btn m3-state m3-target" :aria-label="t('actions.close')" @click="dialog?.close()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>
     </header>
@@ -102,10 +102,10 @@ async function confirm() {
   width: min(560px, calc(100vw - 32px));
   padding: 1.4em 1.5em;
   border: 0;
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+  border-radius: var(--shape-xl);
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface);
+  box-shadow: var(--elevation-3);
 }
 
 .export[open] {
@@ -115,7 +115,7 @@ async function confirm() {
 }
 
 .export::backdrop {
-  background: rgba(15, 23, 42, 0.45);
+  background: rgb(0 0 0 / 0.32);
 }
 
 .head {
@@ -126,21 +126,12 @@ async function confirm() {
 
 .title {
   margin: 0;
-  font-size: 1.25em;
-  font-weight: 700;
+  font: var(--type-headline-small);
 }
 
 .close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
 
 .formats {
@@ -152,23 +143,24 @@ async function confirm() {
 .format {
   display: flex;
   align-items: center;
-  gap: 0.9em;
-  padding: 0.85em 1em;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--shape-md);
   cursor: pointer;
 }
 
 .format--on {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: transparent;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
 }
 
 .format input {
   width: 18px;
   height: 18px;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--md-primary);
 }
 
 .format-text {

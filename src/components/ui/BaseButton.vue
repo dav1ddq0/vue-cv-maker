@@ -1,7 +1,11 @@
 <script setup lang="ts">
+/**
+ * Material 3 common buttons (spec 029): primary = filled, tonal = filled tonal, secondary = outlined,
+ * ghost = text, danger = text in the error colour. 40 dp tall (32 for `sm`), with a 48 dp target.
+ */
 withDefaults(
   defineProps<{
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+    variant?: 'primary' | 'tonal' | 'secondary' | 'ghost' | 'danger'
     size?: 'sm' | 'md'
     disabled?: boolean
     type?: 'button' | 'submit'
@@ -11,69 +15,73 @@ withDefaults(
 </script>
 
 <template>
-  <button :type="type" :disabled="disabled" :class="['btn', `btn--${variant}`, `btn--${size}`]">
+  <button :type="type" :disabled="disabled" :class="['btn', 'm3-state', 'm3-target', `btn--${variant}`, `btn--${size}`]">
     <slot />
   </button>
 </template>
 
 <style scoped>
 .btn {
+  --container: transparent;
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  padding: 0.5em 0.9em;
-  font-weight: 550;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  border-radius: var(--shape-full);
+  font: var(--type-label-large);
+  letter-spacing: var(--tracking-label-large);
   white-space: nowrap;
 }
 
-.btn:hover:not(:disabled) {
-  background: var(--surface-2);
-}
-
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
 .btn--sm {
-  padding: 0.3em 0.6em;
-  font-size: 0.86em;
+  min-height: 32px;
+  padding: 0 16px;
 }
 
 .btn--primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
+  --container: var(--md-primary);
+  color: var(--md-on-primary);
 }
 
 .btn--primary:hover:not(:disabled) {
-  filter: brightness(1.07);
-  background: var(--accent);
+  box-shadow: var(--elevation-1);
+}
+
+.btn--tonal {
+  --container: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+
+.btn--secondary {
+  border-color: var(--md-outline-variant);
+  color: var(--md-primary);
 }
 
 .btn--ghost {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-}
-
-.btn--ghost:hover:not(:disabled) {
-  background: var(--surface-2);
-  color: var(--text);
+  padding-inline: 12px;
+  color: var(--md-primary);
 }
 
 .btn--danger {
-  color: var(--danger);
-  border-color: transparent;
-  background: transparent;
+  padding-inline: 12px;
+  color: var(--md-error);
 }
 
-.btn--danger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--danger) 10%, transparent);
+/* M3 disabled: 12 % container, 38 % content, whatever the variant. */
+.btn:disabled {
+  --container: transparent;
+  border-color: color-mix(in srgb, var(--md-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn--primary:disabled,
+.btn--tonal:disabled {
+  --container: color-mix(in srgb, var(--md-on-surface) 12%, transparent);
+  border-color: transparent;
 }
 </style>
