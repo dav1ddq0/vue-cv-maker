@@ -5,24 +5,34 @@ import { FONT_OPTIONS } from '@/core/stylePresets'
 import { familyNames } from '@/services/export/fonts'
 
 const css = readFileSync(join(process.cwd(), 'src/styles/fonts.css'), 'utf8')
-const imports = [...css.matchAll(/@import '(@fontsource\/[^']+)';/g)].map((m) => m[1]!)
+const faces = [...css.matchAll(/@font-face \{([^}]*)\}/g)].map((m) => {
+  const prop = (name: string) => m[1]!.match(new RegExp(`${name}:\\s*([^;]+);`))?.[1]?.trim()
+  return {
+    family: prop('font-family')!.replace(/'/g, '').toLowerCase(),
+    src: prop('src')!,
+    range: prop('unicode-range'),
+  }
+})
 
-/** The family each Fontsource package registers. */
-const FAMILY: Record<string, string> = {
-  inter: 'inter',
-  'source-sans-3': 'source sans 3',
-  'jetbrains-mono': 'jetbrains mono',
-  'eb-garamond': 'eb garamond',
-  carlito: 'carlito',
-  caladea: 'caladea',
-}
-const shipped = new Set(imports.map((path) => FAMILY[path.split('/')[1]!]).filter(Boolean))
+/** The CV fonts the style step offers; the interface font (Roboto Flex) is not one of them. */
+const CV_FAMILIES = ['inter', 'source sans 3', 'jetbrains mono', 'eb garamond', 'carlito', 'caladea']
+const shipped = new Set(faces.map((face) => face.family))
 
-describe('bundled fonts (spec 026)', () => {
-  it('imports only Latin subsets, regular to bold plus italic', () => {
-    expect(imports.length).toBeGreaterThan(0)
-    for (const path of imports) expect(path).toMatch(/\/latin(-ext)?-(400|600|700)(-italic)?\.css$/)
-    expect(shipped).toEqual(new Set(Object.values(FAMILY)))
+describe('bundled fonts (specs 026, 029)', () => {
+  it('declares Latin and Latin Extended woff2 faces only, from the installed packages', () => {
+    expect(faces.length).toBeGreaterThan(0)
+    for (const face of faces) {
+      expect(face.src).toMatch(/^url\('@fontsource(-variable)?\/[\w-]+\/files\/[\w-]+-latin(-ext)?-[\w-]+\.woff2'\) format\('woff2(-variations)?'\)$/)
+    }
+    expect(shipped).toEqual(new Set([...CV_FAMILIES, 'roboto flex']))
+  })
+
+  it('gives every face its unicode-range, so a page fetches only the subsets it shows (029)', () => {
+    for (const face of faces) {
+      expect(face.range, face.src).toBeTruthy()
+      // The Latin face starts at U+0000; the Latin Extended one at U+0100.
+      expect(face.range).toMatch(face.src.includes('-latin-ext-') ? /^U\+0100-02BA/ : /^U\+0000-00FF/)
+    }
   })
 
   it('marks an option bundled exactly when its stack names a shipped family', () => {

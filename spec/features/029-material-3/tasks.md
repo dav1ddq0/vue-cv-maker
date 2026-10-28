@@ -1,7 +1,7 @@
 # 029 · Tasks
 
-- [x] 1 · Spec, plan, tasks — commit: see the log
-- [ ] 2 · Foundations: colour roles, Roboto Flex + type scale, shape/elevation/state, `unicode-range`
+- [x] 1 · Spec, plan, tasks — commit: `c05c96b`
+- [x] 2 · Foundations: colour roles, Roboto Flex + type scale, shape/elevation/state, `unicode-range` — commit: see the log
 - [ ] 3 · Base components
 - [ ] 4 · Screens
 - [ ] 5 · Dark mode and Android

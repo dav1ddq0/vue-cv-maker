@@ -1,46 +1,179 @@
 /* Application chrome. The CV itself is styled exclusively by its template. */
 
+/*
+ * Material Design 3 (spec 029). Colour roles generated from the brand blue #2563eb: each tone is its
+ * CIELAB L* (M3's definition), at a hue-stable OKLCH angle, so M3's contrast pairings hold; a test
+ * checks them. Warning and success are extra palettes M3 leaves to the product.
+ */
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f1f3f5;
-  --border: #dfe3e8;
-  --text: #17191c;
-  --text-muted: #5f6672;
-  --accent: #2563eb;
-  /* Foreground for anything painted on --accent. It travels with the accent:
-     the dark theme lightens --accent for legibility on dark surfaces, which
-     leaves white text on it at 2.4:1 — below WCAG AA. */
-  --on-accent: #ffffff;
-  --accent-soft: #e8f0fe;
-  --danger: #b42318;
-  --warning-bg: #fff7e6;
-  --warning-border: #f0c36d;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+  --md-primary: #1552d9;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #d5e3fe;
+  --md-on-primary-container: #001551;
+  --md-secondary: #515f78;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #d4e3ff;
+  --md-on-secondary-container: #101b31;
+  --md-tertiary: #7a4f7f;
+  --md-on-tertiary: #ffffff;
+  --md-tertiary-container: #fad7fe;
+  --md-on-tertiary-container: #310936;
+  --md-error: #b91c1e;
+  --md-on-error: #ffffff;
+  --md-error-container: #ffdad5;
+  --md-on-error-container: #400103;
+  --md-warning: #815602;
+  --md-on-warning: #ffffff;
+  --md-warning-container: #ffddb1;
+  --md-on-warning-container: #291800;
+  --md-success: #086d31;
+  --md-on-success: #ffffff;
+  --md-success-container: #9cf6b0;
+  --md-on-success-container: #01210a;
+  --md-surface: #f6f9ff;
+  --md-surface-dim: #d7dadf;
+  --md-surface-bright: #f6f9ff;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #f1f4f9;
+  --md-surface-container: #ebeef3;
+  --md-surface-container-high: #e5e8ee;
+  --md-surface-container-highest: #e0e3e8;
+  --md-on-surface: #1a1c1f;
+  --md-on-surface-variant: #424751;
+  --md-outline: #717782;
+  --md-outline-variant: #c0c7d3;
+  --md-inverse-surface: #2e3035;
+  --md-inverse-on-surface: #eef1f6;
+  --md-inverse-primary: #aac7fe;
+  --md-scrim: #000000;
+  --md-shadow: #000000;
+
+  /* Type scale: Roboto Flex, M3 sizes / line heights / weights; tracking in its own token. */
+  --font-ui: 'Roboto Flex', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --type-display-small: 400 36px/44px var(--font-ui);
+  --type-headline-large: 400 32px/40px var(--font-ui);
+  --type-headline-medium: 400 28px/36px var(--font-ui);
+  --type-headline-small: 400 24px/32px var(--font-ui);
+  --type-title-large: 400 22px/28px var(--font-ui);
+  --type-title-medium: 500 16px/24px var(--font-ui);
+  --type-title-small: 500 14px/20px var(--font-ui);
+  --type-body-large: 400 16px/24px var(--font-ui);
+  --type-body-medium: 400 14px/20px var(--font-ui);
+  --type-body-small: 400 12px/16px var(--font-ui);
+  --type-label-large: 500 14px/20px var(--font-ui);
+  --type-label-medium: 500 12px/16px var(--font-ui);
+  --type-label-small: 500 11px/16px var(--font-ui);
+  --tracking-title-medium: 0.15px;
+  --tracking-title-small: 0.1px;
+  --tracking-body-large: 0.5px;
+  --tracking-body-medium: 0.25px;
+  --tracking-body-small: 0.4px;
+  --tracking-label-large: 0.1px;
+  --tracking-label: 0.5px;
+
+  /* Shape scale. */
+  --shape-none: 0;
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-xl: 28px;
+  --shape-full: 9999px;
+
+  /* Elevation (light: shadow; dark: tonal surfaces carry it, shadows stay subtle). */
+  --elevation-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --elevation-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+  --elevation-3: 0 1px 3px rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+
+  /* State layers: the content colour over the container at these opacities. */
+  --state-hover: 0.08;
+  --state-focus: 0.1;
+  --state-pressed: 0.1;
+  --state-dragged: 0.16;
+
+  /* Motion. */
+  --motion-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --duration-short: 150ms;
+  --duration-medium: 300ms;
+
+  /* Touch target (M3: 48 dp). */
+  --target: 48px;
+
+  /*
+   * The names components already use, mapped onto the roles. --on-accent travels with --accent:
+   * the dark theme lightens the primary, and white on it would fall below WCAG AA.
+   */
+  --bg: var(--md-surface-container-low);
+  --surface: var(--md-surface-container-lowest);
+  --surface-2: var(--md-surface-container);
+  --border: var(--md-outline-variant);
+  --text: var(--md-on-surface);
+  --text-muted: var(--md-on-surface-variant);
+  --accent: var(--md-primary);
+  --on-accent: var(--md-on-primary);
+  --accent-soft: var(--md-secondary-container);
+  --danger: var(--md-error);
+  --warning-bg: var(--md-warning-container);
+  --warning-border: var(--md-warning);
+  --radius: var(--shape-md);
+  --radius-sm: var(--shape-sm);
+  --shadow: var(--elevation-1);
   /* Notch / home-indicator insets; 0 unless the viewport is `viewport-fit=cover` (index.html). */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  --bg: #14161a;
-  --surface: #1c1f24;
-  --surface-2: #24282e;
-  --border: #333840;
-  --text: #e8eaed;
-  --text-muted: #9aa2ad;
-  --accent: #6ea8fe;
-  --on-accent: #0f1319;
-  --accent-soft: #1e2a3d;
-  --danger: #f97066;
-  --warning-bg: #2c2413;
-  --warning-border: #6b5320;
+  --md-primary: #aac7fe;
+  --md-on-primary: #002682;
+  --md-primary-container: #0139b5;
+  --md-on-primary-container: #d5e3fe;
+  --md-secondary: #b7c7e5;
+  --md-on-secondary: #243048;
+  --md-secondary-container: #3a475f;
+  --md-on-secondary-container: #d4e3ff;
+  --md-tertiary: #e7b7ec;
+  --md-on-tertiary: #48214d;
+  --md-tertiary-container: #603766;
+  --md-on-tertiary-container: #fad7fe;
+  --md-error: #ffb4ab;
+  --md-on-error: #680106;
+  --md-error-container: #92030d;
+  --md-on-error-container: #ffdad5;
+  --md-warning: #f9bb5f;
+  --md-on-warning: #442b02;
+  --md-warning-container: #614004;
+  --md-on-warning-container: #ffddb1;
+  --md-success: #80da95;
+  --md-on-success: #013916;
+  --md-success-container: #025223;
+  --md-on-success-container: #9cf6b0;
+  --md-surface: #111317;
+  --md-surface-dim: #111317;
+  --md-surface-bright: #37393d;
+  --md-surface-container-lowest: #0c0e12;
+  --md-surface-container-low: #1a1c1f;
+  --md-surface-container: #1e2023;
+  --md-surface-container-high: #282a2e;
+  --md-surface-container-highest: #333539;
+  --md-on-surface: #e0e3e8;
+  --md-on-surface-variant: #c0c7d3;
+  --md-outline: #8b919c;
+  --md-outline-variant: #424751;
+  --md-inverse-surface: #e0e3e8;
+  --md-inverse-on-surface: #2e3035;
+  --md-inverse-primary: #1552d9;
+  --md-scrim: #000000;
+  --md-shadow: #000000;
+
+  /* In dark, surfaces rise by getting lighter: the page is the surface, cards a container. */
+  --bg: var(--md-surface);
+  --surface: var(--md-surface-container);
+  --surface-2: var(--md-surface-container-high);
   --shadow: none;
   color-scheme: dark;
 }

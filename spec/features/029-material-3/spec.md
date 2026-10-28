@@ -1,6 +1,6 @@
 # 029 · Material 3 interface (dark mode and Android)
 
-**Status:** planned 📝
+**Status:** in progress 🚧
 
 ## What it does
 
@@ -28,16 +28,16 @@ The Android audit of 2026-10-28 (Pixel 7, Chrome, dark and light):
 
 ### Foundations
 
-1. [ ] **Colour roles** of M3 (primary, on-primary, primary-container, secondary-container,
+1. [x] **Colour roles** of M3 (primary, on-primary, primary-container, secondary-container,
        surface and the five surface containers, on-surface(-variant), outline(-variant), error,
        inverse…) as CSS custom properties, generated from the current brand blue for light and dark.
        Every pairing meets WCAG AA (M3's own requirement). Existing variable names keep working.
-2. [ ] **Typography**: Roboto Flex for the interface (CV fonts unchanged) and M3's type scale
+2. [x] **Typography**: Roboto Flex for the interface (CV fonts unchanged) and M3's type scale
        (display → label) as tokens.
 3. [ ] **Shape, elevation, state**: M3 shape scale (none, xs 4, sm 8, md 12, lg 16, xl 28, full)
        replaces the 20 ad-hoc radii; tonal elevation levels; hover/focus/pressed state layers
        (8 / 10 / 10 % of the content colour).
-4. [ ] **Fonts load by need**: every bundled `@font-face` has its `unicode-range`; a Latin-only page
+4. [x] **Fonts load by need**: every bundled `@font-face` has its `unicode-range`; a Latin-only page
        downloads no Latin Extended file.
 
 ### Components (M3 equivalents)
