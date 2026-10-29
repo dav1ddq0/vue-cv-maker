@@ -210,3 +210,53 @@ describe('joinFragments (spec 037)', () => {
     expect(joinFragments([second!, first!])).toBe('Łucja')
   })
 })
+
+describe('tracked-out headings (spec 040)', () => {
+  it('reads capitals split into pieces as the section they spell', () => {
+    const draft = analyze(
+      doc([
+        { text: 'Ada Lovelace', fontSize: 20, bold: true },
+        { text: 'RE SUMEN', fontSize: 9 },
+        { text: 'Analista de sistemas.' },
+        { text: 'EXPE RI ENCIA', fontSize: 9 },
+        { text: 'Analista — Babbage mar 2020 - 2023' },
+        { text: 'FO RM ACIÓN', fontSize: 9 },
+        { text: 'Matemáticas — Londres 2010 - 2014' },
+        { text: 'C H AR L AS', fontSize: 9 },
+        { text: 'Una charla.' },
+      ]),
+    )
+    expect(draft.sections.map((s) => s.kind)).toEqual(['summary', 'experience', 'education'])
+    expect(draft.sections[0]!.heading).toBe('RESUMEN')
+  })
+
+  it('does not turn ordinary lowercase text into a heading', () => {
+    const draft = analyze(doc([{ text: 'Ada Lovelace', fontSize: 20 }, { text: 'Re sumen de cuentas' }, { text: 'texto' }]))
+    expect(draft.sections).toEqual([])
+  })
+})
+
+describe('headings of unknown sections (spec 040)', () => {
+  it('splits at a capitals line set apart by a wider gap, so its lines are not read as languages', () => {
+    const at = (y: number, text: string, extra: Partial<ExtractedLine> = {}) => ({ text, y, ...extra })
+    const draft = analyze(
+      doc([
+        at(800, 'Ada Lovelace', { fontSize: 20 }),
+        at(760, 'IDIOMAS'),
+        at(746, 'Inglés (C1)'),
+        at(732, 'Francés (B1)'),
+        at(700, 'CHARLAS'),
+        at(686, 'Una charla sobre máquinas'),
+        at(672, 'Otra charla'),
+      ]),
+    )
+    expect(draft.sections.find((s) => s.kind === 'languages')!.lines.map((l) => l.text)).toEqual(['Inglés (C1)', 'Francés (B1)'])
+    expect(draft.unclassified.find((b) => b.heading === 'CHARLAS')!.lines).toEqual(['Una charla sobre máquinas', 'Otra charla'])
+  })
+
+  it('does not take an acronym inside a list for a heading', () => {
+    const at = (y: number, text: string) => ({ text, y })
+    const draft = analyze(doc([at(800, 'Ada Lovelace'), at(760, 'COMPETENCIAS'), at(746, 'TypeScript'), at(732, 'SQL'), at(718, 'Go')]))
+    expect(draft.sections[0]!.lines.map((l) => l.text)).toEqual(['TypeScript', 'SQL', 'Go'])
+  })
+})

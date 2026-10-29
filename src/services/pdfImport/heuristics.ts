@@ -9,6 +9,7 @@ import {
   PRESENT_WORDS,
   PROFILE_HOSTS,
   SECTION_KEYWORDS,
+  sectionKindOfSquashed,
   URL_RE,
   type SectionKind,
 } from './patterns'
@@ -103,15 +104,17 @@ interface HeadingHit {
 }
 
 /**
- * A section header is rarely identifiable by one signal alone, so four are
- * combined: a known keyword, above-average font size, bold weight, and being a
- * short isolated line. A keyword match alone is enough; otherwise two of the
- * remaining signals plus an ALL-CAPS or short-line shape are required.
+ * A section header is rarely identifiable by one signal alone, so several are
+ * combined: a known keyword, above-average font size, bold weight, ALL CAPS and
+ * a gap above wider than the usual line spacing. A keyword match alone is
+ * enough; otherwise two of the others plus a short-line shape are required.
  */
 function findHeadings(lines: ExtractedLine[], skipIndex: number): HeadingHit[] {
   if (!lines.length) return []
   const sizes = lines.map((l) => l.fontSize).filter(Boolean)
   const averageSize = sizes.reduce((a, b) => a + b, 0) / (sizes.length || 1)
+
+  const usualGap = medianLineGap(lines)
 
   const hits: HeadingHit[] = []
   lines.forEach((line, index) => {
@@ -128,13 +131,36 @@ function findHeadings(lines: ExtractedLine[], skipIndex: number): HeadingHit[] {
       hits.push({ index, kind: keyword.kind, text: line.text.trim() })
       return
     }
+    // Tracked-out capitals arrive in pieces; run together they may still name a section.
+    const squashedKind = upper ? sectionKindOfSquashed(line.text) : null
+    if (squashedKind) {
+      hits.push({ index, kind: squashedKind, text: line.text.replace(/\s+/g, '') })
+      return
+    }
     // An unrecognized but clearly styled heading still splits the document; its
     // content lands in the unclassified panel for the user to place.
-    const signals = [larger, line.bold, upper].filter(Boolean).length
+    const previous = lines[index - 1]
+    const spaced = !!previous && previous.page === line.page && previous.y - line.y > usualGap * SPACED_GAP
+    const signals = [larger, line.bold, upper, spaced].filter(Boolean).length
     if (isShort && signals >= 2) hits.push({ index, kind: null, text: line.text.trim() })
   })
 
   return hits
+}
+
+/** A gap above a line this many times the usual spacing sets it apart, as a heading is (spec 040). */
+const SPACED_GAP = 1.3
+
+/** The usual distance between consecutive lines of a page: the median of the positive ones. */
+function medianLineGap(lines: ExtractedLine[]): number {
+  const gaps: number[] = []
+  for (let i = 1; i < lines.length; i++) {
+    const gap = lines[i - 1]!.y - lines[i]!.y
+    if (lines[i - 1]!.page === lines[i]!.page && gap > 0) gaps.push(gap)
+  }
+  if (!gaps.length) return Infinity
+  gaps.sort((a, b) => a - b)
+  return gaps[Math.floor(gaps.length / 2)]!
 }
 
 function sliceSections(lines: ExtractedLine[], headings: HeadingHit[]): DetectedSection[] {

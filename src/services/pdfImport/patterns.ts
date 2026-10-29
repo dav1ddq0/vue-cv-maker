@@ -81,6 +81,15 @@ export const SECTION_KEYWORDS: Array<{ kind: SectionKind; words: string[] }> = [
 
 export const BULLET_RE = /^[•‣▪●·*\-–—]\s+/
 
+/**
+ * The keyword a heading names once its letters are run together. A tracked-out heading ("RE SUMEN",
+ * "EXPE RI ENCIA") reaches the extraction in pieces that no word-gap rule can tell from word spaces.
+ */
+export function sectionKindOfSquashed(value: string): SectionKind | null {
+  const squashed = normalizeHeading(value).replace(/ /g, '')
+  return SECTION_KEYWORDS.find((entry) => entry.words.some((word) => word.replace(/ /g, '') === squashed))?.kind ?? null
+}
+
 /** Lowercase, accent-free, punctuation-free — the form section headers are matched in. */
 export function normalizeHeading(value: string): string {
   return value
