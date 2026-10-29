@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { groupIntoLines, joinFragments, readingOrder, repairSpaces, type ExtractedLine } from '@/services/pdfImport/layout'
+import { groupIntoLines, joinFragments, readingOrder, repairSpaces, type DrawnGlyph, type ExtractedLine } from '@/services/pdfImport/layout'
 
 /** A pdf.js text item at (x, y), `width` wide, in `size` type. */
 const item = (str: string, x: number, y: number, width: number, size = 10) =>
@@ -116,39 +116,75 @@ describe('readingOrder, columns above full-width text (spec 040)', () => {
 describe('repairSpaces (spec 040)', () => {
   const item = (str: string) => ({ str, transform: [10, 0, 0, 10, 40, 700], width: str.length * 5, height: 10, fontName: 'f1', dir: 'ltr', hasEOL: false }) as never
   const strs = (items: Array<{ str?: string }>) => items.map((it) => it.str)
+  /** A browser's print: every glyph, spaces included, drawn by an operation of its own. */
+  const chrome = (text: string): DrawnGlyph[] => [...text].map((ch, i) => ({ text: ch, before: 0, op: i }))
+  /** One TJ array: strings are drawn, numbers are the adjustments between them, as pdf.js reports them. */
+  const tj = (...parts: Array<string | number>): DrawnGlyph[] => {
+    const out: DrawnGlyph[] = []
+    let before = 0
+    for (const part of parts) {
+      if (typeof part === 'number') before -= part / 1000
+      else {
+        ;[...part].forEach((ch, i) => out.push({ text: ch, before: i === 0 ? Math.max(0, before) : 0, op: 1 }))
+        before = 0
+      }
+    }
+    return out
+  }
 
   it('takes the text of a letter-spaced item from the glyphs the page draws, with its real spaces', () => {
-    const fixed = repairSpaces([item('I ng e ni e r a de da t os · “ca l i da d”')], 'Ingeniera de datos · “calidad”')
+    const fixed = repairSpaces([item('I ng e ni e r a de da t os · “ca l i da d”')], chrome('Ingeniera de datos · “calidad”'))
     expect(strs(fixed)).toEqual(['Ingeniera de datos · “calidad”'])
   })
 
   it('removes the space pdf.js puts after a lone consonant in a word that is not letter-spaced as a whole', () => {
-    expect(strs(repairSpaces([item('d atos')], 'datos'))).toEqual(['datos'])
+    expect(strs(repairSpaces([item('d atos')], chrome('datos')))).toEqual(['datos'])
   })
 
   it('leaves an item with ordinary words as pdf.js gave it, since a gap drawn as a margin has no glyph', () => {
-    expect(strs(repairSpaces([item('Español (Nativo) · Inglés (C1)')], 'Español (Nativo)·Inglés (C1)'))).toEqual(['Español (Nativo) · Inglés (C1)'])
+    expect(strs(repairSpaces([item('Español (Nativo) · Inglés (C1)')], chrome('Español (Nativo)·Inglés (C1)')))).toEqual(['Español (Nativo) · Inglés (C1)'])
   })
 
   it('marks letter-spaced items so a gap next to them is read as a letter gap', () => {
-    const [letters, words] = repairSpaces([item('U C J A'), item('Estudio Nube')], 'UCJAEstudioNube') as Array<{ tracked?: boolean }>
+    const [letters, words] = repairSpaces([item('U C J A'), item('Estudio Nube')], chrome('UCJAEstudioNube')) as Array<{ tracked?: boolean }>
     expect(letters!.tracked).toBe(true)
     expect(words!.tracked).toBeUndefined()
   })
 
   it('finds each item where the last one ended, and skips one the stream does not hold', () => {
-    const fixed = repairSpaces([item('A B C'), item('hidden text not drawn at all'), item('P Q R S T U V W')], 'ABC PQRSTUVW')
+    const fixed = repairSpaces([item('A B C'), item('hidden text not drawn at all'), item('P Q R S T U V W')], chrome('ABC PQRSTUVW'))
     expect(strs(fixed)).toEqual(['ABC', 'hidden text not drawn at all', 'PQRSTUVW'])
   })
 
   it('looks a long item up further on when glyphs the items do not hold came before it', () => {
-    const fixed = repairSpaces([item('A B C'), item('P Q R S T U V W')], 'ABC watermark PQRSTUVW')
+    const fixed = repairSpaces([item('A B C'), item('P Q R S T U V W')], chrome('ABC watermark PQRSTUVW'))
     expect(strs(fixed)).toEqual(['ABC', 'PQRSTUVW'])
-    expect(strs(repairSpaces([item('A B C'), item('P Q')], 'ABC watermark PQ'))).toEqual(['ABC', 'P Q'])
+    expect(strs(repairSpaces([item('A B C'), item('P Q')], chrome('ABC watermark PQ')))).toEqual(['ABC', 'P Q'])
   })
 
   it('leaves everything alone when the page has no readable glyphs', () => {
-    expect(strs(repairSpaces([item('U C J A')], ''))).toEqual(['U C J A'])
+    expect(strs(repairSpaces([item('U C J A')], []))).toEqual(['U C J A'])
+  })
+
+  describe('a producer that draws no space glyphs and spaces its words with TJ adjustments', () => {
+    it('finds the words of letter-spaced text, where every gap is a space for pdf.js', () => {
+      const glyphs = tj('I', -250, 'N', -250, 'G', -250, 'E', -250, 'N', -250, 'I', -250, 'E', -250, 'R', -250, 'A', -583, 'D', -250, 'E', -583, 'D', -250, 'A', -250, 'T', -250, 'O', -250, 'S')
+      expect(strs(repairSpaces([item('I N G E N I E R A D E D A T O S')], glyphs))).toEqual(['INGENIERA DE DATOS'])
+    })
+
+    it('keeps the words of ordinary text spaced by glue, and does not split a word at a kern', () => {
+      const glyphs = tj('Ingeniera', -333, 'de', -333, 'datos', -333, 'A', 120, 'V', -333, 'y')
+      expect(strs(repairSpaces([item('Ingeniera de datos AV y')], glyphs))).toEqual(['Ingeniera de datos AV y'])
+    })
+
+    it('takes out the spaces pdf.js put at kerns inside a word, a loose one of a tenth of the type size included', () => {
+      expect(strs(repairSpaces([item('Dvo ř ák, Strasse')], tj('Dvo', -120, 'ř', 80, 'ák,', -333, 'Strasse')))).toEqual(['Dvořák, Strasse'])
+    })
+
+    it('does not read two operations drawn close together as one word, whatever the adjustment', () => {
+      const glyphs = [...chrome('Hola').map((g) => ({ ...g, op: 1 })), ...chrome('mundo').map((g) => ({ ...g, op: 2 }))]
+      expect(strs(repairSpaces([item('Hola mundo')], glyphs))).toEqual(['Hola mundo'])
+    })
   })
 })
 

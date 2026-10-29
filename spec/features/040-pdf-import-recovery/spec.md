@@ -40,10 +40,21 @@ Causes found by dumping what the extraction returns for each PDF, and what chang
 7. **Letter-spaced text** (Monograph's name and headline, the headings of the tracked templates).
    pdf.js returns "I ng e ni e r a de da t os" with spaces wherever two glyphs are far apart, so
    the word boundary is lost before the heuristics see it. Two repairs:
-   - The glyphs the page draws are read from its operators (`getOperatorList`), where a space is
-     a space glyph. A letter-spaced item takes its text from there (`repairSpaces`); the other items
-     keep pdf.js's text, since a gap drawn as a margin (the " · " between items) has no glyph. An
-     item is letter-spaced when it is made of pieces of a letter or two, or has a lone consonant
+   - The glyphs the page draws are read from its operators (`getOperatorList`): the glyph itself,
+     the TJ adjustment before it (the gap the producer left, in type sizes) and the drawing
+     operation it belongs to. Each space between two letters of an item is decided from them
+     (`repairSpaces`):
+     - a space glyph is a space;
+     - inside one drawing operation, a gap wider than the usual one of that stretch by 0.2 em is a
+       space, and any other is not, whatever pdf.js said. This is what a producer that draws no
+       space glyphs and spaces its words by adjustment (LaTeX, many generated PDFs) leaves: words
+       about a third of the type size apart, kerning under a sixth, letter-spacing adding the same
+       to every gap, which the usual gap takes out. pdf.js gave "I N G E N I E R A D E D A T O S" for
+       letter-spaced text drawn that way, with the words lost, and "Dvo ř ák" for loose kerning;
+     - between operations (a browser's print draws every glyph on its own) a letter-spaced item
+       takes only its space glyphs, and any other item keeps pdf.js's space, since a gap drawn as a
+       margin (the " · " between items) has no glyph.
+     An item is letter-spaced when it is made of pieces of a letter or two, or has a lone consonant
      ("d atos"). A gap next to one is read with a threshold of 0.3 em instead of 0.1, because every
      letter is that far from the next. The lookahead for an item that is not where the last one
      ended is bounded.
@@ -78,14 +89,17 @@ Causes found by dumping what the extraction returns for each PDF, and what chang
 
 ## Verification
 
-- 569 unit tests (2 skipped: local scratch), plus the typecheck. New: `tests/pdfLayout.test.ts` (cells, reading order, gutters,
+- 575 unit tests (3 skipped: local scratch), plus the typecheck. `tests/pdfTjExtract.test.ts` writes
+  two real PDFs by hand (one TJ array per line, no space glyphs, Helvetica not embedded) and runs
+  them through `extractDocument`. New: `tests/pdfLayout.test.ts` (cells, reading order, gutters,
   tables, bands, side-by-side headings) and cases in `tests/pdfImport.test.ts` for each rule above.
   Every rule was mutated and its test fails without it (two mutants survived the first round, the
   top band and the style match, and got their tests).
 - `qa:roundtrip` 364/364 (232 before, plus the 104 import checks, the 26 names, no longer with an
   exception, and the 26 headlines), `qa:e2e` 93/93, `qa:security` 53/53.
 - Every rule of items 7–10 was mutated and its test fails without it (five mutants survived the
-  first round and got stronger tests).
+  first round and got stronger tests; a sixth, the adjustment threshold, needed a loose kern of a
+  tenth of the type size).
 - A real, three-page CV from another tool (Word-like, dates and headings in a left column, skills
   in capitals) was run before and after, looking at structure only: 4 dated experiences before and
   after (now with 12 highlights instead of 0), 30 skill items before and after, 10 languages (9
@@ -98,8 +112,11 @@ Causes found by dumping what the extraction returns for each PDF, and what chang
 
 ## Not changed
 
-- A PDF whose producer leaves its spaces out and positions the words instead keeps pdf.js's text,
-  as the repair only touches letter-spaced items.
+- A producer that draws each word with its own text-moving operation and no space glyph has no
+  adjustment to read: between operations the spaces are pdf.js's, as before (a gap of a third of the
+  type size is already a separate item there).
+- Standard fonts that are not embedded cannot be loaded without a copy of their data, which the app
+  does not ship: pdf.js warns and still returns the operators, which is all this needs.
 - A heading in ordinary case that is neither larger nor bold nor in capitals, or that has no dates
   guard to rely on (an entry's title with its dates two lines below), cannot be told from the text.
 - A page whose operators cannot be read is used as pdf.js gives it, with no repair and the font ids

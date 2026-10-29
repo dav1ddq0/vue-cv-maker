@@ -1,7 +1,7 @@
 import * as pdfjs from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import type { TextItem } from 'pdfjs-dist/types/src/display/api'
-import { groupIntoLines, repairSpaces, type ExtractedLine } from './layout'
+import { groupIntoLines, repairSpaces, type DrawnGlyph, type ExtractedLine } from './layout'
 
 export type { ExtractedLine } from './layout'
 
@@ -57,9 +57,9 @@ const BOLD_FONT = /bold|black|heavy/i
  * a space glyph) and which of the fonts its text items use are bold. Both are things the text
  * content hides, and both are optional: a page whose operators cannot be read is used as it is.
  */
-async function drawnText(page: pdfjs.PDFPageProxy, items: TextItem[]): Promise<{ glyphs: string; boldFonts: Set<string> }> {
+async function drawnText(page: pdfjs.PDFPageProxy, items: TextItem[]): Promise<{ glyphs: DrawnGlyph[]; boldFonts: Set<string> }> {
   const fontIds = [...new Set(items.map((item) => ('fontName' in item ? item.fontName : '')))]
-  let glyphs = ''
+  let glyphs: DrawnGlyph[] = []
   const boldFonts = new Set<string>()
   try {
     const { fnArray, argsArray } = await page.getOperatorList()
@@ -69,13 +69,21 @@ async function drawnText(page: pdfjs.PDFPageProxy, items: TextItem[]): Promise<{
       const args = argsArray[index] as unknown[]
       const shown = op === OPS.nextLineSetSpacingShowText ? args[2] : args[0]
       if (!Array.isArray(shown)) return
+      // A number between two glyphs is a TJ adjustment in thousandths of the type size, negative to
+      // move right: the gap the producer leaves there, which is how it spaces words it draws in one array.
+      let before = 0
       for (const glyph of shown as unknown[]) {
+        if (typeof glyph === 'number') {
+          before -= glyph / 1000
+          continue
+        }
         const unicode = (glyph as { unicode?: unknown } | null)?.unicode
-        if (typeof unicode === 'string') glyphs += unicode
+        if (typeof unicode === 'string') glyphs.push({ text: unicode, before: Math.max(0, before), op: index })
+        before = 0
       }
     })
   } catch {
-    glyphs = ''
+    glyphs = []
   }
   for (const id of fontIds) {
     let name: unknown

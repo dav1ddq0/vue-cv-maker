@@ -229,14 +229,23 @@ const RESYNC_MIN_LETTERS = 6
 const RESYNC_WINDOW = 4000
 
 /**
- * Gives each text item the spaces the PDF itself draws. pdf.js adds a space wherever two glyphs are
- * far enough apart, so letter-spaced text comes back as "I ng e ni e r a de da t os" and no rule can
- * tell those spaces from the ones between words. The stream of glyphs the page draws (`glyphs`, with
- * a space where the PDF draws a space glyph) has no such guesses. An item that is plainly
- * letter-spaced takes its text from it. Any other keeps what pdf.js gave: its spaces are mostly real,
- * and a gap drawn as a margin instead of a space glyph (the " · " between items) would be lost. An
- * item whose letters are not found in the stream is left alone (spec 040).
+ * A gap this much wider (in type sizes) than the usual one between the glyphs of one drawing
+ * operation is a word space. A producer that leaves its spaces out spaces its words with TJ
+ * adjustments of about a third of the type size; kerning is under a sixth; letter-spacing adds the
+ * same amount to every gap, which the usual one takes out.
  */
+const WORD_ADJUST = 0.2
+
+/** One glyph the page draws, in drawing order. */
+export interface DrawnGlyph {
+  /** What it stands for ("" or a space for a space glyph). */
+  text: string
+  /** The gap the producer left before it inside the same drawing operation, in type sizes. */
+  before: number
+  /** Which drawing operation drew it: a gap between two is a move of the text, not an adjustment. */
+  op: number
+}
+
 export type TrackedItem = TextItem & { tracked?: boolean }
 
 /**
@@ -250,13 +259,30 @@ function looksTracked(text: string): boolean {
   return lone || (tokens.length >= 3 && tokens.join('').length / tokens.length <= 2.2)
 }
 
-export function repairSpaces(items: TextItem[], glyphs: string): TrackedItem[] {
-  const chars = [...glyphs.normalize('NFKC')]
+/**
+ * Gives each text item the spaces the PDF itself draws. pdf.js adds a space wherever two glyphs are
+ * far apart, so letter-spaced text comes back as "I ng e ni e r a de da t os" and no rule can tell
+ * those spaces from the ones between words. The glyphs the page draws (`glyphs`) have no such
+ * guesses, and each space between two letters of an item is decided from them:
+ * - a space glyph between them is a space;
+ * - inside one drawing operation, a gap wider than the usual one by `WORD_ADJUST` is a space and
+ *   any other is not, whatever pdf.js said ("Dvo ř ák" was kerning; letter-spaced words are
+ *   told apart by the wider gap);
+ * - between operations (each glyph its own, in a letter-spaced line) it is a space only when a
+ *   space glyph says so for a letter-spaced item, and as pdf.js said for any other, since a gap
+ *   drawn as a margin (the " · " between items) has no glyph.
+ * An item whose letters are not found in the glyphs is left alone (spec 040).
+ */
+export function repairSpaces(items: TextItem[], glyphs: DrawnGlyph[]): TrackedItem[] {
+  const chars: Array<{ ch: string; before: number; op: number }> = []
+  for (const glyph of glyphs) {
+    ;[...glyph.text.normalize('NFKC')].forEach((ch, index) => chars.push({ ch, before: index === 0 ? glyph.before : 0, op: glyph.op }))
+  }
   const letters: string[] = []
   const at: number[] = []
-  chars.forEach((ch, index) => {
-    if (!/\s/u.test(ch)) {
-      letters.push(ch)
+  chars.forEach((entry, index) => {
+    if (!/\s/u.test(entry.ch)) {
+      letters.push(entry.ch)
       at.push(index)
     }
   })
@@ -278,12 +304,28 @@ export function repairSpaces(items: TextItem[], glyphs: string): TrackedItem[] {
     if (start < 0) return item
     cursor = start + own.length
 
+    // The spaces pdf.js put after each letter.
+    const given: boolean[] = []
+    let letter = -1
+    for (const ch of item.str.normalize('NFKC')) {
+      if (/\s/u.test(ch)) {
+        if (letter >= 0) given[letter] = true
+      } else letter++
+    }
+    const glyphAt = (index: number) => chars[at[start + index]!]!
+    const real = (index: number) => at[start + index + 1]! - at[start + index]! > 1
+    const together = (index: number) => !real(index) && glyphAt(index).op === glyphAt(index + 1).op
+    const gaps = own.slice(1).map((_, index) => index).filter(together).map((index) => glyphAt(index + 1).before).sort((a, b) => a - b)
+    const usual = gaps[Math.floor(gaps.length / 2)] ?? 0
+
     let drawn = ''
     own.forEach((ch, index) => {
       drawn += ch
-      if (index < own.length - 1 && at[start + index + 1]! - at[start + index]! > 1) drawn += ' '
+      if (index === own.length - 1) return
+      const space = real(index) || (together(index) ? glyphAt(index + 1).before - usual >= WORD_ADJUST : !tracked && !!given[index])
+      if (space) drawn += ' '
     })
-    return tracked ? { ...item, str: drawn } : item
+    return { ...item, str: drawn }
   })
 }
 
