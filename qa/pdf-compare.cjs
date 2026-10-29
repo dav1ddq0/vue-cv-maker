@@ -5,8 +5,7 @@
 //   2. a fixture page (half-opaque box, list bullet, dashed and dotted borders) printed by Chromium
 //      and converted, compared shape by shape, which the whole-page threshold is too coarse to see;
 //   3. the side-column warning (spec 033): off for the sample, on for a side column longer than a page.
-// A blank last page in the print is reported as a warning, not compared: Chromium sometimes adds one
-// when the pages fill the sheet to the last fraction of a pixel (seen before and after spec 033).
+// A blank last page in the print fails on its own and is left out of the comparison (spec 036).
 // Usage: npm run qa:pdf [-- templateId,...]. Needs poppler (pdftoppm, pdftotext, pdfinfo).
 const fs = require('node:fs')
 const path = require('node:path')
@@ -22,14 +21,9 @@ const MAX_DIFF = 4
 const SRC = '/vue-cv-maker/src'
 
 const results = []
-const warnings = []
 function check(name, ok, detail = '') {
   results.push({ name, ok: Boolean(ok), detail })
   console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ` — ${detail}` : ''}`)
-}
-function warn(name, detail) {
-  warnings.push(name)
-  console.log(`WARN ${name} — ${detail}`)
 }
 
 /** A page with no ink at all. */
@@ -115,7 +109,7 @@ async function compareTemplates(page, url, ids) {
           printImages.pop()
           blankTail++
         }
-        if (blankTail) warn(`${key}: the print ends in ${blankTail} blank page(s)`, 'Chromium print rounding, not the converter')
+        check(`${key}: the print ends without a blank page`, blankTail === 0, blankTail ? `${blankTail} blank` : '')
         const pages = [printImages.length, directImages.length]
         const missing = missingChars(pdfText(printPdf), pdfText(directPdf))
         const diffs = printImages.map((img, i) => diffPercent(img, directImages[i]))
@@ -291,6 +285,6 @@ async function checkSideColumn(page) {
     server.stop()
   }
   const failed = results.filter((r) => !r.ok)
-  console.log(`\n${results.length - failed.length}/${results.length} checks pass, ${warnings.length} warnings · files in ${path.relative(ROOT, OUT)}/`)
+  console.log(`\n${results.length - failed.length}/${results.length} checks pass · files in ${path.relative(ROOT, OUT)}/`)
   process.exitCode = failed.length ? 1 : 0
 })()

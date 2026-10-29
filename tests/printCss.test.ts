@@ -35,3 +35,9 @@ describe('print.css / per-section page breaks (spec 022)', () => {
     expect(css).not.toMatch(/\[data-break-before/)
   })
 })
+
+describe('print.css / no blank sheet at the end (spec 036)', () => {
+  it('lifts the break paged.js forces after the last page', () => {
+    expect(css).toMatch(/\.pagedjs_page:last-of-type\s*\{[^}]*break-after:\s*auto/)
+  })
+})

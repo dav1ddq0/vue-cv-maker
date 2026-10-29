@@ -104,4 +104,14 @@
     text-decoration: none;
     color: inherit;
   }
+
+  /*
+   * paged.js forces a break after every page, the last one included. The pages fill their sheets to
+   * the last fraction of a pixel, so that final break sometimes opened a blank sheet at the end of
+   * the PDF (spec 036).
+   */
+  .pagedjs_page:last-of-type {
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
 }

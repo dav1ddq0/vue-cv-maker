@@ -46,6 +46,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **033** · Side bands to the foot of every page, a warning when the side column cannot fit page one, e-mails and URLs wrap at sensible points
 - **034** · Import hardening from a security review (typed import, education `null` kept, no control/bidi characters in PDF names, pdf.js without eval)
 - **035** · Review fixes: dashed and dotted borders in the direct PDF, untested branches covered, browser checks in `qa/` (`npm run qa`)
+- **036** · The print no longer ends in a blank page (paged.js's break after the last page lifted)
 
 ## Next 🔜
 
