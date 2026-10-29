@@ -5,4 +5,4 @@
 - [x] 3 · D · export dialog contrast — commit: 9d8065c
 - [x] 4 · rounded fields, audit, verification, roadmap — commit: 1496c64
 - [x] 5 · rounder chrome (8 → 12 px on nine elements) — commit: ee2c881
-- [x] 6 · shape tokens 16 / 20 px — commit: _pending_
+- [x] 6 · shape tokens 16 / 20 px — commit: 54e1e35
