@@ -36,7 +36,7 @@ were right; uploading them again showed three defects.
 1. [x] After a JSON import, the photo shows in the preview and the thumbnail, and is stored as a blob.
 2. [x] A CV stored with an inline photo has it moved to a blob when opened.
 3. [x] Re-importing a downloaded PDF keeps the e-mail whole in all 13 templates, and the name in 12
-   (Monograph's letter-spaced name is the exception, see "Not covered").
+   (Monograph's letter-spaced name was the exception; spec 040 recovers it too).
 4. [x] `slugify('Łucja Øster-Ñúñez')` is `lucja-oster-nunez`.
 5. [x] The round trip is a QA script, `npm run qa:roundtrip` (also part of `npm run qa`). It exits
    non-zero on any failed check.
@@ -53,8 +53,7 @@ were right; uploading them again showed three defects.
   - the photo, embedded only where the template shows it;
   - the HTML opened from disk;
   - the JSON uploaded again: exact, with the photo showing;
-  - both PDFs through PDF import: name and e-mail recovered. Monograph's name is excepted, see
-    "Not covered".
+  - both PDFs through PDF import: name and e-mail recovered (Monograph's name too since spec 040).
 - **Comparing text:**
   - Text is compared without case, because templates set capitals with CSS.
   - PDF text is also compared without spaces, because pdftotext spaces out letter-spaced text.
