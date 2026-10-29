@@ -1,6 +1,6 @@
 # 038 · Desktop polish: dates, lighter fields, export contrast
 
-**Status:** in progress
+**Status:** implemented ✅
 
 ## What it does
 
@@ -18,20 +18,29 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
    - The native controls bring keyboard and screen-reader support without a custom popup.
    - "I work here now" disables both controls and empties them.
 2. **B · Lighter fields.**
-   - The container fill goes from `surface-container-highest` to `surface-container`, hover and
-     disabled included.
+   - The container fill goes from `surface-container-highest` to `surface-container-high`, hover and
+     disabled included. One step lower, `surface-container`, would vanish in dark, where the card is
+     that colour.
+   - Rounded corners all round (`--shape-md`, asked for by the user) with a ring in place of the
+     bottom line: outline-variant at rest, outline on hover, primary and 2 px in focus, error for a
+     warning.
    - Highlights (`TagInput`) become rows with a divider, like the skills in `SkillItemsEditor`,
      instead of outlined chips.
-3. **D · Export contrast.** The "Before you export" block gets a container that reads against the
-   dialog in both themes.
+3. **D · Export contrast.** The "Before you export" block gets a container (`surface-container-lowest`)
+   that reads against the dialog (`surface-container-high`) in both themes.
 
 ## Acceptance criteria
 
-1. [ ] The experience and education dates have no native month input; a year alone is accepted.
-2. [ ] The month names follow the UI language.
-3. [ ] Fields and highlights are lighter in light and dark, with 0 contrast issues in the audit.
-4. [ ] The "Before you export" block is distinguishable from the dialog in dark.
+1. [x] The experience and education dates have no native month input; a year alone is accepted.
+2. [x] The month names follow the UI language.
+3. [x] Fields and highlights are lighter in light and dark, with 0 contrast issues in the audit.
+4. [x] The "Before you export" block is distinguishable from the dialog in dark.
 
 ## Verification
 
-_To be filled in when implemented._
+- 512 unit tests, plus the typecheck. New: `MonthField` (7 cases), `DateRangeFields` updated.
+- `qa:e2e` 81/81.
+- Audit at 1440×900 and Pixel 7, light and dark, on the Experience and Education steps and the
+  export dialog: 0 contrast issues, 0 light patches, 0 console errors. The only flagged boxes are
+  the inline "Save a copy" link (94×16) and a visually hidden 1×1 input, as before.
+- Not changed: the photo crop dialog (plan item C), which was left out on request.

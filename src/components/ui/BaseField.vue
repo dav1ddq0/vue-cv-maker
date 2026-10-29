@@ -37,27 +37,29 @@ const id = useId()
   min-width: 0;
 }
 
-/* Container: surface-container-high (one step softer than M3's highest, spec 038), rounded on top, an active indicator along the bottom. */
+/* Container: surface-container-high (one step softer than M3's highest), rounded all round, with a ring
+   that is the outline at rest, stronger on hover and the primary colour in focus (spec 038). */
 .box {
-  --indicator: var(--md-on-surface-variant);
+  --indicator: var(--md-outline-variant);
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 56px;
-  border-radius: var(--shape-xs) var(--shape-xs) 0 0;
+  border-radius: var(--shape-md);
   background: var(--md-surface-container-high);
-  box-shadow: inset 0 -1px 0 var(--indicator);
+  box-shadow: inset 0 0 0 1px var(--indicator);
   cursor: text;
   transition: box-shadow var(--duration-short) var(--motion-standard);
 }
 
 .box:hover {
+  --indicator: var(--md-outline);
   background: color-mix(in srgb, var(--md-on-surface) calc(var(--state-hover) * 100%), var(--md-surface-container-high));
 }
 
 .box:focus-within {
   --indicator: var(--md-primary);
-  box-shadow: inset 0 -2px 0 var(--indicator);
+  box-shadow: inset 0 0 0 2px var(--indicator);
 }
 
 /* Drawn over the control, which fills the whole container: all of it is the touch target (M3). */
