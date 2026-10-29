@@ -1,6 +1,6 @@
 # 043 · Design consistency: the tokens are what the interface uses
 
-**Status:** implemented ✅ (the two items left for later aside)
+**Status:** implemented ✅ (the two items left for later were done in 045)
 
 ## What it does
 
@@ -46,8 +46,7 @@ the scale. These were not, and are fixed one phase at a time, each its own commi
    catch the size, weight and shadow the moment they are written; the browser suite catches what
    only shows once styles cascade.
 
-Left for later, reported in the audit: a common rule for the title of a view (24, 19.5, 15 and 33 px
-today) and the padding that is off the 4 px grid (from the same `em` units).
+The title of a view and the padding off the 4 px grid, reported in the audit, were done in spec 045.
 
 ## Verification
 

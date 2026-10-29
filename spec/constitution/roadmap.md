@@ -55,6 +55,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **042** · Vue best-practices pass over the latest components (the startup notice and the month-date rules out of the root and the field)
 - **043** · Design consistency: the interface uses the type scale, one button style, the weights and elevations of the tokens, and `qa:consistency` keeps it so
 - **044** · A slider that looks like the rest of the app (the style step's two range inputs)
+- **045** · Consistency everywhere: one view title, spacing on the 4 px grid, the browser suite over a device matrix
 
 ## Next 🔜
 

@@ -1,5 +1,6 @@
-// The interface against its design tokens, in the browser (spec 043): the computed style of every
-// element of every view, light and dark, desktop and a Pixel 7 profile, checked against the scale.
+// The interface against its design tokens, in the browser (spec 043, extended in 045): the computed
+// style of every element of every view, on a laptop, a desktop, an iPad in both orientations, an
+// iPad Pro and three phones, light and dark, checked against the scale.
 //   - text sizes are the sizes of the type scale (`--size-*`), weights are 400/500/600/700;
 //   - corner radii are the shape scale, and every field is the same height and radius;
 //   - a blurred shadow is an elevation token;
@@ -12,6 +13,19 @@ const path = require('node:path')
 const { ROOT, startServer } = require('./lib/server.cjs')
 const { devices } = require('playwright')
 
+/** Every format the interface is built for, with the themes it is checked in. Each is walked the same way. */
+const PROFILES = [
+  { name: 'laptop 1280×800', opts: { viewport: { width: 1280, height: 800 } }, themes: ['light'] },
+  { name: 'desktop 1440×900', opts: { viewport: { width: 1440, height: 900 } }, themes: ['light', 'dark'] },
+  { name: 'desktop 1920×1080', opts: { viewport: { width: 1920, height: 1080 } }, themes: ['dark'] },
+  { name: 'iPad portrait', opts: () => devices['iPad (gen 7)'], themes: ['light', 'dark'] },
+  { name: 'iPad landscape', opts: () => devices['iPad (gen 7) landscape'], themes: ['light'] },
+  { name: 'iPad Pro 11', opts: () => devices['iPad Pro 11'], themes: ['dark'] },
+  { name: 'Pixel 7', opts: () => devices['Pixel 7'], themes: ['light', 'dark'] },
+  { name: 'iPhone SE', opts: () => devices['iPhone SE'], themes: ['light'] },
+  { name: 'phone 360×640', opts: { viewport: { width: 360, height: 640 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }, themes: ['dark'] },
+]
+
 const OUT = path.join(ROOT, '.qa')
 const STEPS = ['Datos personales', 'Resumen', 'Experiencia', 'Formación', 'Competencias', 'Idiomas', 'Secciones propias', 'Plantilla y estilo', 'Exportar']
 const SIZES = new Set(['11px', '12px', '14px', '16px', '22px', '24px', '28px', '32px', '36px'])
@@ -23,7 +37,7 @@ const COLLECT = `(() => {
   const paper = (el) => el.closest('.cv-page, .thumb, .tile-preview, .preview-thumb, .page-wrap, .page-frame, .pagedjs_pages, svg, .paper, [class*=preview] .cv, .sheet-preview')
   const label = (el) => el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).filter((c) => !/^(m3|is-|v-)/.test(c))[0] : '')
   const visible = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; const s = getComputedStyle(el); return s.visibility !== 'hidden' && s.display !== 'none' && s.opacity !== '0' }
-  const out = { text: [], radius: [], shadow: [], buttons: [], fields: [], inputs: [], overflow: [] }
+  const out = { text: [], radius: [], shadow: [], buttons: [], fields: [], inputs: [], overflow: [], titles: [] }
   const clipper = (el) => { for (let n = el.parentElement; n; n = n.parentElement) { const s = getComputedStyle(n); if (/(hidden|auto|scroll|clip)/.test(s.overflowX) || n === document.body) return n } return document.body }
   for (const el of document.body.querySelectorAll('*')) {
     if (paper(el) || !visible(el)) continue
@@ -34,10 +48,14 @@ const COLLECT = `(() => {
     if ((hasBg || hasBorder) && s.borderTopLeftRadius !== '0px') out.radius.push({ l: label(el), v: s.borderTopLeftRadius })
     if (s.boxShadow !== 'none') out.shadow.push({ l: label(el), v: s.boxShadow })
     if (el.matches('button.btn') && own) out.buttons.push({ l: 'btn--' + (el.className.match(/btn--(primary|tonal|secondary|ghost|danger)/) || [])[1] + (el.className.includes('btn--sm') ? ' sm' : ''), h: Math.round(r.height), radius: s.borderTopLeftRadius, size: s.fontSize, weight: s.fontWeight })
+    // A field is 56 px, 80 where the pointer is coarse and the slider has its 48 dp target (not the text ones).
     if (el.matches('.box') && el.querySelector(':scope > input:not([type=color]):not([type=file]), :scope > select')) out.fields.push({ l: label(el), h: Math.round(r.height), radius: s.borderTopLeftRadius })
+    // The title of a view: the heading that names it, not a card's or a dialog's.
+    if (el.matches('h2.title, h2.heading, h2.heading--large') && !el.querySelector('button') && !el.closest('dialog, .sheet, [class*=sheet], .rail, .card, article, section.panel, header')) out.titles.push({ size: s.fontSize, weight: s.fontWeight, text: (el.textContent || '').trim().slice(0, 18) })
     if (el.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea') && s.backgroundColor === 'rgb(239, 239, 239)') out.inputs.push({ l: label(el) + '[' + el.type + ']' })
     // The template carousel of the phone is meant to scroll sideways, and what is in it.
-    if (el.closest('ul.templates') && matchMedia('(max-width: 600px)').matches) continue
+    // ...and the strip of the nine steps on a tablet or a phone, which scrolls sideways by design.
+    if (el.closest('ul.templates, ol.steps')) continue
     const c = clipper(el)
     if (c !== document.body && s.position !== 'absolute' && s.position !== 'fixed') {
       const cr = c.getBoundingClientRect()
@@ -49,13 +67,14 @@ const COLLECT = `(() => {
   return out
 })()`
 
+
 ;(async () => {
   fs.mkdirSync(OUT, { recursive: true })
   const server = await startServer('preview')
   process.env.BASE = server.url
   const { chromium, check, results, open, startSample, step } = require('./e2e/lib.cjs')
   const browser = await chromium.launch()
-  const seen = { btnHeight: new Map(), size: new Map(), weight: new Map(), radius: new Map(), shadow: new Map(), input: new Map(), overflow: new Map(), btn: new Map(), field: new Map() }
+  const seen = { btnHeight: new Map(), size: new Map(), weight: new Map(), radius: new Map(), shadow: new Map(), input: new Map(), overflow: new Map(), btn: new Map(), field: new Map(), title: new Map() }
   const note = (map, key, where) => { if (!map.has(key)) map.set(key, []); if (map.get(key).length < 3) map.get(key).push(where) }
   let views = 0
 
@@ -81,67 +100,80 @@ const COLLECT = `(() => {
       note(seen.btn, `${b.l} | ${b.radius} ${b.size} w${b.weight}`, where)
       if (b.h < 48 && b.h !== (b.l.endsWith(' sm') ? 32 : 40)) note(seen.btnHeight, `${b.l} ${b.h}h`, where)
     }
-    for (const f of d.fields) if (f.h <= 60) note(seen.field, `${f.h}h ${f.radius}`, where)
+    for (const f of d.fields) note(seen.field, `${f.h}h ${f.radius}`, where)
+    for (const t of d.titles) note(seen.title, `${t.size} w${t.weight}`, `${where} «${t.text}»`)
+  }
+
+  /** Clicks a control if this layout has it, without waiting for one it does not. */
+  const tap = async (locator) => { if (await locator.count()) await locator.first().click().catch(() => {}) }
+  /** Whether a button with this name is on screen. */
+  const shown = (p, name) => p.getByRole('button', { name }).first().isVisible().catch(() => false)
+  /** A view of the app by its name: the header tabs where there are any, else the menu of the phone. */
+  async function openView(p, name) {
+    if (await shown(p, name)) return p.getByRole('button', { name }).first().click().catch(() => {})
+    await tap(p.getByRole('button', { name: /^Menú/ }))
+    await p.waitForTimeout(300)
+    await p.getByRole('button', { name }).first().click().catch(() => {})
+  }
+
+  async function walk(profile, theme) {
+    const opts = typeof profile.opts === 'function' ? profile.opts() : profile.opts
+    const p = await open(browser, { ...opts, colorScheme: theme })
+    // A control a layout does not have is not waited for: each walk tries all of them.
+    p.setDefaultTimeout(2000)
+    const where = (view) => `${profile.name} ${theme} ${view}`
+    await p.addInitScript((t) => localStorage.setItem('keireki-craft:prefs', JSON.stringify({ uiLanguage: 'es', theme: t })), theme)
+    await p.reload({ waitUntil: 'networkidle' }).catch(() => {})
+    await grab(p, where('welcome'))
+    await startSample(p)
+
+    const rail = (await p.locator('.editor-rail').count()) > 0
+    // The nine steps: by the rail where there is one, else by the next button of the dock.
+    for (let i = 0; i < STEPS.length; i++) {
+      if (rail) await p.locator('nav button.row', { hasText: STEPS[i] }).first().click().catch(() => {})
+      await p.waitForTimeout(200)
+      await grab(p, where(`step ${i + 1} ${STEPS[i]}`))
+      if (!rail && i < STEPS.length - 1) await tap(p.getByRole('button', { name: /Siguiente/ }))
+    }
+    // The phone shows one pane at a time: the preview too.
+    if (await shown(p, /^Vista previa$/)) {
+      await tap(p.getByRole('button', { name: /^Vista previa$/ }))
+      await p.waitForTimeout(400)
+      await grab(p, where('preview'))
+      await tap(p.getByRole('button', { name: /^Editar$/ }))
+    }
+    if (rail) await p.locator('nav button.row', { hasText: 'Datos personales' }).first().click().catch(() => {})
+    else for (let back = 0; back < 9; back++) await tap(p.getByRole('button', { name: /Paso anterior|Anterior|Plantilla y estilo|Secciones propias/ }))
+    if (await p.locator('.photo-drop input[type=file]').count()) await p.locator('.photo-drop input[type=file]').setInputFiles(path.join(__dirname, 'fixtures/portrait.jpg'))
+    await p.waitForSelector('dialog.crop[open]', { timeout: 1200 }).catch(() => {})
+    await p.waitForTimeout(300)
+    await grab(p, where('photo crop dialog'))
+    await p.keyboard.press('Escape')
+    // Export: the dialog on the rail's layouts, the sheet on the others.
+    await tap(p.getByRole('button', { name: /^Exportar/ }))
+    await p.waitForSelector('dialog[open]', { timeout: 1200 }).catch(() => {})
+    await grab(p, where('export'))
+    await p.keyboard.press('Escape')
+    for (const view of [/^Preferencias/, /^Importar/, /^Mis CVs/]) {
+      await openView(p, view)
+      await p.waitForTimeout(300)
+      await grab(p, where(String(view).slice(2, -2)))
+      await p.keyboard.press('Escape')
+    }
+    // A blank CV: the empty states of every step.
+    await tap(p.getByRole('button', { name: /Nuevo CV/ }))
+    await p.waitForTimeout(400)
+    for (let i = 0; i < STEPS.length; i++) {
+      if (rail) await p.locator('nav button.row', { hasText: STEPS[i] }).first().click().catch(() => {})
+      await p.waitForTimeout(150)
+      await grab(p, where(`blank ${STEPS[i]}`))
+      if (!rail && i < STEPS.length - 1) await tap(p.getByRole('button', { name: /Siguiente/ }))
+    }
+    await p.context().close()
   }
 
   try {
-    for (const theme of ['light', 'dark']) {
-      const p = await open(browser, { viewport: { width: 1440, height: 900 }, colorScheme: theme })
-      await p.addInitScript((t) => localStorage.setItem('keireki-craft:prefs', JSON.stringify({ uiLanguage: 'es', theme: t })), theme)
-      await p.reload({ waitUntil: 'networkidle' }).catch(() => {})
-      await grab(p, `desktop ${theme} welcome`)
-      await startSample(p)
-      for (const name of STEPS) {
-        await step(p, name).catch(() => {})
-        await p.waitForTimeout(200)
-        await grab(p, `desktop ${theme} ${name}`)
-      }
-      await step(p, 'Datos personales').catch(() => {})
-      await p.locator('.photo-drop input[type=file]').setInputFiles(path.join(__dirname, 'fixtures/portrait.jpg')).catch(() => {})
-      await p.waitForSelector('dialog.crop[open]', { timeout: 3000 }).catch(() => {})
-      await p.waitForTimeout(300)
-      await grab(p, `desktop ${theme} photo crop dialog`)
-      await p.keyboard.press('Escape')
-      await p.getByRole('button', { name: /Exportar/ }).first().click().catch(() => {})
-      await p.waitForSelector('dialog[open]', { timeout: 3000 }).catch(() => {})
-      await grab(p, `desktop ${theme} export dialog`)
-      await p.keyboard.press('Escape')
-      await p.getByRole('button', { name: /Preferencias/ }).first().click().catch(() => {})
-      await p.waitForTimeout(250)
-      await grab(p, `desktop ${theme} preferences`)
-      await p.keyboard.press('Escape')
-      await p.getByRole('button', { name: /Importar/ }).first().click().catch(() => {})
-      await p.waitForTimeout(250)
-      await grab(p, `desktop ${theme} import`)
-      await p.getByRole('button', { name: /^Mis CVs/ }).first().click().catch(() => {})
-      await p.waitForTimeout(250)
-      await grab(p, `desktop ${theme} My CVs`)
-      // A blank CV: the empty states of every step.
-      await p.getByRole('button', { name: /Nuevo CV/ }).first().click().catch(() => {})
-      await p.waitForTimeout(400)
-      for (const name of STEPS) {
-        await step(p, name).catch(() => {})
-        await p.waitForTimeout(150)
-        await grab(p, `desktop ${theme} blank ${name}`)
-      }
-      await p.context().close()
-
-      const m = await open(browser, { ...devices['Pixel 7'], colorScheme: theme })
-      await m.addInitScript((t) => localStorage.setItem('keireki-craft:prefs', JSON.stringify({ uiLanguage: 'es', theme: t })), theme)
-      await m.reload({ waitUntil: 'networkidle' }).catch(() => {})
-      await startSample(m)
-      for (let i = 0; i < 9; i++) {
-        await m.waitForTimeout(200)
-        await grab(m, `phone ${theme} step ${i + 1}`)
-        const next = m.getByRole('button', { name: /Siguiente/ }).first()
-        if (!(await next.isVisible().catch(() => false)) || (await next.isDisabled().catch(() => true))) break
-        await next.click().catch(() => {})
-      }
-      await m.getByRole('button', { name: /Menú|Menu|Más/ }).first().click().catch(() => {})
-      await m.waitForTimeout(300)
-      await grab(m, `phone ${theme} menu`)
-      await m.context().close()
-    }
+    for (const profile of PROFILES) for (const theme of profile.themes) await walk(profile, theme)
   } finally {
     await browser.close()
     server.stop()
@@ -156,10 +188,13 @@ const COLLECT = `(() => {
   check('controls', 'nothing sticks out of its box or scrolls sideways', !seen.overflow.size, none(seen.overflow))
   const variants = new Map()
   for (const key of seen.btn.keys()) { const [kind, look] = key.split(' | '); if (!variants.has(kind)) variants.set(kind, new Set()); variants.get(kind).add(look) }
-  const varying = [...variants].filter(([, looks]) => looks.size > 1).map(([kind, looks]) => `${kind}: ${[...looks].join(' / ')}`)
-  check('controls', 'every BaseButton variant looks the same wherever it is', !varying.length, varying.join(' · ') + '')
+  const varying = [...variants].filter(([, looks]) => looks.size > 1).map(([kind, looks]) => `${kind}: ${[...looks].map((look) => `${look} at ${seen.btn.get(`${kind} | ${look}`)[0]}`).join(' / ')}`)
+  check('controls', 'every BaseButton variant looks the same wherever it is', !varying.length, varying.join(' · '))
   check('controls', 'a button is 40 px tall, or 32 for the small one, unless it is a touch-sized call to action', !seen.btnHeight.size, none(seen.btnHeight))
-  check('controls', 'single-line fields are one height and one radius', seen.field.size === 1, [...seen.field].map(([k, w]) => `${k} at ${w[0]}`).join(' · '))
+  const heights = [...seen.field.keys()]
+  check('controls', 'single-line fields are one height and one radius', heights.length === 1, [...seen.field].map(([k, w]) => `${k} at ${w[0]}`).join(' · '))
+  const titles = [...seen.title.keys()]
+  check('titles', 'the title of a view is one size and weight on every view', titles.length === 1, [...seen.title].map(([k, w]) => `${k} at ${w[0]}`).join(' · '))
 
   fs.writeFileSync(path.join(OUT, 'consistency.json'), JSON.stringify({ views, results }, null, 1))
   for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'} [${r.block}] ${r.name}${r.detail ? ' — ' + r.detail : ''}`)
