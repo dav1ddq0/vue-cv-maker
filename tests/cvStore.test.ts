@@ -7,8 +7,16 @@ import type { CVData, CVSummary } from '@/types/cv'
  * history and autosave coordination, not about IndexedDB.
  */
 const saved = new Map<string, CVData>()
+const photos = new Map<string, Blob>()
+let photoVersion = 0
 
 vi.mock('@/services/storage', () => ({
+  savePhoto: async (cvId: string, blob: Blob, previous?: string) => {
+    const key = `photo:${cvId}:${++photoVersion}`
+    photos.set(key, blob)
+    if (previous) photos.delete(previous)
+    return key
+  },
   storage: {
     list: async (): Promise<CVSummary[]> => [],
     load: async (id: string) => saved.get(id)!,
@@ -231,5 +239,65 @@ describe('cv store custom sections (spec 028)', () => {
     expect(cv.data.pageBreaks).toEqual([first, second])
     cv.setPageBreak(second, false)
     expect(cv.data.pageBreaks).toEqual([first])
+  })
+})
+
+describe('an inline photo is stored as a blob (spec 037)', () => {
+  // A 1×1 PNG, as an exported JSON file carries it.
+  const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+  const withPhoto = (photo: string) => {
+    const cv = useCvStore()
+    const incoming: CVData = JSON.parse(JSON.stringify(cv.data))
+    incoming.personal.photo = photo
+    return incoming
+  }
+  const bytes = async (blob: Blob | undefined) => [...new Uint8Array(await blob!.arrayBuffer())]
+  const pngBytes = async () => bytes(await (await fetch(PNG)).blob())
+
+  beforeEach(() => {
+    saved.clear()
+    photos.clear()
+    setActivePinia(createPinia())
+  })
+
+  it('stores the photo of an imported JSON file under the new CV and keeps only its reference', async () => {
+    const cv = useCvStore()
+    await cv.importData(withPhoto(PNG), 'new')
+
+    const reference = cv.data.personal.photo!
+    expect(reference.startsWith(`photo:${cv.data.meta.id}:`)).toBe(true)
+    expect(photos.get(reference)?.type).toBe('image/png')
+    expect(await bytes(photos.get(reference))).toEqual(await pngBytes())
+    expect(saved.get(cv.data.meta.id)?.personal.photo).toBe(reference)
+  })
+
+  it('replaces the open CV photo when importing over it', async () => {
+    const cv = useCvStore()
+    await cv.importData(withPhoto(PNG), 'new')
+    const first = cv.data.personal.photo!
+
+    await cv.importData(withPhoto(PNG), 'current')
+    expect(cv.data.personal.photo).not.toBe(first)
+    expect(photos.has(cv.data.personal.photo!)).toBe(true)
+    expect(photos.has(first)).toBe(false)
+  })
+
+  it('moves the inline photo of a CV stored before the fix when it is opened', async () => {
+    const cv = useCvStore()
+    const old = withPhoto(PNG)
+    saved.set(old.meta.id, old)
+
+    await cv.open(old.meta.id)
+    const reference = cv.data.personal.photo!
+    expect(reference.startsWith('photo:')).toBe(true)
+    expect(saved.get(old.meta.id)?.personal.photo).toBe(reference)
+    expect(await bytes(photos.get(reference))).toEqual(await pngBytes())
+  })
+
+  it('leaves a stored photo reference alone', async () => {
+    const cv = useCvStore()
+    await cv.importData(withPhoto('photo:cv-x:1'), 'new')
+    expect(cv.data.personal.photo).toBe('photo:cv-x:1')
+    expect(photos.size).toBe(0)
   })
 })

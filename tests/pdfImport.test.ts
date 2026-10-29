@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ExtractedDocument, ExtractedLine } from '@/services/pdfImport/extract'
-import { collapseLetterSpacing } from '@/services/pdfImport/extract'
+import { collapseLetterSpacing, joinFragments } from '@/services/pdfImport/extract'
 import { analyze, parseDateRange, titleCaseIfShouting, toPartialIso } from '@/services/pdfImport/heuristics'
 import { assembleCV } from '@/services/pdfImport/assemble'
 
@@ -179,5 +179,34 @@ describe('collapseLetterSpacing', () => {
       { text: 'Analista — Babbage 2020 - 2023' },
     ])
     expect(analyze(spaced).sections.map((s) => s.kind)).toEqual(['experience'])
+  })
+})
+
+describe('joinFragments (spec 037)', () => {
+  /** Fragments laid out left to right at 10 pt: [text, gap before it in em]. */
+  const line = (...parts: [string, number][]) => {
+    let x = 40
+    return parts.map(([text, gap]) => {
+      x += gap * 10
+      const fragment = { x, end: x + text.length * 5, text, fontSize: 10 }
+      x = fragment.end
+      return fragment
+    })
+  }
+
+  it('joins pieces of one word that touch', () => {
+    expect(joinFragments(line(['Ł', 0], ['ucja', 0.02]))).toBe('Łucja')
+    expect(joinFragments(line(['Dvo', 0], ['ř', -0.03], ['ák,', 0.02]))).toBe('Dvořák,')
+    expect(joinFragments(line(['lucja', 0], ['.oster@', 0], ['example', 0], ['.com', 0]))).toBe('lucja.oster@example.com')
+  })
+
+  it('puts a space where there is a word gap', () => {
+    expect(joinFragments(line(['Estudio', 0], ['Nube', 0.17]))).toBe('Estudio Nube')
+    expect(joinFragments(line(['Valencia', 0], ['Estudio Nube', 10]))).toBe('Valencia Estudio Nube')
+  })
+
+  it('reads the fragments left to right whatever order the PDF draws them in', () => {
+    const [first, second] = line(['Ł', 0], ['ucja', 0])
+    expect(joinFragments([second!, first!])).toBe('Łucja')
   })
 })

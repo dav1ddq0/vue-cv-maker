@@ -7,7 +7,8 @@ import { uid } from '@/core/id'
 import { History } from '@/core/history'
 import { debounce } from '@/core/debounce'
 import { migrate, reconcileOrder } from '@/core/migrations'
-import { NotFoundError, storage, StorageQuotaError } from '@/services/storage'
+import { NotFoundError, savePhoto, storage, StorageQuotaError } from '@/services/storage'
+import { dataUrlToBlob } from '@/services/export/json'
 import { readPrefs, writePrefs } from '@/services/prefs'
 
 const AUTOSAVE_MS = 500
@@ -111,8 +112,16 @@ export const useCvStore = defineStore('cv', () => {
 
   async function open(id: string) {
     try {
-      replaceData(await storage.load(id))
+      const loaded = await storage.load(id)
+      // A CV imported before spec 037 was stored with its photo inline; it moves to a blob once.
+      // If that cannot be stored (no space left), the CV still opens as it was.
+      const moved = await storeInlinePhoto(loaded).catch(() => false)
+      replaceData(loaded)
       writePrefs({ lastCvId: id })
+      if (moved) {
+        persist()
+        persist.flush()
+      }
     } catch (error) {
       if (!(error instanceof NotFoundError)) throw error
       await createNew()
@@ -187,6 +196,7 @@ export const useCvStore = defineStore('cv', () => {
 
     if (mode === 'new') {
       merged.meta = { ...merged.meta, id: uid('cv'), createdAt: now, updatedAt: now }
+      await storeInlinePhoto(merged)
       replaceData(merged)
       writePrefs({ lastCvId: merged.meta.id })
       persist()
@@ -200,8 +210,21 @@ export const useCvStore = defineStore('cv', () => {
       createdAt: data.value.meta.createdAt,
       updatedAt: now,
     }
+    await storeInlinePhoto(merged, data.value.personal.photo)
     commitHistory.flush()
     data.value = merged
+  }
+
+  /**
+   * An imported JSON file carries the photo inline, as a data URL. It is stored as a blob like an
+   * uploaded one, so the preview and the thumbnail can show it and the undo snapshots stay small
+   * (spec 037). `previous` is the photo it replaces. Returns whether there was one to store.
+   */
+  async function storeInlinePhoto(next: CVData, previous?: string): Promise<boolean> {
+    const photo = next.personal.photo
+    if (!photo?.startsWith('data:')) return false
+    next.personal.photo = await savePhoto(next.meta.id, await dataUrlToBlob(photo), previous)
+    return true
   }
 
   /* ---- template -------------------------------------------------------- */

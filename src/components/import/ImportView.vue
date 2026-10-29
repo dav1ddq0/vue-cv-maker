@@ -7,6 +7,7 @@ import { useI18n } from '@/i18n'
 import { importJsonFile } from '@/services/export'
 import { UnsupportedSchemaError } from '@/core/migrations'
 import { readPrefs } from '@/services/prefs'
+import { StorageQuotaError } from '@/services/storage'
 import { analyze, extractDocument, type ImportDraft } from '@/services/pdfImport'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
@@ -28,7 +29,11 @@ async function onJson(file: File) {
     ui.goTo('personal')
   } catch (cause) {
     error.value =
-      cause instanceof UnsupportedSchemaError ? t('importView.schemaError') : t('importView.parseError')
+      cause instanceof UnsupportedSchemaError
+        ? t('importView.schemaError')
+        : cause instanceof StorageQuotaError
+          ? t('notices.quota')
+          : t('importView.parseError')
   }
 }
 

@@ -30,6 +30,22 @@ export interface ExtractedDocument {
 /** Fragments whose baselines differ by less than this are the same line. */
 const Y_TOLERANCE = 2.5
 
+/**
+ * A gap wider than this share of the font size between two fragments of a line is a word space.
+ * Measured on the app's own PDFs (spec 037): fragments that touch (a letter from another font
+ * file, an e-mail split at its break points) sit within ±0.03 em; word spaces are 0.17 em or more.
+ */
+const WORD_GAP = 0.1
+
+/** A positioned piece of a line, as pdf.js hands it back. */
+export interface TextFragment {
+  x: number
+  /** Where the fragment's last glyph ends. */
+  end: number
+  text: string
+  fontSize: number
+}
+
 export async function extractDocument(file: File | ArrayBuffer): Promise<ExtractedDocument> {
   const source = file instanceof File ? await file.arrayBuffer() : file
   // A user's PDF is untrusted input: no eval-compiled font code, even where a CSP would allow it (spec 034).
@@ -63,30 +79,50 @@ export async function extractDocument(file: File | ArrayBuffer): Promise<Extract
  * screen (spec §7.2, stage 3) is not optional.
  */
 function groupIntoLines(items: TextItem[], page: number): ExtractedLine[] {
-  const buckets: ExtractedLine[] = []
+  const buckets: (Omit<ExtractedLine, 'text'> & { fragments: TextFragment[] })[] = []
 
   for (const item of items) {
     if (!('str' in item) || !item.str.trim()) continue
     const [, , , scaleY, x, y] = item.transform as number[]
     const fontSize = Math.abs(scaleY) || 0
     const fontName = String(item.fontName ?? '')
+    const fragment = { x, end: x + (item.width || 0), text: item.str, fontSize }
 
     const existing = buckets.find((line) => Math.abs(line.y - y) <= Y_TOLERANCE)
     if (existing) {
-      existing.text += needsSpace(existing.text, item.str) ? ` ${item.str}` : item.str
+      existing.fragments.push(fragment)
       existing.fontSize = Math.max(existing.fontSize, fontSize)
       existing.x = Math.min(existing.x, x)
       existing.bold ||= isBold(fontName)
     } else {
-      buckets.push({ page, y, x, text: item.str, fontSize, fontName, bold: isBold(fontName) })
+      buckets.push({ page, y, x, fragments: [fragment], fontSize, fontName, bold: isBold(fontName) })
     }
   }
 
   return buckets
     // PDF y grows upward: descending y is top-to-bottom reading order.
     .sort((a, b) => b.y - a.y || a.x - b.x)
-    .map((line) => ({ ...line, text: collapseLetterSpacing(line.text.replace(/\s+/g, ' ').trim()) }))
+    .map(({ fragments, ...line }) => ({
+      ...line,
+      text: collapseLetterSpacing(joinFragments(fragments).replace(/\s+/g, ' ').trim()),
+    }))
     .filter((line) => line.text.length > 0)
+}
+
+/**
+ * Joins a line's fragments left to right, with a space only where there is a gap between two.
+ * A PDF draws a word in several pieces when part of it comes from another font file (a "Ł",
+ * an "ř") or when it was laid out with break points (an e-mail address); those pieces touch.
+ */
+export function joinFragments(fragments: TextFragment[]): string {
+  let text = ''
+  let end = -Infinity
+  for (const fragment of [...fragments].sort((a, b) => a.x - b.x)) {
+    if (text && fragment.x - end > WORD_GAP * fragment.fontSize) text += ' '
+    text += fragment.text
+    end = Math.max(end, fragment.end)
+  }
+  return text
 }
 
 /**
@@ -119,10 +155,6 @@ export function collapseLetterSpacing(text: string): string {
   flush()
 
   return out.join(' ').replace(/\s+/g, ' ').trim()
-}
-
-function needsSpace(left: string, right: string): boolean {
-  return !/\s$/.test(left) && !/^\s/.test(right) && !/[-/(]$/.test(left)
 }
 
 function isBold(fontName: string): boolean {
