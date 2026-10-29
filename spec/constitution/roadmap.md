@@ -52,6 +52,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **039** · The app is called Keireki Craft (name, `KC` mark, storage and preferences migrated from the old name)
 - **040** · PDF import recovers more of the CV (columns read in order, entries from several cells, skills and languages as templates lay them out; 24 → 104 of 104 on the round trip)
 - **041** · The page no longer rearranges while a PDF is built (paged.js's copy of the CSS came after the original and won the ties)
+- **042** · Vue best-practices pass over the latest components (the startup notice and the month-date rules out of the root and the field)
 
 ## Next 🔜
 

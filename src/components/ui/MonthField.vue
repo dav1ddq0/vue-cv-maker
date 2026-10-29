@@ -6,6 +6,7 @@
  * (which PDF import produces) shows up instead of reading as empty.
  */
 import { computed, ref, watch } from 'vue'
+import { joinMonth, splitMonth } from '@/core/monthDate'
 import { useI18n } from '@/i18n'
 
 const props = defineProps<{ id?: string; label: string; disabled?: boolean }>()
@@ -13,25 +14,18 @@ const model = defineModel<string>({ required: true })
 
 const { t, locale } = useI18n()
 
-const split = (value: string) => {
-  const match = /^(\d{4})(?:-(\d{2}))?$/.exec(value)
-  return { year: match?.[1] ?? '', month: match?.[2] ?? '' }
-}
+const year = ref(splitMonth(model.value).year)
+const month = ref(splitMonth(model.value).month)
 
-const year = ref(split(model.value).year)
-const month = ref(split(model.value).month)
-
-const MIN_YEAR = 1900
-const MAX_YEAR = 2100
-const plausible = (year: string) => /^\d{4}$/.test(year) && Number(year) >= MIN_YEAR && Number(year) <= MAX_YEAR
-
-const value = computed(() => (plausible(year.value) ? (month.value ? `${year.value}-${month.value}` : year.value) : ''))
+const value = computed(() => joinMonth(year.value, month.value))
 
 // Follows the model when it changes from outside (undo, import), but not while a half-typed value
 // (a month with no year yet) produces the same stored value.
 watch(model, (next) => {
   if (next === value.value) return
-  ;({ year: year.value, month: month.value } = split(next))
+  const parts = splitMonth(next)
+  year.value = parts.year
+  month.value = parts.month
 })
 
 // One path for both controls: whatever changed them, the stored value follows.

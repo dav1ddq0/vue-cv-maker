@@ -10,7 +10,7 @@ import PreviewPane from '@/components/preview/PreviewPane.vue'
 import DocumentList from '@/components/documents/DocumentList.vue'
 import WelcomeView from '@/components/documents/WelcomeView.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import StartupFailed from '@/components/StartupFailed.vue'
 import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import StepRail from '@/components/form/StepRail.vue'
 import { shortcutFor } from '@/core/shortcuts'
@@ -25,7 +25,7 @@ const isDesktop = useIsDesktop()
 // someone actually opens it, so the editor's first paint never pays for it.
 const ImportView = defineAsyncComponent(() => import('@/components/import/ImportView.vue'))
 
-/** The stored CVs could not be opened (or brought over from the app's old name, spec 039): say so, never an empty app. */
+/** The stored CVs could not be opened: the root only decides whether to say so. */
 const startupFailed = ref(false)
 
 onMounted(async () => {
@@ -94,10 +94,7 @@ function onKeydown(event: KeyboardEvent) {
       </NoticeBar>
     </div>
 
-    <main v-if="startupFailed" class="scroll-view startup-failed">
-      <NoticeBar tone="warning">{{ t('notices.startupFailed') }}</NoticeBar>
-      <BaseButton variant="primary" @click="reload">{{ t('notices.reload') }}</BaseButton>
-    </main>
+    <StartupFailed v-if="startupFailed" @reload="reload" />
 
     <main
       v-else-if="ui.view === 'editor'"
@@ -131,14 +128,6 @@ function onKeydown(event: KeyboardEvent) {
   flex-direction: column;
   height: 100%;
   min-height: 0;
-}
-
-.startup-failed {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1em;
-  padding: 1em;
 }
 
 .notices {
