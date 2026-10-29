@@ -37,7 +37,7 @@ describe.each(templates)('$name renders', (definition) => {
     const flagged = wrapper.findAll('[data-page-break]').map((el) => el.attributes('data-section'))
     expect(flagged).toContain('education')
     // These templates put languages in a sidebar, aside or block row; a break there would push the main column.
-    const twoColumn = ['aurora', 'banner', 'chevron', 'facet', 'frame', 'harbor', 'meridian', 'modern']
+    const twoColumn = ['aurora', 'banner', 'chevron', 'cobalt', 'facet', 'frame', 'harbor', 'meridian', 'modern']
     expect(flagged.includes('languages')).toBe(!twoColumn.includes(definition.id))
   })
 

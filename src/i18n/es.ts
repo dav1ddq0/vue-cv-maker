@@ -275,6 +275,10 @@ export default {
       description:
         'Serif a una columna con cabecera centrada y filetes finos. El peso lo lleva la tipografía, no el color.',
     },
+    cobalt: {
+      description:
+        'Cabecera de color con foto redonda, barra lateral pálida para contacto, competencias e idiomas, y la trayectoria a la derecha.',
+    },
     aurora: {
       description:
         'Dos columnas con barra lateral en tinte suave. Admite foto y se lee bien con cualquier acento.',

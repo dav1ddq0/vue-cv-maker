@@ -274,6 +274,10 @@ const en: typeof es = {
       description:
         'Serif single column with a centered masthead and hairline rules. The typography carries the weight, not the color.',
     },
+    cobalt: {
+      description:
+        'Colored header band with a round photo, a pale sidebar for contact, skills and languages, and the career on the right.',
+    },
     aurora: {
       description:
         'Two columns with a softly tinted sidebar. Supports a photo and stays readable with any accent.',
