@@ -149,6 +149,8 @@ function onKeydown(event: KeyboardEvent) {
 
 .level:disabled {
   color: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
+  /* Chromium also dims a disabled <select> to 0.7, which took it to ~27 % instead of M3's 38 %. */
+  opacity: 1;
 }
 
 .add {
