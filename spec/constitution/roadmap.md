@@ -53,7 +53,8 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **040** · PDF import recovers more of the CV (columns read in order, entries from several cells, skills and languages as templates lay them out; 24 → 104 of 104 on the round trip)
 - **041** · The page no longer rearranges while a PDF is built (paged.js's copy of the CSS came after the original and won the ties)
 - **042** · Vue best-practices pass over the latest components (the startup notice and the month-date rules out of the root and the field)
-- **043** · Design consistency (in progress): the interface uses the type scale, one button style, the weights and elevations of the tokens
+- **043** · Design consistency: the interface uses the type scale, one button style, the weights and elevations of the tokens, and `qa:consistency` keeps it so
+- **044** · A slider that looks like the rest of the app (the style step's two range inputs)
 
 ## Next 🔜
 

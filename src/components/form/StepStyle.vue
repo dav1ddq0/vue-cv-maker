@@ -5,6 +5,7 @@ import { useI18n } from '@/i18n'
 import { useCapabilities } from '@/composables/useCapabilities'
 import { applyTemplateDefaults, templates } from '@/templates/registry'
 import BaseField from '@/components/ui/BaseField.vue'
+import RangeSlider from '@/components/ui/RangeSlider.vue'
 import TemplateGallery from './TemplateGallery.vue'
 import StylePreviewStrip from './StylePreviewStrip.vue'
 import { useIsPhone } from '@/composables/useIsPhone'
@@ -102,21 +103,14 @@ function previewAccent(id: string): string {
         </BaseField>
 
         <BaseField v-slot="{ id }" :label="`${t('style.fontScale')} · ${style.fontScale.toFixed(2)}×`">
-          <input :id="id" v-model.number="style.fontScale" type="range" min="0.85" max="1.15" step="0.01" />
+          <RangeSlider :id="id" v-model="style.fontScale" :min="0.85" :max="1.15" :step="0.01" />
         </BaseField>
 
         <BaseField
           v-slot="{ id }"
           :label="`${t('style.spacingScale')} · ${style.spacingScale.toFixed(2)}×`"
         >
-          <input
-            :id="id"
-            v-model.number="style.spacingScale"
-            type="range"
-            min="0.85"
-            max="1.3"
-            step="0.01"
-          />
+          <RangeSlider :id="id" v-model="style.spacingScale" :min="0.85" :max="1.3" :step="0.01" />
         </BaseField>
 
         <BaseField v-slot="{ id }" :label="t('style.pageMargin')">
