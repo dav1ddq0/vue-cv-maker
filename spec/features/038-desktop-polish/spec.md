@@ -26,7 +26,11 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
      warning.
    - Highlights (`TagInput`) become rows with a divider, like the skills in `SkillItemsEditor`,
      instead of outlined chips.
-3. **Rounder chrome.** The smaller radii of the app chrome go from 8 px (`--shape-sm`) to 12 px
+3. **Rounder everywhere.** After comparing 12, 16 and 20 px on desktop and a Pixel 7 profile, the
+   tokens go up: `--shape-md` 12 → 16 px and `--shape-lg` 16 → 20 px (`--radius` follows
+   `--shape-md`). Fields, cards, dialogs and sheets all follow. 20 px on a 56 px field starts to
+   read as a pill.
+   **Rounder chrome (before that).** The smaller radii of the app chrome go from 8 px (`--shape-sm`) to 12 px
    (`--shape-md`): the header select and document title, the preferences action, the entry card
    header, the PDF review select, the export side warning, the crop dialog's secondary button, the
    template thumbnails and the preview toolbar chip. The logo mark, the `kbd` hint, the crop frame
