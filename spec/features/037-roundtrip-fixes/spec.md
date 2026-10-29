@@ -35,7 +35,8 @@ were right; uploading them again showed three defects.
 
 1. [x] After a JSON import, the photo shows in the preview and the thumbnail, and is stored as a blob.
 2. [x] A CV stored with an inline photo has it moved to a blob when opened.
-3. [x] Re-importing a downloaded PDF keeps the name and e-mail whole, in all 13 templates.
+3. [x] Re-importing a downloaded PDF keeps the e-mail whole in all 13 templates, and the name in 12
+   (Monograph's letter-spaced name is the exception, see "Not covered").
 4. [x] `slugify('Łucja Øster-Ñúñez')` is `lucja-oster-nunez`.
 5. [x] The round trip is a QA script, `npm run qa:roundtrip` (also part of `npm run qa`). It exits
    non-zero on any failed check.
