@@ -12,6 +12,7 @@ import { stepStatus } from '@/core/stepStatus'
 import { useCvExport, type ExportKind } from '@/composables/useCvExport'
 import { printTitle } from '@/services/export'
 import { useSideColumnFit } from '@/composables/useSideColumnFit'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ close: [] }>()
@@ -93,7 +94,7 @@ function printInstead() {
     <p v-if="kind === 'pdfFile' && systemFont" class="note">{{ t('exportView.systemFontNote', { font: systemFont }) }}</p>
     <div v-if="failed === 'pdfFile'" class="failed" role="alert">
       <p class="failed-text">{{ t('exportView.pdfFileFailed') }}</p>
-      <button type="button" class="secondary" @click="printInstead">{{ t('exportView.printInstead') }}</button>
+      <BaseButton variant="secondary" @click="printInstead">{{ t('exportView.printInstead') }}</BaseButton>
     </div>
 
     <section class="check" :aria-label="t('exportDialog.checkTitle')">
@@ -108,10 +109,10 @@ function printInstead() {
     </section>
 
     <footer class="foot">
-      <button type="button" class="secondary" @click="dialog?.close()">{{ t('actions.cancel') }}</button>
-      <button type="button" class="primary" :disabled="busy !== null" @click="confirm">
+      <BaseButton variant="secondary" @click="dialog?.close()">{{ t('actions.cancel') }}</BaseButton>
+      <BaseButton variant="primary" :disabled="busy !== null" @click="confirm">
         {{ busy ? t('exportView.preparing') : action }}
-      </button>
+      </BaseButton>
     </footer>
   </dialog>
 </template>
@@ -256,33 +257,6 @@ function printInstead() {
   display: flex;
   justify-content: flex-end;
   gap: 0.6em;
-}
-
-.secondary,
-.primary {
-  min-height: 42px;
-  padding: 0 1.1em;
-  border-radius: var(--shape-md);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.secondary {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-}
-
-.primary {
-  border: 0;
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-.primary:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 
 .failed {

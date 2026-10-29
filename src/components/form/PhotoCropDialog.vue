@@ -9,6 +9,7 @@ import { useI18n } from '@/i18n'
 import { useModalDialog } from '@/composables/useModalDialog'
 import { clampOffset, clampZoom, cropRect, ZOOM_MAX, ZOOM_MIN, type Offset } from '@/core/photoCrop'
 import { decodePhoto, drawCrop, encodeCrop, rotate, sizeOf, type CropSource } from '@/services/photoCrop'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
 /** The photo to frame; the dialog is open while it is set. */
 const props = defineProps<{ photo: Blob | null }>()
@@ -195,17 +196,17 @@ function onClose() {
         :disabled="!source"
         @input="setZoom(Number(($event.target as HTMLInputElement).value))"
       />
-      <button type="button" class="secondary" :disabled="!source" @click="rotateQuarter">
+      <BaseButton variant="secondary" :disabled="!source" @click="rotateQuarter">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" /></svg>
         {{ t('personal.crop.rotate') }}
-      </button>
+      </BaseButton>
     </div>
 
     <footer class="foot">
-      <button type="button" class="secondary" @click="dialog?.close()">{{ t('actions.cancel') }}</button>
-      <button type="button" class="primary" :disabled="!source || busy" @click="confirm">
+      <BaseButton variant="secondary" @click="dialog?.close()">{{ t('actions.cancel') }}</BaseButton>
+      <BaseButton variant="primary" :disabled="!source || busy" @click="confirm">
         {{ t('personal.crop.use') }}
-      </button>
+      </BaseButton>
     </footer>
   </dialog>
 </template>
@@ -307,35 +308,5 @@ function onClose() {
   display: flex;
   justify-content: flex-end;
   gap: 0.6em;
-}
-
-.primary,
-.secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  min-height: 40px;
-  padding: 0 1em;
-  border-radius: var(--shape-md);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.primary {
-  border: 0;
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-.secondary {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-}
-
-.primary:disabled,
-.secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

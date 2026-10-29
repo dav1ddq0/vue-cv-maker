@@ -158,6 +158,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 .remove {
+  font-size: var(--size-14);
   color: var(--md-on-surface-variant);
 }
 

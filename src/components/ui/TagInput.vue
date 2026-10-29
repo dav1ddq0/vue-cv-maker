@@ -74,6 +74,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 .remove {
+  font-size: var(--size-14);
   flex: none;
   color: var(--md-on-surface-variant);
 }

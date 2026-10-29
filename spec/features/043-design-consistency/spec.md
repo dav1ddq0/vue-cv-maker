@@ -15,9 +15,13 @@ the scale. These were not, and are fixed one phase at a time, each its own commi
    36), the nearest to what it rendered; the base of the page is 14 px (M3 body medium). An
    unrecognisable `1em` stays: it inherits. A test fails on any `font-size` in the interface that is
    not a token, so the scale does not erode again.
-2. **Buttons** (phase 3): the primary and secondary buttons of the export dialog are a style of their
-   own (42 px, radius 16, 15 px, weight 600) next to the page's `.btn` (40 px, pill, 14 px, weight 500);
-   `.remove` is 15 or 16 px; `.action` means two things.
+2. **Buttons** (phase 3): the primary and secondary buttons of the export dialog were a style of their
+   own (42 px, radius 16, weight 600), and the photo crop dialog had another (40 px, radius 16,
+   weight 600), next to the page's `.btn` (40 px, pill, weight 500). Both dialogs now use `BaseButton`
+   (primary, secondary), with its disabled state, and their own button CSS is gone. The remove icons
+   of the highlights and the skills were 14 or 16 px by what they inherited and are 14 px. `.action`
+   of the preferences and `.action` of the phone dock only share a name (a compact action and a 56 px
+   bar), and stay.
 3. **Weights** (phase 4): 550 and 650 next to 400/500/600/700.
 4. **Elevation** (phase 5): loose shadows next to `--elevation-1…3`.
 5. **The accent colour picker** (phase 7): a native `<input type="color">` with the browser's grey.
