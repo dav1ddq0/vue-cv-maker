@@ -320,3 +320,118 @@ describe('entries, skills and languages as the templates lay them out (spec 040)
     expect(pairs(assemble(lines('Español (Nativo) · Inglés (C1) · Francés (B1)')))).toEqual([['Español', 'Nativo'], ['Inglés', 'C1'], ['Francés', 'B1']])
   })
 })
+
+describe('a heading that opens a page (spec 040)', () => {
+  it('is set apart by the page break: its lines are not read as part of the section before it', () => {
+    const lines = [
+      { text: 'Ada Lovelace', fontSize: 20, y: 800 },
+      { text: 'IDIOMAS', y: 760 },
+      { text: 'Inglés (C1)', y: 746 },
+      { text: 'CHARLAS', page: 2, y: 800 },
+      { text: 'Una charla sobre máquinas', page: 2, y: 786 },
+    ]
+    const draft = analyze(doc(lines))
+    expect(draft.sections.find((s) => s.kind === 'languages')!.lines.map((l) => l.text)).toEqual(['Inglés (C1)'])
+    expect(draft.unclassified.find((b) => b.heading === 'CHARLAS')!.lines).toEqual(['Una charla sobre máquinas'])
+  })
+})
+
+describe('the place beside the contact details (spec 040)', () => {
+  it('is found next to the e-mail when the header lines are somewhere else', () => {
+    const at = (text: string, y: number, fontSize = 10) => ({ text, y, fontSize })
+    const draft = analyze(
+      doc([
+        at('Ada Lovelace', 800, 22),
+        at('RESUMEN', 760, 9),
+        at('Analista de sistemas.', 746),
+        at('CONTACTO', 700, 9),
+        at('ada@example.com', 686),
+        at('+34 600 123 456', 672),
+        at('Londres, Reino Unido', 658),
+      ]),
+    )
+    expect(draft.location.value).toBe('Londres, Reino Unido')
+  })
+})
+
+describe('layouts that put an entry together from several cells (spec 040)', () => {
+  const at = (text: string, x: number, y: number, fontSize = 10, extra: Partial<ExtractedLine> = {}) => ({ text, x, y, fontSize, end: x + 200, ...extra })
+  const assemble = (lines: Array<Partial<ExtractedLine> & { text: string }>) => assembleCV(analyze(doc(lines)))
+
+  it('joins a date set in its own cell on the title row, and takes the smaller line below as company and place', () => {
+    const cv = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('EXPERIENCIA', 40, 760, 9),
+      at('Analista', 40, 740, 10.2),
+      at('mar 2022 – Actualidad', 400, 740, 8.2),
+      at('Babbage Co · Londres', 40, 726, 8.8),
+      at('Escribió el primer programa.', 40, 708),
+      at('Programador', 40, 680, 10.2),
+      at('sep 2019 – feb 2022', 400, 680, 8.2),
+      at('Otra Co', 40, 666, 8.8),
+      at('Tradujo notas sobre la máquina.', 40, 648),
+    ])
+    expect(cv.experience.map((e) => [e.position, e.company, e.location, e.startDate])).toEqual([
+      ['Analista', 'Babbage Co', 'Londres', '2022-03'],
+      ['Programador', 'Otra Co', '', '2019-09'],
+    ])
+  })
+
+  it('puts a degree\'s institution from the smaller line under it', () => {
+    const cv = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('FORMACIÓN', 40, 760, 9),
+      at('Grado en Matemáticas', 40, 740, 10.2),
+      at('2010 - 2014', 400, 740, 8.2),
+      at('Universidad de Londres', 40, 726, 8.8),
+    ])
+    expect(cv.education[0]).toMatchObject({ degree: 'Grado en Matemáticas', institution: 'Universidad de Londres', startDate: '2010' })
+  })
+
+  it('pairs labels in one column with their rows of items in another, whichever sits a line higher', () => {
+    const labelFirst = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('COMPETENCIAS', 40, 760, 9),
+      at('Lenguajes', 40, 740, 8.3),
+      at('TypeScript · Go', 170, 740, 9.6),
+      at('Frontend', 40, 722, 8.3),
+      at('Vue 3 · React', 170, 722, 9.6),
+    ])
+    const valueFirst = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('COMPETENCIAS', 40, 760, 9),
+      at('TypeScript · Go', 170, 750, 10.5),
+      at('Lenguajes', 40, 740, 10.5),
+      at('Vue 3 · React', 170, 732, 10.5),
+      at('Frontend', 40, 722, 10.5),
+    ])
+    for (const cv of [labelFirst, valueFirst]) {
+      expect(cv.skills.map((g) => [g.category, g.items.map((i) => i.name)])).toEqual([['Lenguajes', ['TypeScript', 'Go']], ['Frontend', ['Vue 3', 'React']]])
+    }
+  })
+
+  it('joins a skill list that wraps onto a lower-case line into one item', () => {
+    const cv = assemble([at('Ada Lovelace', 40, 800, 22), at('COMPETENCIAS', 40, 760, 9), at('Vue 3, React, Vite, CSS', 40, 740), at('moderno', 40, 726), at('FastAPI, Redis,', 40, 712), at('Docker', 40, 698)])
+    expect(cv.skills[0]!.items.map((i) => i.name)).toEqual(['Vue 3', 'React', 'Vite', 'CSS moderno', 'FastAPI', 'Redis', 'Docker'])
+  })
+})
+
+describe('capitals that are not headings (spec 040)', () => {
+  it('keeps uppercase skills inside their section when the headings of the CV are not set in capitals', () => {
+    const at = (text: string, y: number, fontSize = 10) => ({ text, y, fontSize })
+    const draft = analyze(
+      doc([
+        at('Ada Lovelace', 800, 25),
+        at('Profile', 760, 15),
+        at('Mathematician.', 744),
+        at('Skills', 700, 15),
+        at('ALGORITHM DESIGN', 660),
+        at('AGILE METHODOLOGIES', 620),
+        at('DISTRIBUTED SYSTEMS', 580),
+      ]),
+    )
+    expect(draft.sections.map((s) => s.kind)).toEqual(['summary', 'skills'])
+    expect(draft.sections[1]!.lines.map((l) => l.text)).toEqual(['ALGORITHM DESIGN', 'AGILE METHODOLOGIES', 'DISTRIBUTED SYSTEMS'])
+    expect(draft.unclassified).toEqual([])
+  })
+})

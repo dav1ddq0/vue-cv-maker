@@ -67,7 +67,8 @@ export function analyze(doc: ExtractedDocument): ImportDraft {
   const links = findLinks(lines)
   const name = describeName(lines, nameIndex, headerLines)
   const headline = findHeadline(headerLines, name.value)
-  const location = findLocation(headerLines, email.value, phone.value)
+  // The place is in the header or, when the contact details sit in a column of their own, beside them.
+  const location = findLocation([...headerLines, ...nearContact(lines, email.value, phone.value)], email.value, phone.value)
 
   const warnings: ImportDraft['warnings'] = []
   if (doc.looksMultiColumn) warnings.push('multiColumn')
@@ -105,16 +106,21 @@ interface HeadingHit {
 
 /**
  * A section header is rarely identifiable by one signal alone, so several are
- * combined: a known keyword, above-average font size, bold weight, ALL CAPS and
- * a gap above wider than the usual line spacing. A keyword match alone is
- * enough; otherwise two of the others plus a short-line shape are required.
+ * combined. A known keyword is enough on its own. A heading of a section the app
+ * does not know ("CHARLAS") is found by what it has in common with the ones it
+ * does know: it is set in capitals like them, in their type size, and is larger
+ * than the text or set apart from it. Without that, every acronym in a list of
+ * skills would split the section it sits in (spec 040).
  */
 function findHeadings(lines: ExtractedLine[], skipIndex: number): HeadingHit[] {
   if (!lines.length) return []
   const sizes = lines.map((l) => l.fontSize).filter(Boolean)
   const averageSize = sizes.reduce((a, b) => a + b, 0) / (sizes.length || 1)
+  const usualGap = lineSpacing(lines)
 
-  const usualGap = medianLineGap(lines)
+  // Capitals of a word, not a level ("C1") or an acronym ("SQL") in a list.
+  const isUpper = (text: string) => text === text.toUpperCase() && /(?:\p{Lu}[^\p{L}]*){4,}/u.test(text) && !/\d/.test(text)
+  const isShort = (text: string) => text.trim().split(/\s+/).length <= 4
 
   const hits: HeadingHit[] = []
   lines.forEach((line, index) => {
@@ -123,36 +129,51 @@ function findHeadings(lines: ExtractedLine[], skipIndex: number): HeadingHit[] {
     if (!normalized || normalized.length > 40) return
 
     const keyword = SECTION_KEYWORDS.find((entry) => entry.words.includes(normalized))
-    const larger = line.fontSize > averageSize * 1.08
-    const isShort = line.text.trim().split(/\s+/).length <= 4
-    const upper = line.text === line.text.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(line.text)
-
     if (keyword) {
       hits.push({ index, kind: keyword.kind, text: line.text.trim() })
       return
     }
     // Tracked-out capitals arrive in pieces; run together they may still name a section.
-    const squashedKind = upper ? sectionKindOfSquashed(line.text) : null
-    if (squashedKind) {
-      hits.push({ index, kind: squashedKind, text: line.text.replace(/\s+/g, '') })
-      return
-    }
-    // An unrecognized but clearly styled heading still splits the document; its
-    // content lands in the unclassified panel for the user to place.
-    const previous = lines[index - 1]
-    const spaced = !!previous && previous.page === line.page && previous.y - line.y > usualGap * SPACED_GAP
-    const signals = [larger, line.bold, upper, spaced].filter(Boolean).length
-    if (isShort && signals >= 2) hits.push({ index, kind: null, text: line.text.trim() })
+    const squashedKind = isUpper(line.text) ? sectionKindOfSquashed(line.text) : null
+    if (squashedKind) hits.push({ index, kind: squashedKind, text: line.text.replace(/\s+/g, '') })
   })
 
-  return hits
+  // What the known headings have in common.
+  const known = hits.map((hit) => lines[hit.index]!)
+  const knownSize = median(known.map((line) => line.fontSize))
+  const knownUpper = known.filter((line) => isUpper(line.text.replace(/\s+/g, ' '))).length * 2 >= known.length
+  const unknown: HeadingHit[] = []
+  lines.forEach((line, index) => {
+    if (index === skipIndex || hits.some((hit) => hit.index === index)) return
+    if (!isShort(line.text) || !isUpper(line.text) || normalizeHeading(line.text).length > 40) return
+    const previous = lines[index - 1]
+    // A page break sets a line apart as much as any gap does.
+    const gap = !previous ? 0 : previous.page === line.page ? previous.y - line.y : Infinity
+    const apart = line.fontSize > averageSize * 1.08 || gap > usualGap * SPACED_GAP
+    const alike = !known.length || (knownUpper && Math.abs(line.fontSize - knownSize) <= knownSize * HEADING_SIZE_MATCH)
+    if (apart && alike) unknown.push({ index, kind: null, text: line.text.trim() })
+  })
+
+  return [...hits, ...unknown].sort((a, b) => a.index - b.index)
+}
+
+/** An unknown heading is set within this share of the type size of the known ones. */
+const HEADING_SIZE_MATCH = 0.06
+
+function median(values: number[]): number {
+  const sorted = values.filter(Boolean).sort((a, b) => a - b)
+  return sorted[Math.floor(sorted.length / 2)] ?? 0
 }
 
 /** A gap above a line this many times the usual spacing sets it apart, as a heading is (spec 040). */
-const SPACED_GAP = 1.3
+const SPACED_GAP = 1.35
 
-/** The usual distance between consecutive lines of a page: the median of the positive ones. */
-function medianLineGap(lines: ExtractedLine[]): number {
+/**
+ * The spacing of lines within a paragraph or list: the lower quartile of the positive distances
+ * between consecutive lines of a page. The median would be the spacing between entries, as often as
+ * not, and then no heading is "set apart" from them.
+ */
+function lineSpacing(lines: ExtractedLine[]): number {
   const gaps: number[] = []
   for (let i = 1; i < lines.length; i++) {
     const gap = lines[i - 1]!.y - lines[i]!.y
@@ -160,7 +181,7 @@ function medianLineGap(lines: ExtractedLine[]): number {
   }
   if (!gaps.length) return Infinity
   gaps.sort((a, b) => a - b)
-  return gaps[Math.floor(gaps.length / 2)]!
+  return gaps[Math.floor(gaps.length / 4)]!
 }
 
 function sliceSections(lines: ExtractedLine[], headings: HeadingHit[]): DetectedSection[] {
@@ -173,6 +194,14 @@ function sliceSections(lines: ExtractedLine[], headings: HeadingHit[]): Detected
   })
   return sections
 }
+
+/** The lines within a few of the e-mail or phone line: a contact block lists the place beside them. */
+function nearContact(lines: ExtractedLine[], email: string, phone: string): ExtractedLine[] {
+  const at = lines.flatMap((line, index) => ((email && line.text.includes(email)) || (phone && line.text.includes(phone)) ? [index] : []))
+  return lines.filter((_, index) => at.some((contact) => Math.abs(contact - index) <= CONTACT_REACH))
+}
+
+const CONTACT_REACH = 3
 
 /* ---- direct fields ----------------------------------------------------- */
 

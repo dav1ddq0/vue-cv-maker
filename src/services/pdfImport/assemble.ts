@@ -86,11 +86,13 @@ function parseExperience(section: DetectedSection) {
     applyRange(entry, chunk)
 
     if (chunk.subtitle) {
-      // "Position" over "Company · dates · Place" (spec 040).
-      const [company, ...place] = splitMeta(chunk.subtitle)
-      entry.position = chunk.title
-      entry.company = company ?? ''
-      if (place.length) entry.location = place.join(', ')
+      // "Position" over "Company · dates · Place", or over a smaller line (spec 040).
+      const [position, company] = splitTitleLine(chunk.title, false)
+      const [who, ...place] = splitMeta(chunk.subtitle)
+      entry.position = position
+      entry.company = company || who || ''
+      const where = company ? [who, ...place] : place
+      if (where.length) entry.location = where.join(', ')
     } else {
       const [position, company] = splitTitleLine(chunk.title)
       entry.position = position
@@ -109,10 +111,12 @@ function parseEducation(section: DetectedSection) {
     const entry = createEducation()
     applyRange(entry, chunk)
     if (chunk.subtitle) {
-      const [institution, ...place] = splitMeta(chunk.subtitle)
-      entry.degree = chunk.title
-      entry.institution = institution ?? ''
-      if (place.length) entry.location = place.join(', ')
+      const [degree, institution] = splitTitleLine(chunk.title, false)
+      const [who, ...place] = splitMeta(chunk.subtitle)
+      entry.degree = degree
+      entry.institution = institution || who || ''
+      const where = institution ? [who, ...place] : place
+      if (where.length) entry.location = where.join(', ')
     } else {
       // "Grado en Informática" is one degree: only a symbol or a comma separates the institution.
       const [degree, institution] = splitTitleLine(chunk.title, false)
@@ -172,11 +176,15 @@ function splitMeta(text: string): string[] {
 
 /** "Lenguajes: TypeScript, Go" becomes a group; a category line over its items too (spec 040). */
 function parseSkills(section: DetectedSection) {
+  const labelled = pairLabelColumn(section.lines)
+  if (labelled) return labelled
+
   const groups = []
   const loose: string[] = []
   let current: ReturnType<typeof createSkillGroup> | null = null
+  const lines = mergeWrapped(section.lines)
 
-  section.lines.forEach((line, index) => {
+  lines.forEach((line, index) => {
     const text = stripBullet(line.text)
     const match = text.match(/^([^:]{2,40}):\s*(.+)$/)
     if (match) {
@@ -190,7 +198,7 @@ function parseSkills(section: DetectedSection) {
     if (!text) return
 
     // A category is set a little smaller than the items under it, and has no list of its own.
-    const next = section.lines[index + 1]
+    const next = lines[index + 1]
     if (next && next.fontSize > line.fontSize * CATEGORY_SIZE && !/[,;·•|]/.test(text) && text.split(/\s+/).length <= 4) {
       current = createSkillGroup()
       current.category = text
@@ -209,6 +217,47 @@ function parseSkills(section: DetectedSection) {
   }
   return groups.filter((group) => group.items.length || group.category)
 }
+
+/**
+ * A list that wraps continues on a line that starts in lower case after one that does not end in a
+ * separator ("CSS" over "moderno"): it is the same item.
+ */
+function mergeWrapped(lines: ExtractedLine[]): ExtractedLine[] {
+  const merged: ExtractedLine[] = []
+  for (const line of lines) {
+    const previous = merged.at(-1)
+    if (previous && /^\p{Ll}/u.test(line.text.trim()) && !/[,;·•|:]$/.test(previous.text.trim())) {
+      merged[merged.length - 1] = { ...previous, text: `${previous.text.trim()} ${line.text.trim()}` }
+    } else merged.push(line)
+  }
+  return merged
+}
+
+/**
+ * Labels in a column of their own and their items in another, row by row ("Lenguajes" beside
+ * "TypeScript · Go"): the two columns are the same length, and the n-th label goes with the n-th
+ * row of items, whichever of the two sits a line higher (spec 040).
+ */
+function pairLabelColumn(lines: ExtractedLine[]) {
+  const left = Math.min(...lines.map((line) => line.x))
+  const labels = lines.filter((line) => line.x < left + LABEL_COLUMN)
+  const values = lines.filter((line) => line.x >= left + LABEL_COLUMN)
+  if (values.length < 2 || labels.length !== values.length) return null
+  if (Math.max(...values.map((v) => v.x)) - Math.min(...values.map((v) => v.x)) > LABEL_COLUMN) return null
+  if (labels.some((label) => /[,;·•|:]/.test(label.text) || label.text.trim().split(/\s+/).length > 3)) return null
+
+  const byHeight = (a: ExtractedLine, b: ExtractedLine) => b.y - a.y
+  const rows = [...labels].sort(byHeight).map((label, i) => [label, [...values].sort(byHeight)[i]!] as const)
+  return rows.map(([label, value]) => {
+    const group = createSkillGroup()
+    group.category = label.text.trim()
+    group.items = splitItems(stripBullet(value.text)).map((name) => ({ name }))
+    return group
+  })
+}
+
+/** Text this far (PDF units) right of the leftmost line is in a column of its own, not set in. */
+const LABEL_COLUMN = 40
 
 /**
  * "Inglés — C1", "Español (nativo)", "French: B2", "Español · Nativo", a level on its own line
@@ -295,6 +344,7 @@ interface Chunk {
   title: string
   /** Where the title starts across the page: what sets its highlights in. */
   titleX: number
+  titleSize: number
   /** The line under a title that carries the dates: "Company · dates · Place". */
   subtitle?: string
   dateText: string
@@ -318,21 +368,22 @@ const LANGUAGE_LEVEL_RE =
  * entry above it; a title on its own line right above a date line that still
  * carries text ("Company · dates · Place") is that entry's title (spec 040).
  */
-function splitByDate(lines: ExtractedLine[]): Chunk[] {
+function splitByDate(allLines: ExtractedLine[]): Chunk[] {
   const chunks: Chunk[] = []
   let current: Chunk | null = null
 
-  for (const line of lines) {
+  for (const line of onePerRow(allLines)) {
     const text = line.text.trim()
     if (!text) continue
 
     if (!hasDateRange(text)) {
       if (!current) {
-        current = { title: text, titleX: line.x, dateText: '', body: [] }
+        current = { title: text, titleX: line.x, titleSize: line.fontSize, dateText: '', body: [] }
         chunks.push(current)
       } else if (!current.title) {
         current.title = text
         current.titleX = line.x
+        current.titleSize = line.fontSize
       } else {
         current.body.push(line)
       }
@@ -350,11 +401,47 @@ function splitByDate(lines: ExtractedLine[]): Chunk[] {
       current.subtitle = remainder
       continue
     }
-    current = { title: remainder, titleX: line.x, dateText: text, body: [] }
+    current = { title: remainder, titleX: line.x, titleSize: line.fontSize, dateText: text, body: [] }
     chunks.push(current)
   }
 
+  for (const chunk of chunks) takeSubtitle(chunk)
   return chunks.filter((chunk) => chunk.title || chunk.body.length)
+}
+
+/**
+ * A date set in its own cell on the title's row (right-aligned) belongs to that title: they are
+ * read as the one line the other layouts have.
+ */
+function onePerRow(lines: ExtractedLine[]): ExtractedLine[] {
+  const rows: ExtractedLine[] = []
+  for (const line of lines) {
+    const previous = rows.at(-1)
+    const text = line.text.trim()
+    const bareDate = hasDateRange(text) && !stripDatePortion(text)
+    if (previous && bareDate && previous.page === line.page && Math.abs(previous.y - line.y) <= ROW_TOLERANCE && !hasDateRange(previous.text)) {
+      rows[rows.length - 1] = { ...previous, text: `${previous.text.trim()} ${text}`, end: line.end }
+    } else rows.push(line)
+  }
+  return rows
+}
+
+/** The same rows as `pdf.js` grouping: baselines this close are one line. */
+const ROW_TOLERANCE = 2.5
+
+/**
+ * The first line under a title, when it is set smaller than the title and the text after it and
+ * is not a sentence, is the entry's subtitle: "Company · Place", or the institution of a degree.
+ */
+function takeSubtitle(chunk: Chunk) {
+  const [first, second] = chunk.body
+  if (chunk.subtitle || !first || !chunk.titleSize) return
+  const text = first.text.trim()
+  const smaller = first.fontSize < chunk.titleSize * 0.95 && (!second || first.fontSize < second.fontSize * 0.97)
+  if (smaller && first.x < chunk.titleX + INDENT && text.length <= 80 && !/[.!?:]$/.test(text) && !isBullet(text)) {
+    chunk.subtitle = text
+    chunk.body.shift()
+  }
 }
 
 function hasDateRange(text: string): boolean {

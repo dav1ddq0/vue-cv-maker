@@ -90,6 +90,12 @@ export function sectionKindOfSquashed(value: string): SectionKind | null {
   return SECTION_KEYWORDS.find((entry) => entry.words.some((word) => word.replace(/ /g, '') === squashed))?.kind ?? null
 }
 
+/** Whether `value` names one of the known sections, however its letters are spaced (spec 040). */
+export function isSectionHeading(value: string): boolean {
+  const normalized = normalizeHeading(value)
+  return SECTION_KEYWORDS.some((entry) => entry.words.includes(normalized)) || sectionKindOfSquashed(value) !== null
+}
+
 /** Lowercase, accent-free, punctuation-free — the form section headers are matched in. */
 export function normalizeHeading(value: string): string {
   return value

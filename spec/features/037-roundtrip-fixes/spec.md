@@ -67,7 +67,7 @@ were right; uploading them again showed three defects.
   between each, so the word boundary is lost before this code sees it. It still imports as
   "Łucjaøster - Ñúñez".
 - **How well PDF import rebuilds sections.** It varies a lot by template, for example Banner finds
-  42 skills out of 12. The app already presents it as "a help, not an automatic conversion".
+  42 skills out of 12. The app already presents it as "a help, not an automatic conversion". Improved in spec 040.
 
 ## Verification
 

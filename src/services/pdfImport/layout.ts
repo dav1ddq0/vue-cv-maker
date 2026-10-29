@@ -1,4 +1,5 @@
 import type { TextItem } from 'pdfjs-dist/types/src/display/api'
+import { isSectionHeading } from './patterns'
 
 /** One reconstructed visual line (a cell of one: see `CELL_GAP`), with the style signals the heuristics need. */
 export interface ExtractedLine {
@@ -110,16 +111,51 @@ function splitIntoCells(fragments: TextFragment[]): TextFragment[][] {
  * of columns above it. Otherwise it is plain top to bottom, left to right.
  */
 export function readingOrder(cells: ExtractedLine[]): ExtractedLine[] {
-  const topToBottom = [...cells].sort((a, b) => b.y - a.y || a.x - b.x)
-  if (topToBottom.length < 8) return topToBottom
+  return inBands([...cells].sort((a, b) => b.y - a.y || a.x - b.x))
+}
+
+/** The fewest cells worth looking for columns in. */
+const BAND_MIN_CELLS = 8
+
+/**
+ * Columns often cover only part of a page: a full-width summary above a skills column and a
+ * languages column, or a centred headline above two columns. When the whole page has no gutter,
+ * the longest run of rows at the bottom, and failing that at the top, that does is read by column
+ * and the rest is looked at again on its own.
+ */
+function inBands(topToBottom: ExtractedLine[]): ExtractedLine[] {
+  if (topToBottom.length < BAND_MIN_CELLS) return topToBottom
+  const whole = byColumns(topToBottom)
+  if (whole) return whole
+  for (let from = 1; from <= topToBottom.length - BAND_MIN_CELLS + 1; from++) {
+    const below = byColumns(topToBottom.slice(from))
+    if (below) return [...inBands(topToBottom.slice(0, from)), ...below]
+  }
+  for (let to = topToBottom.length - 1; to >= BAND_MIN_CELLS - 1; to--) {
+    const above = byColumns(topToBottom.slice(0, to))
+    if (above) return [...above, ...inBands(topToBottom.slice(to))]
+  }
+  return topToBottom
+}
+
+/** `topToBottom` read column by column, or null when it has no two columns of flowing text. */
+function byColumns(topToBottom: ExtractedLine[]): ExtractedLine[] | null {
   const gutters = findGutters(topToBottom)
-  if (!gutters.length) return topToBottom
+  if (!gutters.length) return null
 
   const crosses = (cell: ExtractedLine) => gutters.some((g) => cell.x < g.end && cell.end > g.start)
   const columnOf = (cell: ExtractedLine) => gutters.filter((g) => cell.x >= g.end).length
   const columns = Array.from({ length: gutters.length + 1 }, (_, index) => topToBottom.filter((cell) => !crosses(cell) && columnOf(cell) === index))
   const flowing = columns.map((column, index) => (flows(column) ? index : -1)).filter((index) => index >= 0)
-  if (flowing.length < 2) return topToBottom
+  if (flowing.length < 2) return null
+  // Section headings in one column, their text beside them in another, is a table of labels and
+  // values: it reads top to bottom. Columns of their own have headings of their own: several each, or
+  // two side by side on one row, which a table never has.
+  const headed = flowing.map((index) => columns[index]!.filter((cell) => isSectionHeading(cell.text)))
+  const total = headed.reduce((sum, cells) => sum + cells.length, 0)
+  const ownHeadings = headed.every((cells) => cells.length >= Math.max(2, total * COLUMN_HEADING_SHARE))
+  const sideBySide = headed.some((cells, i) => headed.slice(i + 1).some((others) => cells.some((a) => others.some((b) => Math.abs(a.y - b.y) <= SAME_ROW))))
+  if (!ownHeadings && !sideBySide) return null
 
   // A column of labels or dates reads with the flowing column nearest to it.
   const target = (index: number) => flowing.reduce((best, candidate) => (Math.abs(candidate - index) < Math.abs(best - index) ? candidate : best))
@@ -162,6 +198,12 @@ function findGutters(cells: ExtractedLine[]): Array<{ start: number; end: number
   }
   return gutters
 }
+
+/** Each column of text of its own has at least this share of the section headings. */
+const COLUMN_HEADING_SHARE = 0.25
+
+/** Cells whose baselines are this close (PDF units) are on one row. */
+const SAME_ROW = 2.5
 
 /** Text that flows: several cells, most of them a line or two below the one above. */
 function flows(column: ExtractedLine[]): boolean {

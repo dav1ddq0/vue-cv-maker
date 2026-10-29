@@ -3,8 +3,9 @@
 //     in the crop dialog, then downloaded as direct PDF, print, HTML and JSON (spec 037).
 //   - Each download is checked for what it holds, the JSON is uploaded again (exact round trip, the
 //     photo shows) and both PDFs go through PDF import (name and e-mail recovered whole).
-//   - How many entries PDF import rebuilds per section is printed as a report, not checked: it is a
-//     help, not a conversion, and varies by template.
+//   - The sections PDF import rebuilds are checked too (spec 040): the experiences, education entries,
+//     skill items and languages of the uploaded CV come back in number, in every template and both PDFs.
+//     The CV is the app's own, so this measures the heuristics on the 13 layouts, not on any PDF.
 // Usage: npm run qa:roundtrip (builds first). Files in .qa/roundtrip/.
 const fs = require('node:fs')
 const path = require('node:path')
@@ -162,6 +163,9 @@ const pdfImages = (file) => execFileSync('pdfimages', ['-list', file]).toString(
         if (!NAME_NOT_RECOVERED.has(id)) check(id, `${kind} PDF import recovers the name`, got.personal.fullName === src.personal.fullName, JSON.stringify(got.personal.fullName))
         check(id, `${kind} PDF import recovers the e-mail`, got.personal.email === src.personal.email, JSON.stringify(got.personal.email))
         const items = (cv) => cv.skills.reduce((n, g) => n + g.items.length, 0)
+        for (const [what, found, wanted] of [['experiences', got.experience.length, src.experience.length], ['education entries', got.education.length, src.education.length], ['skill items', items(got), items(src)], ['languages', got.languages.length, src.languages.length]]) {
+          check(id, `${kind} PDF import recovers the ${what}`, found === wanted, `${found}/${wanted}`)
+        }
         row[kind] = `exp ${got.experience.length}/${src.experience.length} · edu ${got.education.length}/${src.education.length} · skills ${items(got)}/${items(src)} · langs ${got.languages.length}/${src.languages.length} · phone ${got.personal.phone === src.personal.phone ? 'ok' : 'lost'} · summary ${got.summary.trim() === src.summary ? 'ok' : got.summary ? 'partial' : 'lost'}`
       }
       check(id, 'no console errors', p.errs.length === 0, p.errs.join(' | '))
@@ -174,7 +178,7 @@ const pdfImages = (file) => execFileSync('pdfimages', ['-list', file]).toString(
   }
 
   for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'} [${r.block}] ${r.name}${r.detail ? ' — ' + r.detail : ''}`)
-  console.log('\nPDF import, recovered/uploaded (a report, not checked):')
+  console.log('\nPDF import, recovered/uploaded:')
   for (const r of report) for (const kind of ['direct', 'print']) if (r[kind]) console.log(`  ${r.id.padEnd(10)} ${kind.padEnd(6)} ${r[kind]}`)
   const failed = results.filter((r) => !r.ok)
   console.log(`\n${results.length - failed.length}/${results.length} checks pass · files in ${path.relative(ROOT, OUT)}/`)
