@@ -26,7 +26,12 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
      warning.
    - Highlights (`TagInput`) become rows with a divider, like the skills in `SkillItemsEditor`,
      instead of outlined chips.
-3. **D · Export contrast.** The "Before you export" block gets a container (`surface-container-lowest`)
+3. **Rounder chrome.** The smaller radii of the app chrome go from 8 px (`--shape-sm`) to 12 px
+   (`--shape-md`): the header select and document title, the preferences action, the entry card
+   header, the PDF review select, the export side warning, the crop dialog's secondary button, the
+   template thumbnails and the preview toolbar chip. The logo mark, the `kbd` hint, the crop frame
+   and the page highlight keep theirs.
+4. **D · Export contrast.** The "Before you export" block gets a container (`surface-container-lowest`)
    that reads against the dialog (`surface-container-high`) in both themes.
 
 ## Acceptance criteria

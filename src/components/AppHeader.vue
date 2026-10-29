@@ -188,7 +188,7 @@ const phoneState = computed(() => {
   min-height: 40px;
   padding: 0 8px;
   border: 1px solid var(--md-outline-variant);
-  border-radius: var(--shape-sm);
+  border-radius: var(--shape-md);
   background: transparent;
   color: var(--md-on-surface);
   font: var(--type-label-large);

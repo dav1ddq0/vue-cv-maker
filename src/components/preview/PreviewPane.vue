@@ -190,7 +190,7 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
   min-height: 34px;
   padding: 0 0.7em;
   border: 1px solid var(--border);
-  border-radius: var(--shape-sm);
+  border-radius: var(--shape-md);
   background: var(--surface);
   color: var(--text);
   font: inherit;

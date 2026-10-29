@@ -182,7 +182,7 @@ function toggleFallback() {
   min-height: 36px;
   padding: 0 0.8em;
   border: 1px solid var(--border);
-  border-radius: var(--shape-sm);
+  border-radius: var(--shape-md);
   background: var(--surface);
   color: var(--text);
   font: inherit;

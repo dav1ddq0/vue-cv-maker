@@ -47,7 +47,7 @@ const bodyId = useId()
   min-height: 48px;
   padding: 4px 8px;
   border: 0;
-  border-radius: var(--shape-sm);
+  border-radius: var(--shape-md);
   color: var(--md-on-surface);
   font: inherit;
   text-align: left;

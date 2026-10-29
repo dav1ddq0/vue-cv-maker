@@ -262,7 +262,7 @@ function apply(mode: 'new' | 'current') {
 .assign select {
   padding: 0.35em 0.5em;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--shape-md);
   background: var(--surface);
 }
 

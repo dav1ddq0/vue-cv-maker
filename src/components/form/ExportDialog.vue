@@ -305,7 +305,7 @@ function printInstead() {
 .side-warning {
   margin: 0 0 8px;
   padding: 8px 12px;
-  border-radius: var(--shape-sm);
+  border-radius: var(--shape-md);
   background: var(--md-warning-container);
   color: var(--md-on-warning-container);
   font: var(--type-body-medium);

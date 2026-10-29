@@ -316,7 +316,7 @@ function onClose() {
   gap: 0.4em;
   min-height: 40px;
   padding: 0 1em;
-  border-radius: var(--radius-sm);
+  border-radius: var(--shape-md);
   font-weight: 600;
   white-space: nowrap;
 }

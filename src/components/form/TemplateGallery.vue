@@ -127,7 +127,7 @@ const shown = computed(() =>
   width: 100%;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  border-radius: var(--radius-sm);
+  border-radius: var(--shape-md);
   border: 1px solid var(--border);
   background: #fff;
 }
