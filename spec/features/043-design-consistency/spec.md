@@ -22,7 +22,8 @@ the scale. These were not, and are fixed one phase at a time, each its own commi
    of the highlights and the skills were 14 or 16 px by what they inherited and are 14 px. `.action`
    of the preferences and `.action` of the phone dock only share a name (a compact action and a 56 px
    bar), and stay.
-3. **Weights** (phase 4): 550 and 650 next to 400/500/600/700.
+3. **Weights** (phase 4): 550 (StepCustom) and 650 (CvWizard, PdfReview), which a variable font renders
+   as in-between weights, are 500 and 600. A test fails on any other weight in the interface.
 4. **Elevation** (phase 5): loose shadows next to `--elevation-1…3`.
 5. **The accent colour picker** (phase 7): a native `<input type="color">` with the browser's grey.
 

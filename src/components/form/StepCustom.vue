@@ -314,6 +314,6 @@ function addBlank() {
 }
 
 .order-label {
-  font-weight: 550;
+  font-weight: 500;
 }
 </style>

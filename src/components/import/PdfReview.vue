@@ -232,7 +232,7 @@ function apply(mode: 'new' | 'current') {
 
 .block-heading {
   margin: 0 0 0.3em;
-  font-weight: 650;
+  font-weight: 600;
   font-size: var(--size-14);
 }
 

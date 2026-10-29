@@ -13,6 +13,17 @@ function interfaceFiles(dir: string): string[] {
 const files = [...interfaceFiles('src/components'), 'src/App.vue', 'src/styles/app.css']
 
 describe('the type scale of the interface (spec 043)', () => {
+  it('uses the weights 400, 500, 600 and 700 and no in-between ones of a variable font', () => {
+    const odd: string[] = []
+    for (const file of files) {
+      readFileSync(file, 'utf8').split('\n').forEach((line, index) => {
+        const value = /font-weight\s*:\s*([^;]+);/.exec(line)?.[1]?.trim()
+        if (value && !/^(?:400|500|600|700|normal|bold|inherit)$/.test(value)) odd.push(`${file}:${index + 1} font-weight: ${value}`)
+      })
+    }
+    expect(odd).toEqual([])
+  })
+
   it('sets every font-size from a size token, or leaves it inherited', () => {
     const allowed = /^(?:var\(--size-\d+\)|var\(--type-[a-z-]+\)|inherit|1em|100%|0|clamp\(var\(--size-\d+\), [0-9.]+vw, var\(--size-\d+\)\))$/
     const loose: string[] = []

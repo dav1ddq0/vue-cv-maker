@@ -106,7 +106,7 @@ watch(
 .heading {
   margin: 0;
   font-size: var(--size-16);
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .body {
