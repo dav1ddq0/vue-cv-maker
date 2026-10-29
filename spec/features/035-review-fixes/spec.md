@@ -25,6 +25,7 @@ were approved by the user on 2026-10-29 (R1, R2), with `qa:*` scripts allowed in
 | `npm run qa:pdf` | dev | 13 templates × sample / photo / long / page break, print vs direct: same pages, no text missing, ≤ 4 % pixels differing. A fixture page (half-opaque box, list bullet, dashed and dotted borders) compared shape by shape. Side-column warning off for the sample, on for 80 links. |
 | `npm run qa:e2e` | preview (built) | The 81 end-to-end checks with timing budgets: first load, editing, steps, templates, exports, import, documents, phone, widths. |
 | `npm run qa:security` | preview (built) | Hostile JSON (×2) and PDF from `qa/fixtures/security`, imported through the UI and exported every way: nothing runs, nothing leaves the origin, outputs checked for what they contain. |
+| `npm run qa:roundtrip` | preview (built) | Added in 037. For every template: upload, download every way, upload again. |
 | `npm run qa` | — | Build, then all three. |
 
 Servers start on a free port and stop at the end; outputs go to `.qa/` (ignored).

@@ -37,6 +37,28 @@ were right; uploading them again showed three defects.
 2. [x] A CV stored with an inline photo has it moved to a blob when opened.
 3. [x] Re-importing a downloaded PDF keeps the name and e-mail whole, in all 13 templates.
 4. [x] `slugify('Łucja Øster-Ñúñez')` is `lucja-oster-nunez`.
+5. [x] The round trip is a QA script, `npm run qa:roundtrip` (also part of `npm run qa`). It exits
+   non-zero on any failed check.
+
+## `qa:roundtrip`
+
+- **What it runs:** `qa/roundtrip.cjs`, on the built site, with files written to `.qa/roundtrip/`.
+- **Templates:** every one with a folder under `src/templates/` and a `Template.vue` in it.
+- **Checks:**
+  - file names;
+  - the downloaded JSON against the uploaded one;
+  - name, e-mail and accents as text in the direct PDF;
+  - pages in the direct PDF against the print;
+  - the photo, embedded only where the template shows it;
+  - the HTML opened from disk;
+  - the JSON uploaded again: exact, with the photo showing;
+  - both PDFs through PDF import: name and e-mail recovered. Monograph's name is excepted, see
+    "Not covered".
+- **Comparing text:**
+  - Text is compared without case, because templates set capitals with CSS.
+  - PDF text is also compared without spaces, because pdftotext spaces out letter-spaced text.
+- **Report only, not checked:** the entries PDF import rebuilds per section.
+- **Detects the photo bug:** with the store from before this fix, the 8 photo templates fail.
 
 ## Not covered
 
@@ -50,6 +72,6 @@ were right; uploading them again showed three defects.
 
 - 505 unit tests, plus the typecheck. New tests cover the inline photo in the store (four cases),
   `joinFragments` and `slugify`.
-- The round trip in the browser passes 179 of 182 checks (171 before). The 3 that fail come from the
-  check itself: Aurora and Monograph set their text in capitals with CSS.
-- `qa:pdf` 111/111, `qa:e2e` 81/81, `qa:security` 53/53.
+- The round trip in the browser passes 179 of 182 checks (171 before). The 3 that failed came from
+  the check itself (capitals set with CSS) and are fixed in the `qa:roundtrip` version.
+- `qa:roundtrip` 232/232, `qa:pdf` 111/111, `qa:e2e` 81/81, `qa:security` 53/53.
