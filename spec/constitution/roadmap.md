@@ -49,6 +49,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **036** · The print no longer ends in a blank page (paged.js's break after the last page lifted)
 - **037** · Upload → download → upload fixes (a JSON photo shows after import, PDF import keeps touching pieces of a word together, file names keep Ł, Ø and ß)
 - **038** · Desktop polish (month and year fields in the UI language, lighter rounded fields, highlights as rows, export checks contrast)
+- **039** · The app is called Keireki Craft (name, `KC` mark, storage and preferences migrated from the old name)
 
 ## Next 🔜
 

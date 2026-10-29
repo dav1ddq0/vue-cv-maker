@@ -626,7 +626,7 @@ export async function pdfFromPagination(paginated: HTMLElement, title: string, l
     pagesCopy.removeAttribute('id')
     copyHost.appendChild(pagesCopy)
 
-    const doc = new PDFDocument({ size: PAGE_PT, margin: 0, autoFirstPage: false, info: { Title: title, Creator: 'CV Maker' }, lang })
+    const doc = new PDFDocument({ size: PAGE_PT, margin: 0, autoFirstPage: false, info: { Title: title, Creator: 'Keireki Craft' }, lang })
     const chunks: Uint8Array[] = []
     doc.on('data', (chunk) => chunks.push(chunk))
     const done = new Promise<void>((resolve) => doc.on('end', resolve))

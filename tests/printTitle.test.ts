@@ -31,7 +31,7 @@ describe('printTitle (spec 024)', () => {
 
 describe('printCv and the document title', () => {
   it('uses the print title while the dialog is open and restores the app title after', async () => {
-    document.title = 'CV Maker'
+    document.title = 'Keireki Craft'
     let during = ''
     vi.spyOn(window, 'print').mockImplementation(() => {
       during = document.title
@@ -40,16 +40,16 @@ describe('printCv and the document title', () => {
 
     await printCv(cvNamed('Nadia Martín Reyes'), 'classic')
     expect(during).toBe('Nadia Martín Reyes – CV')
-    expect(document.title).toBe('CV Maker')
+    expect(document.title).toBe('Keireki Craft')
   })
 
   it('restores the app title when printing throws', async () => {
-    document.title = 'CV Maker'
+    document.title = 'Keireki Craft'
     vi.spyOn(window, 'print').mockImplementation(() => {
       throw new Error('blocked')
     })
 
     await expect(printCv(cvNamed('Ana'), 'classic')).rejects.toThrow('blocked')
-    expect(document.title).toBe('CV Maker')
+    expect(document.title).toBe('Keireki Craft')
   })
 })

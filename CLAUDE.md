@@ -1,4 +1,4 @@
-# CV Maker
+# Keireki Craft
 
 A local-first CV editor: guided form, live preview and an extensible template
 system. Everything runs in the browser — no account, no server, no connection

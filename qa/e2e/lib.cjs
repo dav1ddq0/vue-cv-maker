@@ -63,7 +63,7 @@ const idbDump = (p) =>
   p.evaluate(
     () =>
       new Promise((resolve) => {
-        const q = indexedDB.open('cv-maker')
+        const q = indexedDB.open('keireki-craft')
         q.onsuccess = () => {
           const all = q.result.transaction('kv').objectStore('kv').getAll()
           all.onsuccess = () => resolve(JSON.stringify(all.result.filter((v) => !(v instanceof Blob))))
@@ -76,7 +76,7 @@ const idbDocCount = (p) =>
   p.evaluate(
     () =>
       new Promise((resolve) => {
-        const q = indexedDB.open('cv-maker')
+        const q = indexedDB.open('keireki-craft')
         q.onsuccess = () => {
           const g = q.result.transaction('kv').objectStore('kv').get('index')
           g.onsuccess = () => resolve((g.result || []).length)

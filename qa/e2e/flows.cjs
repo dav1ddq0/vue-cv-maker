@@ -1,7 +1,7 @@
 // Functional blocks. Each runs in its own browser context (its own IndexedDB), so they run in parallel.
 const fs = require('fs')
 const path = require('path')
-const { check, until, open, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow } = require('./lib.cjs')
+const { BASE, check, until, sleep, open, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow } = require('./lib.cjs')
 
 /** A · writing a CV from blank: every step, links, validation, persistence, undo/redo. */
 async function mainFlow(browser) {
@@ -330,4 +330,56 @@ async function widths(browser) {
   await p.context().close()
 }
 
-module.exports = { mainFlow, customAndStyle, exportImport, documentsAndPrefs, phone, widths }
+/**
+ * G · an install from before the rename (spec 039): the documents and the photo are in the "cv-maker"
+ * database and the preferences under "cv-maker:prefs". They must show up under the new name.
+ */
+async function renameMigration(browser) {
+  const B = 'rename'
+  let p = await open(browser)
+  await startSample(p)
+  await p.locator('.photo-drop input[type=file]').setInputFiles(path.join(__dirname, '../fixtures/portrait.jpg')).catch(() => {})
+  await p.locator('dialog.crop[open] canvas').waitFor({ timeout: 4000 }).catch(() => {})
+  await p.getByRole('button', { name: 'Usar foto' }).click({ timeout: 2000 }).catch(() => {})
+  await until(async () => /photo:/.test(await idbDump(p)) || (await idbDocCount(p)) > 0, { timeout: 4000 })
+  await sleep(800)
+
+  // The app's page is closed (it holds the database open, even in the back/forward cache) and a page of the
+  // same origin that does not start the app moves the data back to where the old version kept it.
+  const next = await p.context().newPage()
+  await p.close()
+  p = next
+  const errs = []
+  p.on('pageerror', (e) => errs.push(e.message))
+  p.on('console', (m) => m.type() === 'error' && errs.push(m.text()))
+  await p.goto(BASE + 'favicon.svg')
+  const moved = await p.evaluate(async () => {
+    const open = (name) => new Promise((resolve, reject) => { const r = indexedDB.open(name); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error) })
+    const next = await open('keireki-craft')
+    const objects = next.transaction('kv').objectStore('kv')
+    const [keys, values] = await Promise.all([new Promise((r) => { const q = objects.getAllKeys(); q.onsuccess = () => r(q.result) }), new Promise((r) => { const q = objects.getAll(); q.onsuccess = () => r(q.result) })])
+    next.close()
+    await new Promise((r, reject) => { const q = indexedDB.deleteDatabase('keireki-craft'); q.onsuccess = () => r(); q.onerror = () => reject(q.error); q.onblocked = () => setTimeout(() => reject(new Error('delete blocked')), 3000) })
+    const legacy = await new Promise((resolve, reject) => { const r = indexedDB.open('cv-maker', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error) })
+    await new Promise((resolve, reject) => { const tx = legacy.transaction('kv', 'readwrite'); keys.forEach((k, i) => tx.objectStore('kv').put(values[i], k)); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error) })
+    legacy.close()
+    localStorage.clear()
+    localStorage.setItem('cv-maker:prefs', JSON.stringify({ uiLanguage: 'en', theme: 'dark' }))
+    return keys
+  })
+  check(B, 'the old install is set up (documents and photo under "cv-maker")', moved.some((k) => k.startsWith('photo:')) && moved.includes('index'), moved.join(', '))
+
+  check(B, 'the new database is gone before the app starts', !(await p.evaluate(async () => (await indexedDB.databases()).some((d) => d.name === 'keireki-craft'))))
+  await p.goto(BASE, { waitUntil: 'networkidle' })
+  check(B, 'the CV is there under the new name', await until(async () => (await p.locator('.pane .cv-page').innerText().catch(() => '')).includes('Nadia Martín Reyes'), { timeout: 6000 }))
+  check(B, 'the documents are in the new database', (await idbDocCount(p)) === 1, String(await idbDocCount(p)))
+  const keys = await p.evaluate(() => new Promise((resolve) => { const r = indexedDB.open('keireki-craft'); r.onsuccess = () => { const q = r.result.transaction('kv').objectStore('kv').getAllKeys(); q.onsuccess = () => resolve(q.result) } }))
+  check(B, 'the photo came with it', keys.some((k) => k.startsWith('photo:')), keys.join(', '))
+  check(B, 'the old preferences carry over', (await p.evaluate(() => document.documentElement.lang)) === 'en' && (await p.evaluate(() => document.documentElement.dataset.theme)) === 'dark')
+  check(B, 'the old database is left as a backup', await p.evaluate(async () => (await indexedDB.databases?.())?.some((d) => d.name === 'cv-maker') ?? true))
+  check(B, 'the app is called Keireki Craft', (await p.title()) === 'Keireki Craft' && (await p.locator('.crumbs, header').first().innerText()).includes('Keireki Craft'))
+  check(B, 'no console errors', errs.length === 0, errs.join(' | '))
+  await p.context().close()
+}
+
+module.exports = { mainFlow, customAndStyle, exportImport, documentsAndPrefs, phone, widths, renameMigration }

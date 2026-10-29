@@ -2,7 +2,7 @@
 // force every translation to repeat the Spanish string. Keys stay checked.
 export default {
   app: {
-    name: 'CV Maker',
+    name: 'Keireki Craft',
     tagline: 'Tus datos nunca salen de este navegador',
   },
   nav: {
@@ -430,7 +430,7 @@ export default {
     sampleHint: 'Un CV ya relleno para ver cómo queda y sustituir lo tuyo.',
     sampleCta: 'Cargar ejemplo',
     importTitle: 'Importar',
-    importHint: 'Desde tu CV en PDF o una copia JSON de CV Maker.',
+    importHint: 'Desde tu CV en PDF o una copia JSON de Keireki Craft.',
     importCta: 'Elegir archivo',
     templates: '{n} plantillas para elegir',
     preview: 'Vista previa en vivo mientras escribes',

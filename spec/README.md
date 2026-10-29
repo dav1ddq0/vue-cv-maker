@@ -1,6 +1,6 @@
 # spec/: Spec Driven Development
 
-> Spec-driven development (SDD) for CV Maker: write the spec first, then the plan, then the tasks, and only then touch the code.
+> Spec-driven development (SDD) for Keireki Craft: write the spec first, then the plan, then the tasks, and only then touch the code.
 
 ## Structure
 

@@ -2,7 +2,7 @@ import type es from './es'
 
 const en: typeof es = {
   app: {
-    name: 'CV Maker',
+    name: 'Keireki Craft',
     tagline: 'Your data never leaves this browser',
   },
   nav: {
@@ -429,7 +429,7 @@ const en: typeof es = {
     sampleHint: 'A filled-in CV to see how it looks and replace with yours.',
     sampleCta: 'Load sample',
     importTitle: 'Import',
-    importHint: 'From your CV as a PDF, or a CV Maker JSON backup.',
+    importHint: 'From your CV as a PDF, or a Keireki Craft JSON backup.',
     importCta: 'Choose a file',
     templates: '{n} templates to choose from',
     preview: 'Live preview as you type',

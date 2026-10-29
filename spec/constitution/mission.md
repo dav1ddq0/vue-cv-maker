@@ -2,7 +2,7 @@
 
 ## What we're building
 
-CV Maker is a fully browser-based CV/résumé editor built for privacy and speed: nothing gets uploaded to a server.
+Keireki Craft is a fully browser-based CV/résumé editor built for privacy and speed: nothing gets uploaded to a server.
 
 1. **Guided authoring** : a step-by-step wizard (personal info, summary, experience, education, skills, languages, custom sections) backed by a single typed `CVData` model.
 2. **Live preview** : a paginated, print-accurate preview that updates as you type, using the same template that will be exported.

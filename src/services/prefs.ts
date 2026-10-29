@@ -4,7 +4,9 @@
  */
 import type { ThemeChoice } from '@/core/theme'
 
-const KEY = 'cv-maker:prefs'
+const KEY = 'keireki-craft:prefs'
+/** The key while the app was called "CV Maker" (spec 039): read when the new one is empty, never written. */
+const LEGACY_KEY = 'cv-maker:prefs'
 
 export interface Prefs {
   uiLanguage: 'es' | 'en'
@@ -25,7 +27,7 @@ const DEFAULTS: Prefs = {
 
 export function readPrefs(): Prefs {
   try {
-    const raw = localStorage.getItem(KEY)
+    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY)
     return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
   } catch {
     return { ...DEFAULTS }

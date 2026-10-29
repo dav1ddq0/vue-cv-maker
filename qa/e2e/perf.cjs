@@ -135,7 +135,7 @@ async function run(browser, outDir) {
   // ---- a long CV ---------------------------------------------------------------------------------
   // Same sample, experience × 8 (48 jobs), imported through the UI as a new CV.
   const big = await p.evaluate(() => {
-    const req = indexedDB.open('cv-maker')
+    const req = indexedDB.open('keireki-craft')
     return new Promise((r) => {
       req.onsuccess = () => {
         const all = req.result.transaction('kv').objectStore('kv').getAll()

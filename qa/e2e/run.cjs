@@ -37,6 +37,7 @@ const { ROOT, startServer } = require('../lib/server.cjs')
       timed('custom+style', () => flows.customAndStyle(browser))(),
       timed('export+import', () => flows.exportImport(browser, outDir, fs.existsSync(printed) ? printed : null))(),
       timed('docs+prefs', () => flows.documentsAndPrefs(browser))(),
+      timed('rename', () => flows.renameMigration(browser))(),
       timed('phone', () => flows.phone(browser))(),
       timed('widths', () => flows.widths(browser))(),
     ])

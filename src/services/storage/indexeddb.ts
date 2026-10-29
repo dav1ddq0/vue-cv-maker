@@ -3,8 +3,9 @@ import type { CVData, CVSummary } from '@/types/cv'
 import { migrate } from '@/core/migrations'
 import { readPrefs } from '@/services/prefs'
 import { NotFoundError, StorageQuotaError, type StorageAdapter } from './adapter'
+import { copyLegacyStore } from './legacy'
 
-const store = createStore('cv-maker', 'kv')
+const store = createStore('keireki-craft', 'kv')
 
 const cvKey = (id: string) => `cv:${id}`
 /**
@@ -16,6 +17,17 @@ export const photoKey = (cvId: string, version = Date.now().toString(36)) => `ph
 const INDEX_KEY = 'index'
 
 /**
+ * The first call brings in what an install from before the rename (spec 039) stored; a failure is
+ * thrown to the caller and the next call tries again, rather than carrying on with an empty store.
+ */
+let migrated: Promise<void> | undefined
+const ready = () =>
+  (migrated ??= copyLegacyStore(store, INDEX_KEY).catch((error) => {
+    migrated = undefined
+    throw error
+  }))
+
+/**
  * Key scheme (spec §8.1):
  *   `cv:{id}`    full CVData (photos excluded — only the reference is stored)
  *   `photo:{id}:{version}` the image as a Blob (~33% smaller than a base64 dataURL); see `photoKey`
@@ -23,11 +35,13 @@ const INDEX_KEY = 'index'
  */
 export class IndexedDBAdapter implements StorageAdapter {
   async list(): Promise<CVSummary[]> {
+    await ready()
     const index = (await get<CVSummary[]>(INDEX_KEY, store)) ?? []
     return [...index].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   }
 
   async load(id: string): Promise<CVData> {
+    await ready()
     const raw = await get<CVData>(cvKey(id), store)
     if (!raw) throw new NotFoundError(id)
     // Before spec 021 every CV was shown in the global last pick; keep it looking that way.
@@ -35,6 +49,7 @@ export class IndexedDBAdapter implements StorageAdapter {
   }
 
   async save(data: CVData): Promise<void> {
+    await ready()
     try {
       await set(cvKey(data.meta.id), structuredClone(data), store)
       await this.updateIndex(data)
@@ -44,6 +59,7 @@ export class IndexedDBAdapter implements StorageAdapter {
   }
 
   async delete(id: string): Promise<void> {
+    await ready()
     const data = await get<CVData>(cvKey(id), store)
     if (data?.personal.photo) await del(data.personal.photo, store).catch(() => {})
     await del(cvKey(id), store)
@@ -72,6 +88,7 @@ export class IndexedDBAdapter implements StorageAdapter {
 
 /** Stores `blob` under a new key and drops `previous`, the version it replaces. */
 export async function savePhoto(cvId: string, blob: Blob, previous?: string): Promise<string> {
+  await ready()
   const key = photoKey(cvId)
   try {
     await set(key, blob, store)
@@ -83,10 +100,12 @@ export async function savePhoto(cvId: string, blob: Blob, previous?: string): Pr
 }
 
 export async function loadPhoto(key: string): Promise<Blob | undefined> {
+  await ready()
   return get<Blob>(key, store)
 }
 
 export async function deletePhoto(key: string): Promise<void> {
+  await ready()
   await del(key, store)
 }
 

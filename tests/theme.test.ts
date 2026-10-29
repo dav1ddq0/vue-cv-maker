@@ -33,7 +33,7 @@ describe('ui store theme', () => {
     const ui = useUiStore()
     ui.setTheme('system')
     expect(document.documentElement.dataset.theme).toBe('light')
-    expect(JSON.parse(localStorage.getItem('cv-maker:prefs')!).theme).toBe('system')
+    expect(JSON.parse(localStorage.getItem('keireki-craft:prefs')!).theme).toBe('system')
 
     listener!({ matches: true })
     expect(ui.resolvedTheme).toBe('dark')
@@ -57,7 +57,7 @@ describe('theme on Android and first visits (spec 029)', () => {
     const { useUiStore } = await import('@/stores/ui')
     expect(useUiStore().resolvedTheme).toBe('dark')
 
-    localStorage.setItem('cv-maker:prefs', JSON.stringify({ theme: 'light' }))
+    localStorage.setItem('keireki-craft:prefs', JSON.stringify({ theme: 'light' }))
     setActivePinia(createPinia())
     expect(useUiStore().resolvedTheme).toBe('light')
   })

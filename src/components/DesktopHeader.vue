@@ -34,7 +34,7 @@ const saveText = computed(() => {
 <template>
   <header class="header">
     <button type="button" class="brand" @click="ui.view = 'documents'">
-      <span class="mark" aria-hidden="true">CV</span>{{ t('app.name') }}
+      <span class="mark" aria-hidden="true">KC</span>{{ t('app.name') }}
     </button>
 
     <nav v-if="ui.view === 'editor'" class="crumbs" :aria-label="t('header.breadcrumb')">
