@@ -216,7 +216,8 @@ function printInstead() {
 .check {
   padding: 0.9em 1em;
   border-radius: var(--shape-md);
-  background: var(--surface-2);
+  /* The dialog itself is surface-container-high; one step up or down would vanish in one theme (spec 038). */
+  background: var(--md-surface-container-lowest);
 }
 
 .check-title {
