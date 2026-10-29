@@ -25,8 +25,10 @@ name. The user's choices: rename the browser storage with a migration, rename th
      call, so the app never carries on with an empty store; `App.vue` then shows a message with a
      reload button instead of a blank app. A legacy database that cannot even be opened holds nothing
      readable and does not stop the app.
-   - The old database is left in place as a backup; clearing the site's data in the browser removes
-     it. A browser that never had one gets no empty database left behind.
+   - Once every copied key is read back from the new database, the old one is deleted (the user
+     asked for this). A copy that does not check out throws and leaves it untouched. If another tab
+     still has the old database open, the deletion waits until that tab lets go. A browser that never
+     had one gets no empty database left behind.
 
 ## Not changed
 
@@ -41,7 +43,8 @@ name. The user's choices: rename the browser storage with a migration, rename th
 1. [x] The interface, the tab, the favicon and the PDF metadata say Keireki Craft.
 2. [x] An install from before the rename finds its CVs, photo and preferences after the update.
 3. [x] A browser with no old data ends with no `cv-maker` database.
-4. [x] The next start does not copy the old data over later edits.
+4. [x] The old database is gone after a verified copy, and the next start does not copy anything
+   over later edits.
 5. [x] Storage that cannot be opened shows a message and a reload button.
 
 ## Verification
@@ -49,7 +52,7 @@ name. The user's choices: rename the browser storage with a migration, rename th
 - 518 unit tests, plus the typecheck. New: preferences fallback (4 cases).
 - `qa:e2e` 93/93, with a new block, `rename`: an old install is set up in a real browser (data moved
   back to `cv-maker`, new database deleted, old preferences), and after loading the app the CV, the
-  photo, the preferences and the title are there; an edit survives the next start; and a browser
+  photo, the preferences and the title are there, and the old database is gone; an edit survives the next start; and a browser
   whose storage cannot be opened shows the message. Without the copy, 3 of its checks fail; without
   the already-migrated guard, 1 does.
 - Header screenshots on desktop and a Pixel 7 profile.

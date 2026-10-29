@@ -1,4 +1,4 @@
-import { get, setMany, type UseStore } from 'idb-keyval'
+import { get, getMany, setMany, type UseStore } from 'idb-keyval'
 
 /** The database the app used while it was called "CV Maker" (spec 039). */
 const LEGACY_DB = 'cv-maker'
@@ -44,8 +44,10 @@ function readAll(db: IDBDatabase): Promise<[IDBValidKey, unknown][]> {
 /**
  * Copies the documents and photos of the "CV Maker" database into `target`, once (spec 039). It runs
  * before the first read, so `target` is still empty: it has the CV index only after a copy or after
- * the app has been used under its new name. One transaction writes everything or nothing; the legacy
- * database is left as it was, a backup that the browser's site data can clear.
+ * the app has been used under its new name. One transaction writes everything or nothing. Only once
+ * every key is read back from `target` is the legacy database deleted (asked for by the user); a copy
+ * that does not check out throws and leaves it untouched. If another tab still has it open the
+ * deletion waits until that tab lets go.
  */
 export async function copyLegacyStore(target: UseStore, indexKey: string): Promise<void> {
   if (await get(indexKey, target)) return
@@ -53,7 +55,13 @@ export async function copyLegacyStore(target: UseStore, indexKey: string): Promi
   if (!legacy) return
   try {
     const entries = await readAll(legacy)
-    if (entries.length) await setMany(entries, target)
+    if (entries.length) {
+      await setMany(entries, target)
+      const copied = await getMany(entries.map(([key]) => key), target)
+      if (copied.some((value) => value === undefined)) throw new Error('the copy of the old database is incomplete')
+    }
+    legacy.close()
+    indexedDB.deleteDatabase(LEGACY_DB)
   } finally {
     legacy.close()
   }

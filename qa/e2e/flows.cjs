@@ -376,7 +376,7 @@ async function renameMigration(browser) {
   const keys = await p.evaluate(() => new Promise((resolve) => { const r = indexedDB.open('keireki-craft'); r.onsuccess = () => { const q = r.result.transaction('kv').objectStore('kv').getAllKeys(); q.onsuccess = () => resolve(q.result) } }))
   check(B, 'the photo came with it', keys.some((k) => k.startsWith('photo:')), keys.join(', '))
   check(B, 'the old preferences carry over', (await p.evaluate(() => document.documentElement.lang)) === 'en' && (await p.evaluate(() => document.documentElement.dataset.theme)) === 'dark')
-  check(B, 'the old database is left as a backup', await p.evaluate(async () => (await indexedDB.databases?.())?.some((d) => d.name === 'cv-maker') ?? true))
+  check(B, 'the old database is deleted once the copy is checked', await until(() => p.evaluate(async () => !(await indexedDB.databases()).some((d) => d.name === 'cv-maker')), { timeout: 4000 }))
   check(B, 'the app is called Keireki Craft', (await p.title()) === 'Keireki Craft' && (await p.locator('.crumbs, header').first().innerText()).includes('Keireki Craft'))
   // The next start must not bring the old copy over what was edited since: the new database wins.
   // The old preferences set the UI to English.
