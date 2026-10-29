@@ -127,7 +127,7 @@ function toggleFallback() {
   border-radius: var(--shape-md);
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  box-shadow: var(--elevation-3);
   /* Top layer: pinned under the header's right edge. */
   position: fixed;
   inset: 60px 16px auto auto;

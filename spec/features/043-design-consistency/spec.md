@@ -24,7 +24,10 @@ the scale. These were not, and are fixed one phase at a time, each its own commi
    bar), and stay.
 3. **Weights** (phase 4): 550 (StepCustom) and 650 (CvWizard, PdfReview), which a variable font renders
    as in-between weights, are 500 and 600. A test fails on any other weight in the interface.
-4. **Elevation** (phase 5): loose shadows next to `--elevation-1…3`.
+4. **Elevation** (phase 5): five drop shadows of their own (the preferences panel, the paper of the
+   preview and of the paginated view, the strip's page, and the crop dialog's mask) are the tokens
+   `--elevation-2/3` and the scrim colour. Rings and indicator lines (`0 0 0 2px`, `inset 0 -2px 0`)
+   have no blur and are not elevation. A test fails on a blurred shadow that is not a token.
 5. **The accent colour picker** (phase 7): a native `<input type="color">` with the browser's grey.
 
 Left for later, reported in the audit: a common rule for the title of a view (24, 19.5, 15 and 33 px

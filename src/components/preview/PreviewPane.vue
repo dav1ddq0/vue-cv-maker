@@ -299,6 +299,6 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
 }
 
 .cv-page {
-  box-shadow: 0 2px 18px rgba(16, 24, 40, 0.14);
+  box-shadow: var(--elevation-2);
 }
 </style>

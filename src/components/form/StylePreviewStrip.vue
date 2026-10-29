@@ -49,7 +49,7 @@ const { t } = useI18n()
   height: calc(297mm * var(--scale));
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.18);
+  box-shadow: var(--elevation-2);
 }
 
 .scaled {

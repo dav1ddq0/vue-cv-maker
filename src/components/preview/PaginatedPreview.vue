@@ -119,7 +119,7 @@ async function repaginate() {
 /* paged.js output is injected imperatively, so its styles need :deep. */
 .pages :deep(.pagedjs_page) {
   background: #fff;
-  box-shadow: 0 2px 12px rgba(16, 24, 40, 0.14);
+  box-shadow: var(--elevation-2);
   margin: 0 auto 1em;
 }
 </style>

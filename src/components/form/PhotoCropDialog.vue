@@ -271,7 +271,7 @@ function onClose() {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  box-shadow: 0 0 0 999px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 0 0 999px color-mix(in srgb, var(--md-scrim) 35%, transparent);
   outline: 1px solid rgba(255, 255, 255, 0.8);
   pointer-events: none;
 }

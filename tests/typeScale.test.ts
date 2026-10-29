@@ -49,3 +49,21 @@ describe('the type scale of the interface (spec 043)', () => {
     expect(/body\s*\{[^}]*font-size:\s*var\(--size-14\)/.test(css)).toBe(true)
   })
 })
+
+describe('the elevations of the interface (spec 043)', () => {
+  it('casts a shadow only from the elevation tokens; rings and indicator lines have no blur', () => {
+    const loose: string[] = []
+    for (const file of files) {
+      readFileSync(file, 'utf8').split('\n').forEach((line, index) => {
+        const value = /box-shadow\s*:\s*([^;]+);/.exec(line)?.[1]?.trim()
+        if (!value || value === 'none' || /var\(--(?:elevation-[123]|shadow)\)/.test(value)) return
+        // Every layer of the value, without its colour: x y blur spread.
+        for (const layer of value.replace(/\([^)]*\)/g, '').split(',')) {
+          const lengths = layer.replace(/inset/, '').trim().split(/\s+/).filter((part) => /^-?[0-9.]+(?:px|em)?$/.test(part))
+          if (parseFloat(lengths[2] ?? '0') !== 0) loose.push(`${file}:${index + 1} box-shadow: ${value}`)
+        }
+      })
+    }
+    expect(loose).toEqual([])
+  })
+})
