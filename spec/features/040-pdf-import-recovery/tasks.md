@@ -5,4 +5,4 @@
 - [x] 3 · Table guard, side-by-side headings, style-matched unknown headings, subtitles, the place beside the contact details; real-CV check — commit: 88e098d
 - [x] 4 · qa:roundtrip checks the import counts; verification; roadmap — commit: 88e098d
 - [x] 5 · The name from the PDF title, headings in ordinary case, tests, Monograph no longer an exception — commit: 25af771
-- [x] 6 · Letter-spaced text repaired from the glyphs the page draws, real bold, title parts, the headline by position, bold-aware headings; the round trip checks the headline — commit: _pending_
+- [x] 6 · Letter-spaced text repaired from the glyphs the page draws, real bold, title parts, the headline by position, bold-aware headings; the round trip checks the headline — commit: 07d8f7a
