@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * A month and a year for a date that may be partial (spec 038). The value is `''`, `YYYY` or
- * `YYYY-MM`: the month is optional, a month without a year stores nothing. Two native controls
+ * `YYYY-MM`: the month is optional, a month without a (plausible) year stores nothing. Two native controls
  * instead of `<input type="month">`, so the month names follow the UI language and a year-only date
  * (which PDF import produces) shows up instead of reading as empty.
  */
@@ -21,7 +21,11 @@ const split = (value: string) => {
 const year = ref(split(model.value).year)
 const month = ref(split(model.value).month)
 
-const value = computed(() => (/^\d{4}$/.test(year.value) ? (month.value ? `${year.value}-${month.value}` : year.value) : ''))
+const MIN_YEAR = 1900
+const MAX_YEAR = 2100
+const plausible = (year: string) => /^\d{4}$/.test(year) && Number(year) >= MIN_YEAR && Number(year) <= MAX_YEAR
+
+const value = computed(() => (plausible(year.value) ? (month.value ? `${year.value}-${month.value}` : year.value) : ''))
 
 // Follows the model when it changes from outside (undo, import), but not while a half-typed value
 // (a month with no year yet) produces the same stored value.
@@ -30,14 +34,14 @@ watch(model, (next) => {
   ;({ year: year.value, month: month.value } = split(next))
 })
 
-function commit() {
-  if (value.value !== model.value) model.value = value.value
-}
+// One path for both controls: whatever changed them, the stored value follows.
+watch(value, (next) => {
+  if (next !== model.value) model.value = next
+})
 
 function onYear(event: Event) {
   const input = event.target as HTMLInputElement
   year.value = input.value = input.value.replace(/\D/g, '').slice(0, 4)
-  commit()
 }
 
 const months = computed(() => {
@@ -57,7 +61,6 @@ const months = computed(() => {
       class="month"
       :disabled="disabled"
       :aria-label="`${props.label} · ${t('experience.month')}`"
-      @change="commit"
     >
       <option value="">{{ t('experience.month') }}</option>
       <option v-for="m in months" :key="m.value" :value="m.value">{{ m.name }}</option>

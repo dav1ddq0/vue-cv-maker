@@ -7,3 +7,4 @@
 - [x] 5 · rounder chrome (8 → 12 px on nine elements) — commit: ee2c881
 - [x] 6 · shape tokens 16 / 20 px — commit: 54e1e35
 - [x] 7 · Review fix: field ring at 3:1, contrast test — commit: 6768425
+- [x] 8 · Review suggestions: one watch in MonthField, year 1900–2100, forced-colours ring, spec tidy — commit: _pending_

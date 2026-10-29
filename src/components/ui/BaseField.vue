@@ -62,6 +62,19 @@ const id = useId()
   box-shadow: inset 0 0 0 2px var(--indicator);
 }
 
+/* Forced colours drop box-shadow and backgrounds: the edge and the focus ring are outlines there. */
+@media (forced-colors: active) {
+  .box {
+    outline: 1px solid ButtonBorder;
+    outline-offset: -1px;
+  }
+
+  .box:focus-within {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 /* Drawn over the control, which fills the whole container: all of it is the touch target (M3). */
 .label {
   position: absolute;

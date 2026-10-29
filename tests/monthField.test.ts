@@ -49,6 +49,21 @@ describe('MonthField (spec 038)', () => {
     expect(stored(wrapper)).toBe('2023-01')
   })
 
+  it('does not store a year outside 1900–2100', async () => {
+    const wrapper = mountField('')
+    const year = wrapper.find('input')
+    await year.setValue('1850')
+    expect(stored(wrapper)).toBe('')
+    await year.setValue('0000')
+    expect(stored(wrapper)).toBe('')
+    await year.setValue('2101')
+    expect(stored(wrapper)).toBe('')
+    await year.setValue('1900')
+    expect(stored(wrapper)).toBe('1900')
+    await year.setValue('2100')
+    expect(stored(wrapper)).toBe('2100')
+  })
+
   it('follows the model when it changes from outside, as undo does', async () => {
     const wrapper = mountField('2020-01')
     await wrapper.setProps({ modelValue: '2018-11' })

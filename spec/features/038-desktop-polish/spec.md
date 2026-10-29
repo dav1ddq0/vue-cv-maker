@@ -14,7 +14,8 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
      Spanish UI no longer shows "March 2022".
    - The month is optional: a year alone is stored as `YYYY`, as PDF import already produces. The
      native input showed those dates empty.
-   - The stored value stays `''`, `YYYY` or `YYYY-MM`. A month without a year stores nothing.
+   - The stored value stays `''`, `YYYY` or `YYYY-MM`. A month without a year stores nothing, nor
+     does a year outside 1900–2100.
    - The native controls bring keyboard and screen-reader support without a custom popup.
    - "I work here now" disables both controls and empties them.
 2. **B · Lighter fields.**
@@ -25,33 +26,38 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
      bottom line: outline at rest (4.5:1 on the card in light, 5.15:1 in dark; WCAG 1.4.11 asks 3:1),
      on-surface-variant on hover, primary and 2 px in focus, error for a warning. A first version
      used outline-variant (1.7:1); the review caught it and `tests/fieldContrast.test.ts` now holds
-     the line.
+     the line. In forced-colours mode, where box-shadow is dropped, the edge and the focus ring are
+     outlines.
    - Highlights (`TagInput`) become rows with a divider, like the skills in `SkillItemsEditor`,
      instead of outlined chips.
-3. **Rounder everywhere.** After comparing 12, 16 and 20 px on desktop and a Pixel 7 profile, the
-   tokens go up: `--shape-md` 12 → 16 px and `--shape-lg` 16 → 20 px (`--radius` follows
-   `--shape-md`). Fields, cards, dialogs and sheets all follow. 20 px on a 56 px field starts to
-   read as a pill.
-   **Rounder chrome (before that).** The smaller radii of the app chrome go from 8 px (`--shape-sm`) to 12 px
-   (`--shape-md`): the header select and document title, the preferences action, the entry card
-   header, the PDF review select, the export side warning, the crop dialog's secondary button, the
-   template thumbnails and the preview toolbar chip. The logo mark, the `kbd` hint, the crop frame
-   and the page highlight keep theirs.
+3. **Rounder shapes.** Two steps, both asked for by the user.
+   - The smaller radii of the app chrome go from 8 px (`--shape-sm`) to 12 px (`--shape-md`): the
+     header select and document title, the preferences action, the entry card header, the PDF review
+     select, the export side warning, the crop dialog's secondary button, the template thumbnails and
+     the preview toolbar chip. The logo mark, the `kbd` hint, the crop frame and the page highlight
+     keep theirs.
+   - After comparing 12, 16 and 20 px on desktop and a Pixel 7 profile, the tokens go up:
+     `--shape-md` 12 → 16 px and `--shape-lg` 16 → 20 px (`--radius` follows `--shape-md`). Fields,
+     cards, dialogs and sheets all follow. 20 px on a 56 px field starts to read as a pill.
 4. **D · Export contrast.** The "Before you export" block gets a container (`surface-container-lowest`)
    that reads against the dialog (`surface-container-high`) in both themes.
 
 ## Acceptance criteria
 
 1. [x] The experience and education dates have no native month input; a year alone is accepted.
-2. [x] The month names follow the UI language.
+2. [x] The month names follow the UI language, and a year outside 1900–2100 is not stored.
 3. [x] Fields and highlights are lighter in light and dark, with 0 contrast issues in the audit.
 4. [x] The "Before you export" block is distinguishable from the dialog in dark.
-5. [x] The edge of a field reaches 3:1 against the card in both themes (unit test).
-6. [x] The shape tokens are 16 px (`--shape-md`) and 20 px (`--shape-lg`).
+5. [x] The edge of a field reaches 3:1 against the card in both themes (unit test) and survives
+   forced colours.
+6. [x] The shape tokens are 16 px (`--shape-md`) and 20 px (`--shape-lg`); the smaller chrome radii are
+   12 px.
 
 ## Verification
 
-- 518 unit tests, plus the typecheck. New: `MonthField` (7 cases), `DateRangeFields` updated.
+- 519 unit tests, plus the typecheck. New: `MonthField` (8 cases), `DateRangeFields` updated, the field
+  contrast test. The lockfile was regenerated with `npm install --package-lock-only --offline`: no
+  change, so the hand-edited name matches what npm writes.
 - `qa:e2e` 93/93.
 - Audit at 1440×900 and Pixel 7, light and dark, on the Experience and Education steps and the
   export dialog: 0 contrast issues, 0 light patches, 0 console errors. The only flagged boxes are
