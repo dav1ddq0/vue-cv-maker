@@ -4,4 +4,4 @@
 - [x] 2 · Columns: cells, reading order by column and band; entries, skills and languages parsers — commit: 2bd7c47
 - [x] 3 · Table guard, side-by-side headings, style-matched unknown headings, subtitles, the place beside the contact details; real-CV check — commit: 88e098d
 - [x] 4 · qa:roundtrip checks the import counts; verification; roadmap — commit: 88e098d
-- [x] 5 · The name from the PDF title, headings in ordinary case, tests, Monograph no longer an exception — commit: _pending_
+- [x] 5 · The name from the PDF title, headings in ordinary case, tests, Monograph no longer an exception — commit: 25af771
