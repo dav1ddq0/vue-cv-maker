@@ -1,6 +1,6 @@
 # 043 · Design consistency: the tokens are what the interface uses
 
-**Status:** in progress
+**Status:** implemented ✅ (the two items left for later aside)
 
 ## What it does
 
@@ -33,6 +33,19 @@ the scale. These were not, and are fixed one phase at a time, each its own commi
    with the chosen colour inside and a ring of every hue to say "any colour"; disabled it dims like
    the rest.
 
+6. **A suite for it** (phase 8): `npm run qa:consistency` (also in `npm run qa`) repeats the audit in the
+   browser over 68 views (desktop light and dark: the steps, the photo crop and export dialogs, the
+   preferences, Import, My CVs, a blank CV for the empty states; a Pixel 7 profile: the nine steps and
+   the menu) and fails on a text size or weight off the scale, a radius off the shape scale, a blurred
+   shadow that is not an elevation token, an input in the browser's own grey, an element that sticks
+   out of its box or scrolls sideways (the phone's template carousel is meant to), a BaseButton
+   variant that looks different somewhere, and single-line fields of different heights. It found one
+   more: a date field (58 px) and the two sliders (60 px) were taller than a text field (56 px), the
+   first from the browser's own date control and the others from the default margin of a range input;
+   a field's input is now `margin: 0; height: 56px`. The static guards (`tests/typeScale.test.ts`)
+   catch the size, weight and shadow the moment they are written; the browser suite catches what
+   only shows once styles cascade.
+
 Left for later, reported in the audit: a common rule for the title of a view (24, 19.5, 15 and 33 px
 today) and the padding that is off the 4 px grid (from the same `em` units).
 
@@ -48,3 +61,10 @@ _Per phase, below._
   typecheck, `qa:e2e` 96/96, the overflow detection over 9 steps × 6 widths × 2 themes finds nothing
   new, and screenshots of the steps, My CVs, the template gallery and the phone read the same with
   the type a point smaller where it inherited 15 px.
+
+### Phases 3, 4, 5, 7 and 8
+
+- 597 unit tests, `qa:e2e` 96/96, `qa:consistency` 9/9 over 68 views. Each guard was mutated: a loose
+  `font-size`, an odd weight and a raw shadow fail the static tests; a font size, a taller field and a
+  loose shadow in a view the suite visits fail the browser suite (a shadow in the preferences panel and
+  a size in an empty state were missed until those views were added).

@@ -120,6 +120,7 @@ const id = useId()
 .box > :deep(select) {
   width: 100%;
   min-height: 56px;
+  margin: 0;
   padding: 24px 16px 8px;
   border: 0;
   border-radius: 0;
@@ -128,6 +129,11 @@ const id = useId()
   font: var(--type-body-large);
   letter-spacing: var(--tracking-body-large);
   outline: none;
+}
+
+/* One line is one height: a date field and a slider are taller than a text one on their own (spec 043). */
+.box > :deep(input:not([type='checkbox'], [type='radio'])) {
+  height: 56px;
 }
 
 .box > :deep(textarea) {

@@ -1,0 +1,169 @@
+// The interface against its design tokens, in the browser (spec 043): the computed style of every
+// element of every view, light and dark, desktop and a Pixel 7 profile, checked against the scale.
+//   - text sizes are the sizes of the type scale (`--size-*`), weights are 400/500/600/700;
+//   - corner radii are the shape scale, and every field is the same height and radius;
+//   - a blurred shadow is an elevation token;
+//   - the buttons of one class look alike, and no input shows the browser's own grey;
+//   - nothing sticks out of its box, scrolls sideways or is cut without an ellipsis.
+// The CV paper (templates, thumbnails, the phone's preview) sets its own type and is left out.
+// Usage: npm run qa:consistency (builds first). Report in .qa/consistency.json.
+const fs = require('node:fs')
+const path = require('node:path')
+const { ROOT, startServer } = require('./lib/server.cjs')
+const { devices } = require('playwright')
+
+const OUT = path.join(ROOT, '.qa')
+const STEPS = ['Datos personales', 'Resumen', 'Experiencia', 'Formación', 'Competencias', 'Idiomas', 'Secciones propias', 'Plantilla y estilo', 'Exportar']
+const SIZES = new Set(['11px', '12px', '14px', '16px', '22px', '24px', '28px', '32px', '36px'])
+const WEIGHTS = new Set(['400', '500', '600', '700'])
+const RADII = new Set(['0px', '4px', '8px', '16px', '20px', '28px', '9999px', '50%'])
+
+/** Runs in the page: the facts of every visible element of the interface. */
+const COLLECT = `(() => {
+  const paper = (el) => el.closest('.cv-page, .thumb, .tile-preview, .preview-thumb, .page-wrap, .page-frame, .pagedjs_pages, svg, .paper, [class*=preview] .cv, .sheet-preview')
+  const label = (el) => el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).filter((c) => !/^(m3|is-|v-)/.test(c))[0] : '')
+  const visible = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; const s = getComputedStyle(el); return s.visibility !== 'hidden' && s.display !== 'none' && s.opacity !== '0' }
+  const out = { text: [], radius: [], shadow: [], buttons: [], fields: [], inputs: [], overflow: [] }
+  const clipper = (el) => { for (let n = el.parentElement; n; n = n.parentElement) { const s = getComputedStyle(n); if (/(hidden|auto|scroll|clip)/.test(s.overflowX) || n === document.body) return n } return document.body }
+  for (const el of document.body.querySelectorAll('*')) {
+    if (paper(el) || !visible(el)) continue
+    const s = getComputedStyle(el), r = el.getBoundingClientRect()
+    const own = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())
+    if (own && !/Source Sans|Caladea|Inter|Merriweather|Lora|Playfair|Georgia|Times|Courier/i.test(s.fontFamily)) out.text.push({ l: label(el), size: s.fontSize, weight: s.fontWeight })
+    const hasBg = s.backgroundColor !== 'rgba(0, 0, 0, 0)', hasBorder = parseFloat(s.borderTopWidth) > 0 && s.borderTopStyle !== 'none'
+    if ((hasBg || hasBorder) && s.borderTopLeftRadius !== '0px') out.radius.push({ l: label(el), v: s.borderTopLeftRadius })
+    if (s.boxShadow !== 'none') out.shadow.push({ l: label(el), v: s.boxShadow })
+    if (el.matches('button.btn') && own) out.buttons.push({ l: 'btn--' + (el.className.match(/btn--(primary|tonal|secondary|ghost|danger)/) || [])[1] + (el.className.includes('btn--sm') ? ' sm' : ''), h: Math.round(r.height), radius: s.borderTopLeftRadius, size: s.fontSize, weight: s.fontWeight })
+    if (el.matches('.box') && el.querySelector(':scope > input:not([type=color]):not([type=file]), :scope > select')) out.fields.push({ l: label(el), h: Math.round(r.height), radius: s.borderTopLeftRadius })
+    if (el.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea') && s.backgroundColor === 'rgb(239, 239, 239)') out.inputs.push({ l: label(el) + '[' + el.type + ']' })
+    // The template carousel of the phone is meant to scroll sideways, and what is in it.
+    if (el.closest('ul.templates') && matchMedia('(max-width: 600px)').matches) continue
+    const c = clipper(el)
+    if (c !== document.body && s.position !== 'absolute' && s.position !== 'fixed') {
+      const cr = c.getBoundingClientRect()
+      if (r.right > cr.right + 1.5 || r.left < cr.left - 1.5) out.overflow.push({ l: label(el) + ' in ' + label(c), by: Math.round(Math.max(r.right - cr.right, cr.left - r.left)) })
+    }
+    if (/(auto|scroll)/.test(s.overflowX) && el.scrollWidth > el.clientWidth + 1) out.overflow.push({ l: 'scrolls sideways: ' + label(el), by: el.scrollWidth - el.clientWidth })
+  }
+  if (document.documentElement.scrollWidth > innerWidth + 1) out.overflow.push({ l: 'the page scrolls sideways', by: document.documentElement.scrollWidth - innerWidth })
+  return out
+})()`
+
+;(async () => {
+  fs.mkdirSync(OUT, { recursive: true })
+  const server = await startServer('preview')
+  process.env.BASE = server.url
+  const { chromium, check, results, open, startSample, step } = require('./e2e/lib.cjs')
+  const browser = await chromium.launch()
+  const seen = { btnHeight: new Map(), size: new Map(), weight: new Map(), radius: new Map(), shadow: new Map(), input: new Map(), overflow: new Map(), btn: new Map(), field: new Map() }
+  const note = (map, key, where) => { if (!map.has(key)) map.set(key, []); if (map.get(key).length < 3) map.get(key).push(where) }
+  let views = 0
+
+  const grab = async (p, where) => {
+    views++
+    const d = await p.evaluate(COLLECT)
+    for (const t of d.text) {
+      if (!SIZES.has(t.size)) note(seen.size, `${t.size} ${t.l}`, where)
+      if (!WEIGHTS.has(t.weight)) note(seen.weight, `${t.weight} ${t.l}`, where)
+    }
+    for (const r of d.radius) if (!RADII.has(r.v)) note(seen.radius, `${r.v} ${r.l}`, where)
+    for (const s of d.shadow) {
+      // A drop shadow is an elevation token; rings and indicator lines have no blur.
+      const lengths = s.v.replace(/rgba?\([^)]*\)|color\([^)]*\)/g, '').split(',').map((layer) => layer.replace('inset', '').trim().split(/\s+/).map(parseFloat))
+      const blurred = lengths.some((l) => (l[2] || 0) !== 0)
+      const tokens = ['0px 1px 2px', '0px 2px 6px', '0px 4px 8px'].some((x) => s.v.includes(x))
+      if (blurred && !tokens) note(seen.shadow, `${s.v.slice(0, 60)} ${s.l}`, where)
+    }
+    for (const i of d.inputs) note(seen.input, i.l, where)
+    for (const o of d.overflow) note(seen.overflow, `${o.l} (+${o.by}px)`, where)
+    // The height of a touch-sized call to action (48 and up) is its own; the look of every variant is not.
+    for (const b of d.buttons) {
+      note(seen.btn, `${b.l} | ${b.radius} ${b.size} w${b.weight}`, where)
+      if (b.h < 48 && b.h !== (b.l.endsWith(' sm') ? 32 : 40)) note(seen.btnHeight, `${b.l} ${b.h}h`, where)
+    }
+    for (const f of d.fields) if (f.h <= 60) note(seen.field, `${f.h}h ${f.radius}`, where)
+  }
+
+  try {
+    for (const theme of ['light', 'dark']) {
+      const p = await open(browser, { viewport: { width: 1440, height: 900 }, colorScheme: theme })
+      await p.addInitScript((t) => localStorage.setItem('keireki-craft:prefs', JSON.stringify({ uiLanguage: 'es', theme: t })), theme)
+      await p.reload({ waitUntil: 'networkidle' }).catch(() => {})
+      await grab(p, `desktop ${theme} welcome`)
+      await startSample(p)
+      for (const name of STEPS) {
+        await step(p, name).catch(() => {})
+        await p.waitForTimeout(200)
+        await grab(p, `desktop ${theme} ${name}`)
+      }
+      await step(p, 'Datos personales').catch(() => {})
+      await p.locator('.photo-drop input[type=file]').setInputFiles(path.join(__dirname, 'fixtures/portrait.jpg')).catch(() => {})
+      await p.waitForSelector('dialog.crop[open]', { timeout: 3000 }).catch(() => {})
+      await p.waitForTimeout(300)
+      await grab(p, `desktop ${theme} photo crop dialog`)
+      await p.keyboard.press('Escape')
+      await p.getByRole('button', { name: /Exportar/ }).first().click().catch(() => {})
+      await p.waitForSelector('dialog[open]', { timeout: 3000 }).catch(() => {})
+      await grab(p, `desktop ${theme} export dialog`)
+      await p.keyboard.press('Escape')
+      await p.getByRole('button', { name: /Preferencias/ }).first().click().catch(() => {})
+      await p.waitForTimeout(250)
+      await grab(p, `desktop ${theme} preferences`)
+      await p.keyboard.press('Escape')
+      await p.getByRole('button', { name: /Importar/ }).first().click().catch(() => {})
+      await p.waitForTimeout(250)
+      await grab(p, `desktop ${theme} import`)
+      await p.getByRole('button', { name: /^Mis CVs/ }).first().click().catch(() => {})
+      await p.waitForTimeout(250)
+      await grab(p, `desktop ${theme} My CVs`)
+      // A blank CV: the empty states of every step.
+      await p.getByRole('button', { name: /Nuevo CV/ }).first().click().catch(() => {})
+      await p.waitForTimeout(400)
+      for (const name of STEPS) {
+        await step(p, name).catch(() => {})
+        await p.waitForTimeout(150)
+        await grab(p, `desktop ${theme} blank ${name}`)
+      }
+      await p.context().close()
+
+      const m = await open(browser, { ...devices['Pixel 7'], colorScheme: theme })
+      await m.addInitScript((t) => localStorage.setItem('keireki-craft:prefs', JSON.stringify({ uiLanguage: 'es', theme: t })), theme)
+      await m.reload({ waitUntil: 'networkidle' }).catch(() => {})
+      await startSample(m)
+      for (let i = 0; i < 9; i++) {
+        await m.waitForTimeout(200)
+        await grab(m, `phone ${theme} step ${i + 1}`)
+        const next = m.getByRole('button', { name: /Siguiente/ }).first()
+        if (!(await next.isVisible().catch(() => false)) || (await next.isDisabled().catch(() => true))) break
+        await next.click().catch(() => {})
+      }
+      await m.getByRole('button', { name: /Menú|Menu|Más/ }).first().click().catch(() => {})
+      await m.waitForTimeout(300)
+      await grab(m, `phone ${theme} menu`)
+      await m.context().close()
+    }
+  } finally {
+    await browser.close()
+    server.stop()
+  }
+
+  const none = (map) => [...map.entries()].map(([k, w]) => `${k} (${w[0]})`).join(' · ')
+  check('scale', `text sizes are the sizes of the type scale, over ${views} views`, !seen.size.size, none(seen.size))
+  check('scale', 'font weights are 400, 500, 600 or 700', !seen.weight.size, none(seen.weight))
+  check('scale', 'corner radii are the shape scale', !seen.radius.size, none(seen.radius))
+  check('scale', 'blurred shadows are elevation tokens', !seen.shadow.size, none(seen.shadow))
+  check('controls', 'no input shows the browser\'s own grey', !seen.input.size, none(seen.input))
+  check('controls', 'nothing sticks out of its box or scrolls sideways', !seen.overflow.size, none(seen.overflow))
+  const variants = new Map()
+  for (const key of seen.btn.keys()) { const [kind, look] = key.split(' | '); if (!variants.has(kind)) variants.set(kind, new Set()); variants.get(kind).add(look) }
+  const varying = [...variants].filter(([, looks]) => looks.size > 1).map(([kind, looks]) => `${kind}: ${[...looks].join(' / ')}`)
+  check('controls', 'every BaseButton variant looks the same wherever it is', !varying.length, varying.join(' · ') + '')
+  check('controls', 'a button is 40 px tall, or 32 for the small one, unless it is a touch-sized call to action', !seen.btnHeight.size, none(seen.btnHeight))
+  check('controls', 'single-line fields are one height and one radius', seen.field.size === 1, [...seen.field].map(([k, w]) => `${k} at ${w[0]}`).join(' · '))
+
+  fs.writeFileSync(path.join(OUT, 'consistency.json'), JSON.stringify({ views, results }, null, 1))
+  for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'} [${r.block}] ${r.name}${r.detail ? ' — ' + r.detail : ''}`)
+  const failed = results.filter((r) => !r.ok)
+  console.log(`\n${results.length - failed.length}/${results.length} checks pass · ${views} views`)
+  process.exitCode = failed.length ? 1 : 0
+})()

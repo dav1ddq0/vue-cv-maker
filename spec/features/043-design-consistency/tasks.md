@@ -5,4 +5,4 @@
 - [x] 4 · Weights — commit: 549121b
 - [x] 5 · Elevation — commit: eb8231c
 - [x] 7 · Accent colour picker — commit: 73700b8
-- [ ] 8 · qa:consistency
+- [x] 8 · qa:consistency, single-line fields one height — commit: _pending_
