@@ -103,6 +103,8 @@ const en: typeof es = {
     location: 'Location',
     start: 'Start',
     end: 'End',
+    month: 'Month',
+    year: 'Year',
     current: 'I work here now',
     description: 'Description',
     highlights: 'Highlights',

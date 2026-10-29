@@ -6,16 +6,13 @@
 import { useI18n } from '@/i18n'
 import { useValidation } from '@/composables/useValidation'
 import BaseField from '@/components/ui/BaseField.vue'
+import MonthField from '@/components/ui/MonthField.vue'
 
 const start = defineModel<string>('start', { required: true })
 const end = defineModel<string | null>('end', { required: true })
 
 const { t } = useI18n()
 const { dateOrderWarning } = useValidation()
-
-function onEndInput(event: Event) {
-  end.value = (event.target as HTMLInputElement).value
-}
 
 function onCurrentChange(event: Event) {
   end.value = (event.target as HTMLInputElement).checked ? null : ''
@@ -25,7 +22,7 @@ function onCurrentChange(event: Event) {
 <template>
   <div class="dates">
     <BaseField v-slot="{ id }" :label="t('experience.start')">
-      <input :id="id" v-model="start" type="month" />
+      <MonthField :id="id" v-model="start" :label="t('experience.start')" />
     </BaseField>
     <BaseField
       v-slot="{ id }"
@@ -33,7 +30,7 @@ function onCurrentChange(event: Event) {
       :warning="dateOrderWarning(start, end)"
       :disabled="end === null"
     >
-      <input :id="id" :value="end ?? ''" type="month" :disabled="end === null" @input="onEndInput" />
+      <MonthField :id="id" :model-value="end ?? ''" :label="t('experience.end')" :disabled="end === null" @update:model-value="end = $event" />
     </BaseField>
     <label class="current">
       <input type="checkbox" :checked="end === null" @change="onCurrentChange" />
@@ -45,7 +42,7 @@ function onCurrentChange(event: Event) {
 <style scoped>
 .dates {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.6em;
   align-items: end;
 }

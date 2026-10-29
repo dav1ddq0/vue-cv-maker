@@ -104,6 +104,8 @@ export default {
     location: 'Ubicación',
     start: 'Inicio',
     end: 'Fin',
+    month: 'Mes',
+    year: 'Año',
     current: 'Actualmente aquí',
     description: 'Descripción',
     highlights: 'Logros',
