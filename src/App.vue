@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onBeforeUnmount, onMounted } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
@@ -10,6 +10,7 @@ import PreviewPane from '@/components/preview/PreviewPane.vue'
 import DocumentList from '@/components/documents/DocumentList.vue'
 import WelcomeView from '@/components/documents/WelcomeView.vue'
 import NoticeBar from '@/components/ui/NoticeBar.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import { useIsDesktop, useIsPhone } from '@/composables/useIsPhone'
 import StepRail from '@/components/form/StepRail.vue'
 import { shortcutFor } from '@/core/shortcuts'
@@ -24,10 +25,18 @@ const isDesktop = useIsDesktop()
 // someone actually opens it, so the editor's first paint never pays for it.
 const ImportView = defineAsyncComponent(() => import('@/components/import/ImportView.vue'))
 
+/** The stored CVs could not be opened (or brought over from the app's old name, spec 039): say so, never an empty app. */
+const startupFailed = ref(false)
+
 onMounted(async () => {
   ui.setTheme(ui.theme)
   await ui.probeEnvironment()
-  await cv.init()
+  try {
+    await cv.init()
+  } catch {
+    startupFailed.value = true
+    return
+  }
   // First visit: nothing saved yet, so offer the ways in rather than an empty form (spec 019).
   if (!cv.documents.length) ui.view = 'welcome'
   window.addEventListener('keydown', onKeydown)
@@ -38,6 +47,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
   window.removeEventListener('beforeunload', flushPending)
 })
+
+const reload = () => location.reload()
 
 /** A debounced autosave must not be lost to a tab close. */
 function flushPending() {
@@ -83,8 +94,13 @@ function onKeydown(event: KeyboardEvent) {
       </NoticeBar>
     </div>
 
+    <main v-if="startupFailed" class="scroll-view startup-failed">
+      <NoticeBar tone="warning">{{ t('notices.startupFailed') }}</NoticeBar>
+      <BaseButton variant="primary" @click="reload">{{ t('notices.reload') }}</BaseButton>
+    </main>
+
     <main
-      v-if="ui.view === 'editor'"
+      v-else-if="ui.view === 'editor'"
       class="editor"
       :class="{ 'editor--preview-open': ui.previewOpen, 'editor--rail': isDesktop, 'editor--expanded': isDesktop && ui.previewExpanded }"
     >
@@ -105,7 +121,7 @@ function onKeydown(event: KeyboardEvent) {
       <ImportView />
     </main>
 
-    <MobileDock v-if="ui.view === 'editor'" />
+    <MobileDock v-if="ui.view === 'editor' && !startupFailed" />
   </div>
 </template>
 
@@ -115,6 +131,14 @@ function onKeydown(event: KeyboardEvent) {
   flex-direction: column;
   height: 100%;
   min-height: 0;
+}
+
+.startup-failed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1em;
+  padding: 1em;
 }
 
 .notices {

@@ -37,10 +37,10 @@ const id = useId()
   min-width: 0;
 }
 
-/* Container: surface-container-high (one step softer than M3's highest), rounded all round, with a ring
-   that is the outline at rest, stronger on hover and the primary colour in focus (spec 038). */
+/* Container: surface-container-high (one step softer than M3's highest), rounded all round, with a ring:
+   the outline at rest (4.5:1 on the card, WCAG 1.4.11 asks 3:1), darker on hover, primary in focus (spec 038). */
 .box {
-  --indicator: var(--md-outline-variant);
+  --indicator: var(--md-outline);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -53,7 +53,7 @@ const id = useId()
 }
 
 .box:hover {
-  --indicator: var(--md-outline);
+  --indicator: var(--md-on-surface-variant);
   background: color-mix(in srgb, var(--md-on-surface) calc(var(--state-hover) * 100%), var(--md-surface-container-high));
 }
 

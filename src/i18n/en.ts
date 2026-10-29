@@ -481,6 +481,9 @@ const en: typeof es = {
     notPersisted:
       'The browser may evict this data if it runs low on space. Export the JSON as a backup.',
     saveFailed: 'Could not save',
+    startupFailed:
+      "This browser's storage could not be opened (for example, when there is not enough space to bring over the CVs of the previous version). Your data has not been deleted: free some space and reload the page.",
+    reload: 'Reload',
     quota: 'Storage is full. Delete a CV or remove a photo.',
     importIsAnAid:
       'PDF import saves typing, it does not replace review. Always check the result.',

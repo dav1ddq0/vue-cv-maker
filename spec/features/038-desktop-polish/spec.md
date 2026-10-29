@@ -22,8 +22,10 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
      disabled included. One step lower, `surface-container`, would vanish in dark, where the card is
      that colour.
    - Rounded corners all round (`--shape-md`, asked for by the user) with a ring in place of the
-     bottom line: outline-variant at rest, outline on hover, primary and 2 px in focus, error for a
-     warning.
+     bottom line: outline at rest (4.5:1 on the card in light, 5.15:1 in dark; WCAG 1.4.11 asks 3:1),
+     on-surface-variant on hover, primary and 2 px in focus, error for a warning. A first version
+     used outline-variant (1.7:1); the review caught it and `tests/fieldContrast.test.ts` now holds
+     the line.
    - Highlights (`TagInput`) become rows with a divider, like the skills in `SkillItemsEditor`,
      instead of outlined chips.
 3. **Rounder everywhere.** After comparing 12, 16 and 20 px on desktop and a Pixel 7 profile, the
@@ -44,11 +46,13 @@ place, the grey fields are heavy, and highlights are boxes inside a box. The exp
 2. [x] The month names follow the UI language.
 3. [x] Fields and highlights are lighter in light and dark, with 0 contrast issues in the audit.
 4. [x] The "Before you export" block is distinguishable from the dialog in dark.
+5. [x] The edge of a field reaches 3:1 against the card in both themes (unit test).
+6. [x] The shape tokens are 16 px (`--shape-md`) and 20 px (`--shape-lg`).
 
 ## Verification
 
-- 512 unit tests, plus the typecheck. New: `MonthField` (7 cases), `DateRangeFields` updated.
-- `qa:e2e` 81/81.
+- 518 unit tests, plus the typecheck. New: `MonthField` (7 cases), `DateRangeFields` updated.
+- `qa:e2e` 93/93.
 - Audit at 1440×900 and Pixel 7, light and dark, on the Experience and Education steps and the
   export dialog: 0 contrast issues, 0 light patches, 0 console errors. The only flagged boxes are
   the inline "Save a copy" link (94×16) and a visually hidden 1×1 input, as before.

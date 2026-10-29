@@ -378,8 +378,29 @@ async function renameMigration(browser) {
   check(B, 'the old preferences carry over', (await p.evaluate(() => document.documentElement.lang)) === 'en' && (await p.evaluate(() => document.documentElement.dataset.theme)) === 'dark')
   check(B, 'the old database is left as a backup', await p.evaluate(async () => (await indexedDB.databases?.())?.some((d) => d.name === 'cv-maker') ?? true))
   check(B, 'the app is called Keireki Craft', (await p.title()) === 'Keireki Craft' && (await p.locator('.crumbs, header').first().innerText()).includes('Keireki Craft'))
+  // The next start must not bring the old copy over what was edited since: the new database wins.
+  // The old preferences set the UI to English.
+  await step(p, 'Personal details')
+  await p.getByLabel('Full name').fill('Editada tras migrar')
+  check(B, 'an edit after the migration is saved', await until(async () => (await idbDump(p)).includes('Editada tras migrar'), { timeout: 4000 }))
+  await p.reload({ waitUntil: 'networkidle' })
+  check(B, 'the next start keeps the edit and does not copy the old data again', await until(async () => (await p.locator('.pane .cv-page').innerText().catch(() => '')).includes('Editada tras migrar'), { timeout: 6000 }))
   check(B, 'no console errors', errs.length === 0, errs.join(' | '))
   await p.context().close()
+
+  // Storage that cannot be opened says so, instead of an empty or blank app.
+  const broken = await browser.newContext({ locale: 'es-ES' })
+  await broken.addInitScript(() => {
+    const open = IDBFactory.prototype.open
+    IDBFactory.prototype.open = function (name, ...rest) {
+      if (name === 'keireki-craft') throw new Error('storage unavailable')
+      return open.call(this, name, ...rest)
+    }
+  })
+  const q = await broken.newPage()
+  await q.goto(BASE, { waitUntil: 'networkidle' })
+  check(B, 'storage that cannot be opened shows a message and a reload button', await until(async () => /No se pudo abrir el almacenamiento/.test(await q.locator('.startup-failed').innerText().catch(() => '')) && (await q.getByRole('button', { name: 'Recargar' }).isVisible()), { timeout: 4000 }))
+  await broken.close()
 }
 
 module.exports = { mainFlow, customAndStyle, exportImport, documentsAndPrefs, phone, widths, renameMigration }

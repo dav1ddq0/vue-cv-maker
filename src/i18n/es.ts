@@ -482,6 +482,9 @@ export default {
     notPersisted:
       'El navegador puede borrar estos datos si le falta espacio. Exporta el JSON como respaldo.',
     saveFailed: 'No se pudo guardar',
+    startupFailed:
+      'No se pudo abrir el almacenamiento de este navegador (por ejemplo, si falta espacio para traer los CV de la versión anterior). Tus datos no se han borrado: libera espacio y recarga la página.',
+    reload: 'Recargar',
     quota: 'No queda espacio de almacenamiento. Elimina algún CV o quita alguna foto.',
     importIsAnAid:
       'La importación de PDF ahorra teclear, no sustituye la revisión. Comprueba siempre el resultado.',

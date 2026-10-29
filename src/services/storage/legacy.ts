@@ -4,10 +4,18 @@ import { get, setMany, type UseStore } from 'idb-keyval'
 const LEGACY_DB = 'cv-maker'
 const LEGACY_STORE = 'kv'
 
-/** The legacy database, or null when this browser never had one (it is not left behind empty). */
+/**
+ * The legacy database, or null when this browser never had one (it is not left behind empty) or it
+ * cannot be opened: that holds nothing readable here, and it must not keep the app from starting.
+ */
 function openLegacy(): Promise<IDBDatabase | null> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(LEGACY_DB)
+  return new Promise((resolve) => {
+    let request: IDBOpenDBRequest
+    try {
+      request = indexedDB.open(LEGACY_DB)
+    } catch {
+      return resolve(null)
+    }
     let created = false
     request.onupgradeneeded = () => {
       created = true
@@ -19,7 +27,7 @@ function openLegacy(): Promise<IDBDatabase | null> {
       if (created) indexedDB.deleteDatabase(LEGACY_DB)
       resolve(null)
     }
-    request.onerror = () => reject(request.error)
+    request.onerror = () => resolve(null)
   })
 }
 
