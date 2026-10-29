@@ -83,20 +83,23 @@ export function assembleCV(draft: ImportDraft, decisions: ReviewDecisions = {}):
 function parseExperience(section: DetectedSection) {
   return splitByDate(section.lines).map((chunk) => {
     const entry = createExperience()
-    const range = chunk.dateText ? parseDateRange(chunk.dateText) : null
-    if (range) {
-      entry.startDate = range.start
-      entry.endDate = range.end
+    applyRange(entry, chunk)
+
+    if (chunk.subtitle) {
+      // "Position" over "Company · dates · Place" (spec 040).
+      const [company, ...place] = splitMeta(chunk.subtitle)
+      entry.position = chunk.title
+      entry.company = company ?? ''
+      if (place.length) entry.location = place.join(', ')
+    } else {
+      const [position, company] = splitTitleLine(chunk.title)
+      entry.position = position
+      entry.company = company
     }
 
-    const [position, company] = splitTitleLine(chunk.title)
-    entry.position = position
-    entry.company = company
-
-    for (const line of chunk.body) {
-      if (isBullet(line)) entry.highlights.push(stripBullet(line))
-      else entry.description = entry.description ? `${entry.description} ${line}` : line
-    }
+    const { description, highlights } = splitBody(chunk)
+    entry.description = description
+    entry.highlights = highlights
     return entry
   })
 }
@@ -104,25 +107,76 @@ function parseExperience(section: DetectedSection) {
 function parseEducation(section: DetectedSection) {
   return splitByDate(section.lines).map((chunk) => {
     const entry = createEducation()
-    const range = chunk.dateText ? parseDateRange(chunk.dateText) : null
-    if (range) {
-      entry.startDate = range.start
-      entry.endDate = range.end
+    applyRange(entry, chunk)
+    if (chunk.subtitle) {
+      const [institution, ...place] = splitMeta(chunk.subtitle)
+      entry.degree = chunk.title
+      entry.institution = institution ?? ''
+      if (place.length) entry.location = place.join(', ')
+    } else {
+      // "Grado en Informática" is one degree: only a symbol or a comma separates the institution.
+      const [degree, institution] = splitTitleLine(chunk.title, false)
+      entry.degree = degree
+      entry.institution = institution
     }
-    const [degree, institution] = splitTitleLine(chunk.title)
-    entry.degree = degree
-    entry.institution = institution
-    entry.description = chunk.body.map(stripBullet).join(' ').trim() || undefined
+    const { description, highlights } = splitBody(chunk)
+    entry.description = [description, ...highlights].filter(Boolean).join(' ').trim() || undefined
     return entry
   })
 }
 
-/** "Lenguajes: TypeScript, Go" becomes a group; a bare list becomes one unnamed group. */
+function applyRange(entry: { startDate: string; endDate: string | null }, chunk: Chunk) {
+  const range = chunk.dateText ? parseDateRange(chunk.dateText) : null
+  if (range) {
+    entry.startDate = range.start
+    entry.endDate = range.end
+  }
+}
+
+/**
+ * The lines under an entry's title: plain ones are its description, and the ones set in from the
+ * title are its highlights (spec 040). A bullet drawn as a shape leaves no character to recognise,
+ * so the indent is the signal; a line that wraps (it starts in lower case, or follows a full line
+ * with no full stop) continues the highlight above instead of starting a new one.
+ */
+function splitBody(chunk: Chunk): { description: string; highlights: string[] } {
+  const description: string[] = []
+  const highlights: string[] = []
+  const indented = chunk.body.filter((line) => line.x >= chunk.titleX + INDENT)
+  const widest = Math.max(0, ...indented.map((line) => line.end - line.x))
+  let previous: ExtractedLine | null = null
+
+  for (const line of chunk.body) {
+    const text = line.text.trim()
+    if (isBullet(text)) {
+      highlights.push(stripBullet(text))
+      previous = null
+    } else if (line.x >= chunk.titleX + INDENT) {
+      const full = !!previous && previous.end - previous.x >= widest * 0.85
+      const continues = !!previous && (/^\p{Ll}/u.test(text) || (full && !/[.!?]$/.test(previous.text.trim())))
+      if (continues) highlights[highlights.length - 1] += ` ${text}`
+      else highlights.push(text)
+      previous = line
+    } else {
+      description.push(text)
+      previous = null
+    }
+  }
+  return { description: description.join(' '), highlights }
+}
+
+/** "Cartograf · Remoto": the first part is who, the rest is where. */
+function splitMeta(text: string): string[] {
+  return text.split(/\s[·•|]\s|\s[–—]\s/).map((part) => part.trim()).filter(Boolean)
+}
+
+/** "Lenguajes: TypeScript, Go" becomes a group; a category line over its items too (spec 040). */
 function parseSkills(section: DetectedSection) {
   const groups = []
   const loose: string[] = []
+  let current: ReturnType<typeof createSkillGroup> | null = null
 
-  for (const line of section.lines) {
+  section.lines.forEach((line, index) => {
     const text = stripBullet(line.text)
     const match = text.match(/^([^:]{2,40}):\s*(.+)$/)
     if (match) {
@@ -130,35 +184,67 @@ function parseSkills(section: DetectedSection) {
       group.category = match[1].trim()
       group.items = splitItems(match[2]).map((name) => ({ name }))
       groups.push(group)
-    } else if (text) {
-      loose.push(...splitItems(text))
+      current = null
+      return
     }
-  }
+    if (!text) return
+
+    // A category is set a little smaller than the items under it, and has no list of its own.
+    const next = section.lines[index + 1]
+    if (next && next.fontSize > line.fontSize * CATEGORY_SIZE && !/[,;·•|]/.test(text) && text.split(/\s+/).length <= 4) {
+      current = createSkillGroup()
+      current.category = text
+      groups.push(current)
+      return
+    }
+    const names = splitItems(text).map((name) => ({ name }))
+    if (current) current.items.push(...names)
+    else loose.push(...names.map((item) => item.name))
+  })
 
   if (loose.length) {
     const group = createSkillGroup()
     group.items = loose.map((name) => ({ name }))
-    groups.push(group)
+    groups.unshift(group)
   }
-  return groups
+  return groups.filter((group) => group.items.length || group.category)
 }
 
-/** "Inglés — C1", "Español (nativo)", "French: B2". */
+/**
+ * "Inglés — C1", "Español (nativo)", "French: B2", "Español · Nativo", a level on its own line
+ * after or before its language, and a whole row ("Español (Nativo) · Inglés (C1)").
+ */
 function parseLanguages(section: DetectedSection) {
-  return section.lines
-    .map((line) => stripBullet(line.text))
-    .filter(Boolean)
-    .map((text) => {
-      const entry = createLanguage()
-      const match = text.match(/^(.+?)\s*(?:[:–—-]|\()\s*([^)]+)\)?$/)
-      if (match) {
-        entry.name = match[1].trim()
-        entry.level = match[2].trim()
-      } else {
-        entry.name = text
+  const entries: ReturnType<typeof createLanguage>[] = []
+  let pendingLevel = ''
+
+  for (const line of section.lines) {
+    const text = stripBullet(line.text)
+    if (!text) continue
+    const parts = text.split(/\s[·•|]\s/).map((part) => part.trim()).filter(Boolean)
+    const named = parts.length === 2 && LANGUAGE_LEVEL_RE.test(parts[1]!) ? [text] : parts
+
+    for (const part of named) {
+      if (LANGUAGE_LEVEL_RE.test(part)) {
+        const last = entries.at(-1)
+        if (last && !last.level) last.level = part
+        else pendingLevel = part
+        continue
       }
-      return entry
-    })
+      const entry = createLanguage()
+      const match = part.match(/^(.+?)\s*(?:[:–—·-]|\()\s*([^)]+)\)?$/)
+      if (match) {
+        entry.name = match[1]!.trim()
+        entry.level = match[2]!.trim()
+      } else {
+        entry.name = part
+        entry.level = pendingLevel
+        pendingLevel = ''
+      }
+      entries.push(entry)
+    }
+  }
+  return entries
 }
 
 /* ---- reviewed blocks --------------------------------------------------- */
@@ -207,15 +293,30 @@ function applyBlocks(cv: CVData, draft: ImportDraft, targets: Record<string, Blo
 
 interface Chunk {
   title: string
+  /** Where the title starts across the page: what sets its highlights in. */
+  titleX: number
+  /** The line under a title that carries the dates: "Company · dates · Place". */
+  subtitle?: string
   dateText: string
-  body: string[]
+  body: ExtractedLine[]
 }
+
+/** A line set in this far (PDF units) from its entry's title is one of its highlights. */
+const INDENT = 6
+
+/** A category line is smaller than the next line by this factor at least. */
+const CATEGORY_SIZE = 1.015
+
+/** A level of language, on its own: "Nativo", "C1", "Intermediate", "B2 – C1". */
+const LANGUAGE_LEVEL_RE =
+  /^(?:nativ[oa]|native|bilingüe|bilingual|fluid[oa]|fluent|avanzad[oa]|advanced|intermedi[oa]|intermediate|básic[oa]|basic|elementary|proficient|lengua materna|mother tongue|[abc][12](?:\s*[-–]\s*[abc][12])?)$/iu
 
 /**
  * Splits a section into entries at each line carrying a date range: in practice
  * that is the most reliable boundary marker across CV layouts. Text left on the
  * date line becomes the entry title; a date on its own line attaches to the
- * entry above it.
+ * entry above it; a title on its own line right above a date line that still
+ * carries text ("Company · dates · Place") is that entry's title (spec 040).
  */
 function splitByDate(lines: ExtractedLine[]): Chunk[] {
   const chunks: Chunk[] = []
@@ -227,12 +328,13 @@ function splitByDate(lines: ExtractedLine[]): Chunk[] {
 
     if (!hasDateRange(text)) {
       if (!current) {
-        current = { title: text, dateText: '', body: [] }
+        current = { title: text, titleX: line.x, dateText: '', body: [] }
         chunks.push(current)
       } else if (!current.title) {
         current.title = text
+        current.titleX = line.x
       } else {
-        current.body.push(text)
+        current.body.push(line)
       }
       continue
     }
@@ -243,7 +345,12 @@ function splitByDate(lines: ExtractedLine[]): Chunk[] {
       current.dateText = text
       continue
     }
-    current = { title: remainder, dateText: text, body: [] }
+    if (current && !current.dateText && current.title && !current.body.length && remainder && Math.abs(line.x - current.titleX) < INDENT) {
+      current.dateText = text
+      current.subtitle = remainder
+      continue
+    }
+    current = { title: remainder, titleX: line.x, dateText: text, body: [] }
     chunks.push(current)
   }
 
@@ -261,13 +368,14 @@ function stripDatePortion(text: string): string {
   return text
     .replace(match[0], ' ')
     .replace(/\s+/g, ' ')
+    .replace(/(\s[|·–—-])+(?=\s)/g, (run) => run.slice(0, 2))
     .replace(/^[\s|·–—-]+|[\s|·–—(-]+$/g, '')
     .trim()
 }
 
 /** "Backend Engineer — Acme" / "Backend Engineer at Acme" / "Backend Engineer, Acme". */
-function splitTitleLine(text: string): [string, string] {
-  const separators = /\s(?:[–—|·]|-{1,2}|en|at)\s/i
+function splitTitleLine(text: string, withWords = true): [string, string] {
+  const separators = withWords ? /\s(?:[–—|·]|-{1,2}|en|at)\s/i : /\s(?:[–—|·]|-{1,2})\s/
   const parts = text.split(separators)
   if (parts.length >= 2) return [parts[0].trim(), parts.slice(1).join(' ').trim()]
   const comma = text.split(/,\s*/)
@@ -288,5 +396,5 @@ function joinLines(section: DetectedSection): string {
 
 /** Blocks carry plain strings; the parsers want `ExtractedLine`s. */
 function toLine(text: string): ExtractedLine {
-  return { page: 1, y: 0, x: 0, text, fontSize: 0, fontName: '', bold: false }
+  return { page: 1, y: 0, x: 0, end: 0, text, fontSize: 0, fontName: '', bold: false }
 }

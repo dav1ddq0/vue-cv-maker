@@ -1,21 +1,12 @@
 import * as pdfjs from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import type { TextItem } from 'pdfjs-dist/types/src/display/api'
+import { groupIntoLines, type ExtractedLine } from './layout'
+
+export type { ExtractedLine } from './layout'
 
 // The worker is a separate chunk, loaded only when the user actually imports a PDF.
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
-
-/** One reconstructed visual line, with the style signals the heuristics need. */
-export interface ExtractedLine {
-  page: number
-  /** Distance from the top of the page, in PDF units. */
-  y: number
-  x: number
-  text: string
-  fontSize: number
-  fontName: string
-  bold: boolean
-}
 
 export interface ExtractedDocument {
   lines: ExtractedLine[]
@@ -25,25 +16,6 @@ export interface ExtractedDocument {
   hasTextLayer: boolean
   /** Set when text sits in two clearly separated x-bands (spec §7.3). */
   looksMultiColumn: boolean
-}
-
-/** Fragments whose baselines differ by less than this are the same line. */
-const Y_TOLERANCE = 2.5
-
-/**
- * A gap wider than this share of the font size between two fragments of a line is a word space.
- * Measured on the app's own PDFs (spec 037): fragments that touch (a letter from another font
- * file, an e-mail split at its break points) sit within ±0.03 em; word spaces are 0.17 em or more.
- */
-const WORD_GAP = 0.1
-
-/** A positioned piece of a line, as pdf.js hands it back. */
-export interface TextFragment {
-  x: number
-  /** Where the fragment's last glyph ends. */
-  end: number
-  text: string
-  fontSize: number
 }
 
 export async function extractDocument(file: File | ArrayBuffer): Promise<ExtractedDocument> {
@@ -70,95 +42,6 @@ export async function extractDocument(file: File | ArrayBuffer): Promise<Extract
     hasTextLayer: lines.some((l) => l.text.trim().length > 0),
     looksMultiColumn: detectColumns(lines),
   }
-}
-
-/**
- * pdf.js hands back positioned fragments, not lines. Grouping on the Y
- * coordinate within a tolerance rebuilds reading order for ordinary layouts;
- * it is also exactly where two-column CVs interleave, which is why the review
- * screen (spec §7.2, stage 3) is not optional.
- */
-function groupIntoLines(items: TextItem[], page: number): ExtractedLine[] {
-  const buckets: (Omit<ExtractedLine, 'text'> & { fragments: TextFragment[] })[] = []
-
-  for (const item of items) {
-    if (!('str' in item) || !item.str.trim()) continue
-    const [, , , scaleY, x, y] = item.transform as number[]
-    const fontSize = Math.abs(scaleY) || 0
-    const fontName = String(item.fontName ?? '')
-    const fragment = { x, end: x + (item.width || 0), text: item.str, fontSize }
-
-    const existing = buckets.find((line) => Math.abs(line.y - y) <= Y_TOLERANCE)
-    if (existing) {
-      existing.fragments.push(fragment)
-      existing.fontSize = Math.max(existing.fontSize, fontSize)
-      existing.x = Math.min(existing.x, x)
-      existing.bold ||= isBold(fontName)
-    } else {
-      buckets.push({ page, y, x, fragments: [fragment], fontSize, fontName, bold: isBold(fontName) })
-    }
-  }
-
-  return buckets
-    // PDF y grows upward: descending y is top-to-bottom reading order.
-    .sort((a, b) => b.y - a.y || a.x - b.x)
-    .map(({ fragments, ...line }) => ({
-      ...line,
-      text: collapseLetterSpacing(joinFragments(fragments).replace(/\s+/g, ' ').trim()),
-    }))
-    .filter((line) => line.text.length > 0)
-}
-
-/**
- * Joins a line's fragments left to right, with a space only where there is a gap between two.
- * A PDF draws a word in several pieces when part of it comes from another font file (a "Ł",
- * an "ř") or when it was laid out with break points (an e-mail address); those pieces touch.
- */
-export function joinFragments(fragments: TextFragment[]): string {
-  let text = ''
-  let end = -Infinity
-  for (const fragment of [...fragments].sort((a, b) => a.x - b.x)) {
-    if (text && fragment.x - end > WORD_GAP * fragment.fontSize) text += ' '
-    text += fragment.text
-    end = Math.max(end, fragment.end)
-  }
-  return text
-}
-
-/**
- * Undoes CSS `letter-spacing` in the extracted text.
- *
- * A tracked-out heading reaches pdf.js as one fragment per glyph, and line
- * reconstruction joins them with spaces: "EXPERIENCIA" arrives as
- * "E X P E R I E N C I A" and no keyword heuristic recognises it. Runs of three
- * or more single-character tokens are glued back together; shorter runs are
- * left alone so real text like "Go y R" survives.
- */
-export function collapseLetterSpacing(text: string): string {
-  const tokens = text.split(' ')
-  const out: string[] = []
-  let run: string[] = []
-
-  const flush = () => {
-    if (run.length >= 3) out.push(run.join(''))
-    else out.push(...run)
-    run = []
-  }
-
-  for (const token of tokens) {
-    if ([...token].length === 1 && /[\p{L}\p{N}]/u.test(token)) run.push(token)
-    else {
-      flush()
-      out.push(token)
-    }
-  }
-  flush()
-
-  return out.join(' ').replace(/\s+/g, ' ').trim()
-}
-
-function isBold(fontName: string): boolean {
-  return /bold|black|heavy|semibold|[-,]bd\b/i.test(fontName)
 }
 
 /**

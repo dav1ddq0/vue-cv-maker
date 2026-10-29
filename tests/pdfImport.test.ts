@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ExtractedDocument, ExtractedLine } from '@/services/pdfImport/extract'
-import { collapseLetterSpacing, joinFragments } from '@/services/pdfImport/extract'
+import { collapseLetterSpacing, joinFragments } from '@/services/pdfImport/layout'
 import { analyze, parseDateRange, titleCaseIfShouting, toPartialIso } from '@/services/pdfImport/heuristics'
 import { assembleCV } from '@/services/pdfImport/assemble'
 
@@ -10,6 +10,7 @@ function doc(lines: Array<Partial<ExtractedLine> & { text: string }>): Extracted
     page: 1,
     y: 800 - index * 14,
     x: 50,
+    end: 50 + line.text.length * 5,
     fontSize: 10,
     fontName: 'Helvetica',
     bold: false,
@@ -258,5 +259,64 @@ describe('headings of unknown sections (spec 040)', () => {
     const at = (y: number, text: string) => ({ text, y })
     const draft = analyze(doc([at(800, 'Ada Lovelace'), at(760, 'COMPETENCIAS'), at(746, 'TypeScript'), at(732, 'SQL'), at(718, 'Go')]))
     expect(draft.sections[0]!.lines.map((l) => l.text)).toEqual(['TypeScript', 'SQL', 'Go'])
+  })
+})
+
+describe('entries, skills and languages as the templates lay them out (spec 040)', () => {
+  const at = (text: string, x: number, y: number, fontSize = 10, extra: Partial<ExtractedLine> = {}) => ({ text, x, y, fontSize, end: x + 200, ...extra })
+  const assemble = (lines: Array<Partial<ExtractedLine> & { text: string }>) => assembleCV(analyze(doc(lines)))
+
+  it('reads a title over "Company · dates · Place" as one entry, and sets-in lines as its highlights', () => {
+    const cv = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('EXPERIENCIA', 40, 760, 9),
+      at('Analista', 40, 740, 10.2),
+      at('Babbage Co · mar 2020 – Actualidad · Londres', 40, 726, 8.6),
+      at('Escribió el primer programa.', 40, 708),
+      at('Redujo el tiempo de cálculo un 40 %', 52, 690, 10, { end: 330 }),
+      at('en la máquina analítica.', 52, 676, 10, { end: 200 }),
+      at('Formó a tres personas.', 52, 662, 10, { end: 220 }),
+    ])
+    expect(cv.experience).toHaveLength(1)
+    expect(cv.experience[0]).toMatchObject({ position: 'Analista', company: 'Babbage Co', location: 'Londres', startDate: '2020-03', endDate: null, description: 'Escribió el primer programa.' })
+    expect(cv.experience[0]!.highlights).toEqual(['Redujo el tiempo de cálculo un 40 % en la máquina analítica.', 'Formó a tres personas.'])
+  })
+
+  it('does not split "Grado en Informática" at the "en" of a degree', () => {
+    const cv = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('FORMACIÓN', 40, 760, 9),
+      at('Grado en Matemáticas · Universidad de Londres 2010 - 2014', 40, 740),
+    ])
+    expect(cv.education[0]).toMatchObject({ degree: 'Grado en Matemáticas', institution: 'Universidad de Londres' })
+  })
+
+  it('reads a category line, set a little smaller than its items, as a skill group', () => {
+    const cv = assemble([
+      at('Ada Lovelace', 40, 800, 22),
+      at('COMPETENCIAS', 40, 760, 9),
+      at('Lenguajes', 40, 740, 8.8),
+      at('TypeScript', 40, 726, 9.2),
+      at('Python', 40, 712, 9.2),
+      at('Frontend', 40, 698, 8.8),
+      at('Vue 3, React', 40, 684, 9.2),
+    ])
+    expect(cv.skills.map((g) => [g.category, g.items.map((i) => i.name)])).toEqual([
+      ['Lenguajes', ['TypeScript', 'Python']],
+      ['Frontend', ['Vue 3', 'React']],
+    ])
+  })
+
+  it('keeps a plain list of skills as one group without a category', () => {
+    const cv = assemble([at('Ada Lovelace', 40, 800, 22), at('COMPETENCIAS', 40, 760, 9), at('TypeScript', 40, 740), at('Python', 40, 726)])
+    expect(cv.skills.map((g) => [g.category, g.items.map((i) => i.name)])).toEqual([['', ['TypeScript', 'Python']]])
+  })
+
+  it('reads languages with their level in the same line, on the next line, or in a whole row', () => {
+    const lines = (...texts: string[]) => [at('Ada Lovelace', 40, 800, 22), at('IDIOMAS', 40, 760, 9), ...texts.map((text, i) => at(text, 40, 740 - i * 14))]
+    const pairs = (cv: ReturnType<typeof assembleCV>) => cv.languages.map((l) => [l.name, l.level])
+    expect(pairs(assemble(lines('Español · Nativo', 'Inglés — C1')))).toEqual([['Español', 'Nativo'], ['Inglés', 'C1']])
+    expect(pairs(assemble(lines('Español', 'Nativo', 'Inglés', 'C1')))).toEqual([['Español', 'Nativo'], ['Inglés', 'C1']])
+    expect(pairs(assemble(lines('Español (Nativo) · Inglés (C1) · Francés (B1)')))).toEqual([['Español', 'Nativo'], ['Inglés', 'C1'], ['Francés', 'B1']])
   })
 })

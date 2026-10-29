@@ -1,4 +1,5 @@
-export { extractDocument, collapseLetterSpacing } from './extract'
+export { extractDocument } from './extract'
+export { collapseLetterSpacing } from './layout'
 export type { ExtractedDocument, ExtractedLine } from './extract'
 export { analyze } from './heuristics'
 export type { ImportDraft, DetectedField, DetectedSection, TextBlock, Confidence } from './heuristics'
