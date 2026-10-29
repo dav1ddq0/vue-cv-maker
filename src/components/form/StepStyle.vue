@@ -150,11 +150,6 @@ function previewAccent(id: string): string {
   gap: 0.9em;
 }
 
-input[type='color'] {
-  height: 2.4em;
-  padding: 0.2em;
-}
-
 .color-row {
   display: flex;
   flex-wrap: wrap;
@@ -178,8 +173,40 @@ input[type='color'] {
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
 }
 
+/*
+ * The custom colour: the browser's own box drawn as one more swatch, a round one with a ring of
+ * every hue around it to say "any colour" (spec 043). The ring is the input's padding showing its
+ * gradient; the swatch inside it is the chosen colour.
+ */
 .color-row input[type='color'] {
-  width: 3em;
+  appearance: none;
+  box-sizing: border-box;
+  width: 2.2em;
+  height: 2.2em;
+  padding: 3px;
+  border: 0;
+  border-radius: 50%;
+  background: conic-gradient(#ef4444, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444);
+  cursor: pointer;
+}
+
+.color-row input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-row input[type='color']::-webkit-color-swatch {
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+}
+
+.color-row input[type='color']::-moz-color-swatch {
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+}
+
+.color-row input[type='color']:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
 }
 
 /* After the base rules, which would otherwise win on source order. */
@@ -190,6 +217,7 @@ input[type='color'] {
   }
 
   .color-row input[type='color'] {
+    width: 44px;
     height: 44px;
   }
 }
