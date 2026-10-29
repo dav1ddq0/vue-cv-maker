@@ -199,7 +199,7 @@ async function compareFixture(browser, page) {
       host.style.cssText = 'position:fixed;left:-10000px;top:0'
       document.body.appendChild(host)
       try {
-        if (!(await paginateInto(host, html, css))) throw new Error('Pagination failed')
+        if (!(await paginateInto(host, html, { app: css, print: '' }))) throw new Error('Pagination failed')
         return window.__base64(await pdfFromPagination(host, 'Fixture', 'en'))
       } finally {
         releasePagination(host)

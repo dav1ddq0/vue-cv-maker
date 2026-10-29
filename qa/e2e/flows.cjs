@@ -403,4 +403,34 @@ async function renameMigration(browser) {
   await broken.close()
 }
 
-module.exports = { mainFlow, customAndStyle, exportImport, documentsAndPrefs, phone, widths, renameMigration }
+/**
+ * H · the page does not move while a PDF is built or the paginated view is open (spec 041): paged.js left
+ * a copy of the interface CSS after the original, and a base rule then beat the media query overriding it.
+ */
+async function noLayoutShift(browser) {
+  const B = 'layout'
+  const p = await open(browser, { acceptDownloads: true })
+  await startSample(p)
+  await step(p, 'Exportar')
+  const rects = () => p.evaluate(() => ['.editor', '.editor-rail', '.editor-form', '.editor-preview'].map((s) => { const r = document.querySelector(s)?.getBoundingClientRect(); return r ? [r.x, r.y, r.width, r.height].map(Math.round).join(',') : '-' }).join(' | '))
+  const watch = () => p.evaluate(() => { window.__rects = new Set(); const sel = ['.editor', '.editor-rail', '.editor-form', '.editor-preview']; const tick = () => { window.__rects.add(sel.map((s) => { const r = document.querySelector(s)?.getBoundingClientRect(); return r ? [r.x, r.y, r.width, r.height].map(Math.round).join(',') : '-' }).join(' | ')); window.__watch = requestAnimationFrame(tick) }; tick() })
+  const seen = () => p.evaluate(() => { cancelAnimationFrame(window.__watch); return [...window.__rects] })
+  const before = await rects()
+
+  await watch()
+  await Promise.all([p.waitForEvent('download', { timeout: 30000 }), p.getByRole('button', { name: 'Descargar PDF' }).click()])
+  await sleep(600)
+  const during = await seen()
+  check(B, 'building the direct PDF moves nothing on the page', during.length === 1 && during[0] === before, during.length > 1 ? `${during.length} different layouts: ${during.slice(0, 2).join(' ‖ ')}` : '')
+
+  await watch()
+  await p.getByRole('button', { name: 'Ver vista previa' }).click()
+  await p.locator('dialog[open] .pagedjs_page, .pagedjs_page').first().waitFor({ timeout: 20000 }).catch(() => {})
+  await sleep(800)
+  const preview = await seen()
+  check(B, 'the paginated view moves nothing either, opening or open', preview.length === 1 && preview[0] === before, preview.length > 1 ? `${preview.length} different layouts: ${preview.slice(0, 2).join(' ‖ ')}` : '')
+  check(B, 'no console errors', p.errs.length === 0, p.errs.join(' | '))
+  await p.context().close()
+}
+
+module.exports = { mainFlow, customAndStyle, exportImport, documentsAndPrefs, phone, widths, renameMigration, noLayoutShift }

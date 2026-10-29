@@ -93,12 +93,29 @@ export async function printCv(
   }
 }
 
+/**
+ * The CSS paged.js is given, in two sheets so that they can be told apart in `<head>` afterwards:
+ * the document's own (the templates' and, since they cannot be told from them, the interface's) and
+ * the print rules, which must stay the last word.
+ */
+export interface ExportCss {
+  app: string
+  print: string
+}
+
+/** A rule at the head of each sheet, to find the `<style>` paged.js makes of it (spec 041). */
+const APP_SHEET = 'cv-export-app-sheet'
+const PRINT_SHEET = 'cv-export-print-sheet'
+
 /** Markup + CSS as handed to paged.js, the HTML export and (Phase 5) WeasyPrint. */
-export function exportCss(): string {
+export function exportCss(): ExportCss {
   // No @font-face: the fonts are already registered in this document, and paged.js re-declares every
   // rule it gets in a sheet of its own, where the copied font URLs no longer resolve. Being later,
   // those broken faces won, and the PDF came out in the system font (spec 026).
-  return `${collectDocumentCss({ fontFaces: false })}\n${printCss}`
+  return {
+    app: `.${APP_SHEET}{--cv-export-sheet:app}\n${collectDocumentCss({ fontFaces: false })}`,
+    print: `.${PRINT_SHEET}{--cv-export-sheet:print}\n${printCss}`,
+  }
 }
 
 /**
@@ -113,10 +130,26 @@ export function exportCss(): string {
 export async function paginateInto(
   container: HTMLElement,
   html: string,
-  css: string,
+  css: ExportCss,
 ): Promise<boolean> {
   releasePagination(container)
   const before = new Set(document.head.querySelectorAll('style'))
+  // paged.js appends a copy of the document's CSS, interface included, after the original. Equal
+  // rules then come twice and the later copy wins their ties, so a base rule beat the media query
+  // that overrides it and the app re-laid itself out for as long as the pages existed: the rail
+  // and the panes moved while a PDF was built or the paginated view was open (spec 041). Ahead of
+  // the original the copy changes nothing there, and the host still sees the same rules in the
+  // same order, the print rules last. It is moved as soon as it is added, a microtask before the
+  // browser can lay the page out with it in the wrong place, not when paged.js is done.
+  const place = (records: MutationRecord[]) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (node instanceof HTMLStyleElement && node.textContent?.includes(APP_SHEET) && document.head.firstChild !== node) document.head.prepend(node)
+      }
+    }
+  }
+  const mover = new MutationObserver(place)
+  mover.observe(document.head, { childList: true })
   try {
     const { Previewer } = await import('pagedjs')
     const previewer = new Previewer()
@@ -124,7 +157,7 @@ export async function paginateInto(
     // page breaks); without it paged.js laid the CV out ignoring all of them (spec 022).
     const page = `<div class="cv-page cv-page--paged">${html}</div>`
     // An object entry feeds paged.js raw CSS text instead of a URL to fetch.
-    await previewer.preview(page, [{ 'cv-export.css': css }], container)
+    await previewer.preview(page, [{ 'cv-export-app.css': css.app }, { 'cv-export-print.css': css.print }], container)
     return container.querySelector('.pagedjs_page') !== null
   } catch (error) {
     // A failed run leaves its half-built pages behind; printed before the fallback they were blank sheets.
@@ -132,6 +165,7 @@ export async function paginateInto(
     console.warn('[export] paged.js failed; falling back to unpaginated output', error)
     return false
   } finally {
+    mover.disconnect()
     const added = [...document.head.querySelectorAll('style')].filter((style) => !before.has(style))
     for (const style of added) style.setAttribute(PAGED_STYLE_ATTR, '')
     pagedStyles.set(container, added)
