@@ -19,7 +19,7 @@ const TEMPLATES = fs
   .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(ROOT, 'src/templates', entry.name, 'Template.vue')))
   .map((entry) => entry.name)
 /** Its name is letter-spaced: pdf.js returns single letters evenly spaced, so the word gap is lost. */
-const NAME_NOT_RECOVERED = new Set(['monograph'])
+const NAME_NOT_RECOVERED = new Set()
 
 const strip = (cv) => {
   const copy = JSON.parse(JSON.stringify(cv))

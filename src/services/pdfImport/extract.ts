@@ -16,6 +16,8 @@ export interface ExtractedDocument {
   hasTextLayer: boolean
   /** Set when text sits in two clearly separated x-bands (spec §7.3). */
   looksMultiColumn: boolean
+  /** The title in the PDF's own metadata, which a CV usually sets to its owner's name (spec 040). */
+  title?: string
 }
 
 export async function extractDocument(file: File | ArrayBuffer): Promise<ExtractedDocument> {
@@ -24,6 +26,7 @@ export async function extractDocument(file: File | ArrayBuffer): Promise<Extract
   const doc = await pdfjs.getDocument({ data: new Uint8Array(source), isEvalSupported: false }).promise
 
   const lines: ExtractedLine[] = []
+  const title = await metadataTitle(doc)
   try {
     for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber++) {
       const page = await doc.getPage(pageNumber)
@@ -41,6 +44,18 @@ export async function extractDocument(file: File | ArrayBuffer): Promise<Extract
     pageCount: doc.numPages,
     hasTextLayer: lines.some((l) => l.text.trim().length > 0),
     looksMultiColumn: detectColumns(lines),
+    title,
+  }
+}
+
+/** The metadata title, if the PDF has one and it is text. */
+async function metadataTitle(doc: pdfjs.PDFDocumentProxy): Promise<string | undefined> {
+  try {
+    const { info } = await doc.getMetadata()
+    const title = (info as { Title?: unknown } | undefined)?.Title
+    return typeof title === 'string' && title.trim() ? title : undefined
+  } catch {
+    return undefined
   }
 }
 

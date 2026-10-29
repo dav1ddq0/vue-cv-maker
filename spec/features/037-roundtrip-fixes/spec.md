@@ -64,8 +64,8 @@ were right; uploading them again showed three defects.
 ## Not covered
 
 - **Monograph's letter-spaced name.** pdf.js already returns it as single letters with one space
-  between each, so the word boundary is lost before this code sees it. It still imports as
-  "Łucjaøster - Ñúñez".
+  between each, so the word boundary is lost before this code sees it. It imported as
+  "Łucjaøster - Ñúñez"; spec 040 repairs it from the PDF's title.
 - **How well PDF import rebuilds sections.** It varies a lot by template, for example Banner finds
   42 skills out of 12. The app already presents it as "a help, not an automatic conversion". Improved in spec 040.
 

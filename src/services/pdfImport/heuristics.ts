@@ -65,7 +65,7 @@ export function analyze(doc: ExtractedDocument): ImportDraft {
   const email = findFirst(lines, EMAIL_RE)
   const phone = findPhone(lines)
   const links = findLinks(lines)
-  const name = describeName(lines, nameIndex, headerLines)
+  const name = describeName(lines, nameIndex, headerLines, doc.title)
   const headline = findHeadline(headerLines, name.value)
   // The place is in the header or, when the contact details sit in a column of their own, beside them.
   const location = findLocation([...headerLines, ...nearContact(lines, email.value, phone.value)], email.value, phone.value)
@@ -154,11 +154,37 @@ function findHeadings(lines: ExtractedLine[], skipIndex: number): HeadingHit[] {
     if (apart && alike) unknown.push({ index, kind: null, text: line.text.trim() })
   })
 
+  // Headings set in ordinary case ("Charlas") have only their size, their place and the gap above
+  // to go by: the size of the known headings, within a hair, in the same column, when that size is
+  // visibly larger than the text. An entry's title is nearly as large, so the match is tight.
+  const bodySize = median(sizes)
+  if (known.length && !knownUpper && knownSize >= bodySize * HEADING_OVER_TEXT) {
+    lines.forEach((line, index) => {
+      if (index === skipIndex || hits.some((hit) => hit.index === index) || unknown.some((hit) => hit.index === index)) return
+      const text = line.text.trim()
+      if (!text || isUpper(text) || text.split(/\s+/).length > 3 || /[\d.,:;!?@/]/.test(text)) return
+      const previous = lines[index - 1]
+      const gap = !previous ? 0 : previous.page === line.page ? previous.y - line.y : Infinity
+      const sameSize = Math.abs(line.fontSize - knownSize) <= knownSize * TITLE_CASE_SIZE_MATCH
+      const sameColumn = known.some((heading) => Math.abs(heading.x - line.x) <= HEADING_COLUMN)
+      if (sameSize && sameColumn && gap > usualGap * SPACED_GAP) unknown.push({ index, kind: null, text })
+    })
+  }
+
   return [...hits, ...unknown].sort((a, b) => a.index - b.index)
 }
 
 /** An unknown heading is set within this share of the type size of the known ones. */
 const HEADING_SIZE_MATCH = 0.06
+
+/** ...and, when it is not in capitals, within this much (an entry's title is about 3 % smaller). */
+const TITLE_CASE_SIZE_MATCH = 0.02
+
+/** Headings must be this much larger than the text for size alone to tell them from it. */
+const HEADING_OVER_TEXT = 1.02
+
+/** A heading is in the same column as another when they start this close (PDF units). */
+const HEADING_COLUMN = 8
 
 function median(values: number[]): number {
   const sorted = values.filter(Boolean).sort((a, b) => a - b)
@@ -266,13 +292,32 @@ function findNameIndex(lines: ExtractedLine[]): number {
   )
 }
 
+/**
+ * The name as the PDF's title spells it, when the title is the same letters: "Łucja Øster-Ñúñez – CV".
+ * A name set with letter-spacing reaches the extraction as "Ł UCJA Ø STER", with no telling where a
+ * word ends; the title keeps its spaces and case (spec 040).
+ */
+function nameFromTitle(title: string | undefined, detected: string): string | null {
+  if (!title) return null
+  const candidate = title
+    .replace(/[\p{Cc}\p{Cf}]/gu, '')
+    .replace(/\s*[–—|·-]\s*(?:cv|curriculum(?: vitae)?|resume|résumé|currículum)\s*$/iu, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const letters = (value: string) => value.normalize('NFC').toLocaleUpperCase().replace(/[^\p{L}]/gu, '')
+  return candidate && letters(candidate) === letters(detected) ? candidate : null
+}
+
 function describeName(
   lines: ExtractedLine[],
   index: number,
   headerLines: ExtractedLine[],
+  title?: string,
 ): DetectedField<string> {
   if (index < 0) return { value: '', confidence: 'low' }
   const chosen = lines[index]
+  const spelled = nameFromTitle(title, chosen.text)
+  if (spelled) return { value: spelled, confidence: 'high' }
   const others = nameCandidates(lines).filter((i) => i !== index)
   const runnerUp = others.length ? Math.max(...others.map((i) => lines[i].fontSize)) : 0
 

@@ -435,3 +435,57 @@ describe('capitals that are not headings (spec 040)', () => {
     expect(draft.unclassified).toEqual([])
   })
 })
+
+describe('the name from the PDF title (spec 040)', () => {
+  const tracked = (title?: string) => analyze({ ...doc([{ text: 'ŁUCJAØSTER - ÑÚÑEZ', fontSize: 22, y: 800 }, { text: 'RESUMEN', y: 760 }, { text: 'Texto.', y: 746 }]), title })
+
+  it('takes the spelling of the title when it has the same letters as the name set with letter-spacing', () => {
+    expect(tracked('Łucja Øster-Ñúñez – CV').fullName).toEqual({ value: 'Łucja Øster-Ñúñez', confidence: 'high' })
+    expect(tracked('Łucja Øster-Ñúñez').fullName.value).toBe('Łucja Øster-Ñúñez')
+    expect(tracked('Łucja Øster-Ñúñez - Resume').fullName.value).toBe('Łucja Øster-Ñúñez')
+  })
+
+  it('ignores a title with other letters, and no title at all', () => {
+    expect(tracked('Mi currículum de 2024').fullName.value).not.toBe('Mi currículum de 2024')
+    expect(tracked(undefined).fullName.value).toBe('Łucjaøster - Ñúñez')
+  })
+
+  it('drops control and bidirectional characters from the title it adopts', () => {
+    expect(tracked('‮Łucja Øster-Ñúñez\u0007 – CV').fullName.value).toBe('Łucja Øster-Ñúñez')
+  })
+})
+
+describe('headings in ordinary case (spec 040)', () => {
+  const at = (text: string, y: number, fontSize = 10, x = 45) => ({ text, y, fontSize, x })
+  const page = () => [
+    at('Ada Lovelace', 800, 22),
+    at('Experiencia', 760, 10.5),
+    at('Analista · Babbage mar 2020 - 2023', 740, 10.2),
+    at('Escribió el primer programa.', 726),
+    at('Formación', 690, 10.5),
+    at('Matemáticas · Londres 2010 - 2014', 670, 10.2),
+    at('Charlas', 630, 10.5),
+    at('Una charla sobre máquinas', 610),
+    at('Otra charla', 596),
+  ]
+
+  it('splits at a heading set like the known ones, so its lines are not read as education', () => {
+    const draft = analyze(doc(page()))
+    expect(draft.sections.find((s) => s.kind === 'education')!.lines).toHaveLength(1)
+    expect(draft.unclassified.find((b) => b.heading === 'Charlas')!.lines).toEqual(['Una charla sobre máquinas', 'Otra charla'])
+  })
+
+  it('does not take a short line of the same size, right under another line, for a heading', () => {
+    const lines = page()
+    lines.splice(8, 0, at('Notas', 603, 10.5))
+    lines.push(at('Una tercera charla', 582), at('Una cuarta charla', 568), at('Una quinta charla', 554), at('Una sexta charla', 540))
+    const draft = analyze(doc(lines))
+    expect(draft.unclassified.find((b) => b.heading === 'Notas')).toBeUndefined()
+    expect(draft.unclassified.find((b) => b.heading === 'Charlas')!.lines).toContain('Notas')
+  })
+
+  it('does not take the title of an entry for a heading, though it is nearly as large and set apart', () => {
+    const draft = analyze(doc([...page().slice(0, 4), at('Programador', 700, 10.2), at('Otra Co mar 2018 - 2019', 686, 10.2), at('Formación', 650, 10.5), at('Matemáticas · Londres 2010 - 2014', 630, 10.2)]))
+    expect(draft.unclassified.filter((b) => b.heading)).toEqual([])
+  })
+})
