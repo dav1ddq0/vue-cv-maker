@@ -51,11 +51,12 @@ const COLLECT = `(() => {
     // A field is 56 px, 80 where the pointer is coarse and the slider has its 48 dp target (not the text ones).
     if (el.matches('.box') && el.querySelector(':scope > input:not([type=color]):not([type=file]), :scope > select')) out.fields.push({ l: label(el), h: Math.round(r.height), radius: s.borderTopLeftRadius })
     // The title of a view: the heading that names it, not a card's or a dialog's.
-    if (el.matches('h2.title, h2.heading, h2.heading--large') && !el.querySelector('button') && !el.closest('dialog, .sheet, [class*=sheet], .rail, .card, article, section.panel, header')) out.titles.push({ size: s.fontSize, weight: s.fontWeight, text: (el.textContent || '').trim().slice(0, 18) })
+    if (el.matches('h2.title, h2.heading, h2.heading--large') && !el.querySelector(':scope > button.trigger') && !el.closest('dialog, .sheet, [class*=sheet], .rail, .card, article, section.panel, header')) out.titles.push({ size: s.fontSize, weight: s.fontWeight, text: (el.textContent || '').trim().slice(0, 18) })
     if (el.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]), select, textarea') && s.backgroundColor === 'rgb(239, 239, 239)') out.inputs.push({ l: label(el) + '[' + el.type + ']' })
-    // The template carousel of the phone is meant to scroll sideways, and what is in it.
-    // ...and the strip of the nine steps on a tablet or a phone, which scrolls sideways by design.
-    if (el.closest('ul.templates, ol.steps')) continue
+    // The template carousel of the phone is meant to scroll sideways, and what is in it...
+    if (el.closest('ul.templates') && matchMedia('(max-width: 600px)').matches) continue
+    // ...and so is the strip of the nine steps on a tablet or a phone.
+    if (el.closest('ol.steps')) continue
     const c = clipper(el)
     if (c !== document.body && s.position !== 'absolute' && s.position !== 'fixed') {
       const cr = c.getBoundingClientRect()
