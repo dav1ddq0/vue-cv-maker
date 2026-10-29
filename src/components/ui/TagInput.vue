@@ -51,45 +51,56 @@ function onKeydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
-/* Inside a filled text field: the chips and the entry share the field's container (spec 029). */
+/* Inside a filled text field: each entry is a row divided by the outline-variant, like the skills in
+   SkillItemsEditor, and the entry field closes the list (spec 038). */
 .tags {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0 8px;
+  flex-direction: column;
+  padding-bottom: 8px;
 }
 
-/* M3 input chip: 32 dp, outlined, trailing remove icon. */
 .tag {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 4px;
-  min-height: 32px;
-  max-width: 100%;
-  padding: 0 4px 0 12px;
-  border: 1px solid var(--md-outline-variant);
-  border-radius: var(--shape-sm);
-  color: var(--md-on-surface-variant);
-  font: var(--type-label-large);
-  letter-spacing: var(--tracking-label-large);
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--md-outline-variant);
+  color: var(--md-on-surface);
+  font: var(--type-body-large);
+  letter-spacing: var(--tracking-body-large);
+  overflow-wrap: anywhere;
 }
 
 .remove {
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
+  flex: none;
+  color: var(--md-on-surface-variant);
+}
+
+.remove:hover:not(:disabled) {
+  color: var(--md-error);
 }
 
 .entry {
-  flex: 1;
-  min-width: 8em;
-  padding: 4px 0;
+  margin-top: 4px;
+  min-width: 0;
+  padding: 8px 0;
   border: 0;
   background: transparent;
   color: var(--md-on-surface);
   font: var(--type-body-large);
   letter-spacing: var(--tracking-body-large);
   outline: none;
+}
+
+.entry:focus-visible {
+  box-shadow: inset 0 -2px 0 var(--md-primary);
+}
+
+@media (pointer: coarse) {
+  .entry {
+    min-height: var(--target);
+  }
 }
 </style>

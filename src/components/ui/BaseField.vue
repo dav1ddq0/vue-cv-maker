@@ -37,7 +37,7 @@ const id = useId()
   min-width: 0;
 }
 
-/* Container: surface-container-highest, rounded on top, an active indicator along the bottom. */
+/* Container: surface-container-high (one step softer than M3's highest, spec 038), rounded on top, an active indicator along the bottom. */
 .box {
   --indicator: var(--md-on-surface-variant);
   position: relative;
@@ -45,14 +45,14 @@ const id = useId()
   flex-direction: column;
   min-height: 56px;
   border-radius: var(--shape-xs) var(--shape-xs) 0 0;
-  background: var(--md-surface-container-highest);
+  background: var(--md-surface-container-high);
   box-shadow: inset 0 -1px 0 var(--indicator);
   cursor: text;
   transition: box-shadow var(--duration-short) var(--motion-standard);
 }
 
 .box:hover {
-  background: color-mix(in srgb, var(--md-on-surface) calc(var(--state-hover) * 100%), var(--md-surface-container-highest));
+  background: color-mix(in srgb, var(--md-on-surface) calc(var(--state-hover) * 100%), var(--md-surface-container-high));
 }
 
 .box:focus-within {
