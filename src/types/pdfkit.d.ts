@@ -8,7 +8,6 @@ declare module 'pdfkit' {
     baseline?: 'alphabetic' | 'top' | number
     characterSpacing?: number
     horizontalScaling?: number
-    link?: string
   }
 
   interface StandardFontData {

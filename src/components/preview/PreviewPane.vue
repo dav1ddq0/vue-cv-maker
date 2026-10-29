@@ -69,10 +69,10 @@ function zoomBy(delta: number) {
   zoom.value = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round((zoom.value + delta) * 10) / 10))
 }
 
-/** The zoom at which the page fills the panel (`contentRect` already excludes the padding). */
 /** Fitting never enlarges the page past its real size; only + goes above 100 % (spec 027). */
 const FIT_MAX = 1
 
+/** The zoom at which the page fills the panel (`contentRect` already excludes the padding). */
 function fit() {
   if (available.value > 0) zoom.value = Math.min(FIT_MAX, Math.max(ZOOM_MIN, available.value / PAGE_PX))
 }

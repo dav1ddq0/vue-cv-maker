@@ -201,7 +201,6 @@ export function resolveSections(data: CVData): ResolvedSection[] {
     .map((s) => (data.pageBreaks.includes(s.id) ? { ...s, breakBefore: true } : s))
 }
 
-/** Strips the protocol so links read as "github.com/nadia" rather than the full URL. */
 /**
  * An e-mail or URL cut into pieces that may end a line (spec 033): after "@", and before ".", "/",
  * "?", "#", "&" or "=" (but not inside "://"). Templates join them with <wbr>, so a narrow column
@@ -224,6 +223,7 @@ export function breakParts(text: string): string[] {
   return parts
 }
 
+/** Strips the protocol so links read as "github.com/nadia" rather than the full URL. */
 export function displayUrl(url: string): string {
   return url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 }
