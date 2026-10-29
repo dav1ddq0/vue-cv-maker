@@ -4,5 +4,5 @@
 - [x] 3 · Buttons — commit: ca72b3a
 - [x] 4 · Weights — commit: 549121b
 - [x] 5 · Elevation — commit: eb8231c
-- [ ] 7 · Accent colour picker
+- [x] 7 · Accent colour picker — commit: 73700b8
 - [ ] 8 · qa:consistency
