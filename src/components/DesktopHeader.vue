@@ -122,9 +122,9 @@ const saveText = computed(() => {
 .views {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 8px;
   min-width: 0;
-  margin-left: 0.75em;
+  margin-left: 12px;
 }
 
 .crumb {

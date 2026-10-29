@@ -50,8 +50,8 @@ function message(item: Suggestion): string {
 .review {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
-  padding: 1em;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -62,7 +62,7 @@ function message(item: Suggestion): string {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6em 1em;
+  gap: 8px 16px;
 }
 
 .title {
@@ -73,7 +73,7 @@ function message(item: Suggestion): string {
 .score {
   display: flex;
   align-items: center;
-  gap: 0.6em;
+  gap: 8px;
   font-size: var(--size-14);
   font-weight: 600;
 }
@@ -101,8 +101,8 @@ meter {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.4em 0.8em;
-  padding: 0.55em 0;
+  gap: 4px 12px;
+  padding: 8px 0;
   border-top: 1px solid var(--border);
 }
 
@@ -111,7 +111,7 @@ meter {
 }
 
 .level {
-  padding: 0.1em 0.5em;
+  padding: 1.1px 4px;
   border-radius: var(--shape-full);
   font-size: var(--size-11);
   font-weight: 600;

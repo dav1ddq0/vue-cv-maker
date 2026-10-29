@@ -79,7 +79,7 @@ function entrySubtitle(item: EducationEntry): string {
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 16px;
   align-items: flex-start;
 }
 
@@ -96,13 +96,13 @@ function entrySubtitle(item: EducationEntry): string {
 .entry {
   display: flex;
   flex-direction: column;
-  gap: 0.7em;
+  gap: 8px;
 }
 
 .row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .actions {

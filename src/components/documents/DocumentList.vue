@@ -66,7 +66,7 @@ async function confirmDelete(id: string) {
 <template>
   <section class="documents">
     <header class="head">
-      <h2 class="title">{{ t('documents.title') }}</h2>
+      <h2 class="title view-title">{{ t('documents.title') }}</h2>
       <div v-if="!isPhone" class="head-actions">
         <BaseButton @click="loadSample">{{ t('actions.loadSample') }}</BaseButton>
         <BaseButton variant="primary" @click="cv.createNew().then(() => ui.goTo('personal'))">
@@ -154,8 +154,8 @@ async function confirmDelete(id: string) {
 .documents {
   display: flex;
   flex-direction: column;
-  gap: 1em;
-  padding: 1.4em;
+  gap: 16px;
+  padding: 20px;
   max-width: 1180px;
   margin: 0 auto;
   width: 100%;
@@ -166,18 +166,13 @@ async function confirmDelete(id: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .head-actions {
   display: flex;
-  gap: 0.5em;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--size-22);
+  gap: 8px;
 }
 
 .empty {
@@ -190,7 +185,7 @@ async function confirmDelete(id: string) {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 /* M3 search bar: 56 dp, full shape, surface-container-high. */
@@ -233,16 +228,16 @@ async function confirmDelete(id: string) {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1em;
+  gap: 16px;
 }
 
 .tile {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.8em;
+  gap: 12px;
   min-height: 150px;
-  padding: 1em;
+  padding: 16px;
   border: 1px solid var(--border);
   border-radius: var(--shape-md);
   background: var(--surface);
@@ -258,7 +253,7 @@ async function confirmDelete(id: string) {
   height: 100%;
   align-items: center;
   justify-content: center;
-  gap: 0.4em;
+  gap: 4px;
   border: 2px dashed var(--border);
   background: transparent;
   color: var(--text);
@@ -287,7 +282,7 @@ async function confirmDelete(id: string) {
 .tile-open {
   display: flex;
   flex-direction: column;
-  gap: 0.2em;
+  gap: 2px;
   padding: 0;
   border: 0;
   background: none;
@@ -311,7 +306,7 @@ async function confirmDelete(id: string) {
 .confirm {
   display: flex;
   align-items: center;
-  gap: 0.4em;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
@@ -325,22 +320,21 @@ async function confirmDelete(id: string) {
   bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
-  margin: 0 -1.4em;
-  padding: 0.8em 1.4em calc(1em + var(--safe-bottom));
+  gap: 8px;
+  margin: 0 -20px;
+  padding: 12px 20px calc(16px + var(--safe-bottom));
   background: var(--bg);
 }
 
 .pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .big {
   min-height: 52px;
   justify-content: center;
-  border-radius: var(--shape-md);
 }
 
 .confirm-text {

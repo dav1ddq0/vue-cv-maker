@@ -24,7 +24,7 @@ const { t } = useI18n()
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1em;
-  padding: 1em;
+  gap: 16px;
+  padding: 16px;
 }
 </style>

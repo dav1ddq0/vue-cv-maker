@@ -53,7 +53,7 @@ const { t } = useI18n()
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 16px;
   align-items: flex-start;
 }
 
@@ -70,7 +70,7 @@ const { t } = useI18n()
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
-  gap: 0.6em;
+  gap: 8px;
   align-items: end;
 }
 

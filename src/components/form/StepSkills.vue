@@ -51,7 +51,7 @@ const levelsReason = reasonFor('skillLevels')
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 16px;
   align-items: flex-start;
 }
 
@@ -68,7 +68,7 @@ const levelsReason = reasonFor('skillLevels')
 .entry {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .actions {

@@ -131,10 +131,10 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 .notices {
-  padding: 0.6em 1em 0;
+  padding: 8px 16px 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4em;
+  gap: 4px;
 }
 
 /* A phone held sideways has ~390px of height: the dismissible notice is not worth 70px of it. */

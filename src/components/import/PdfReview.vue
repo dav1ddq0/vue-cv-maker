@@ -153,14 +153,14 @@ function apply(mode: 'new' | 'current') {
 .review-main {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 16px;
 }
 
 /* Desktop: review on the left, the text it came from on the right, scrolling on its own. */
 .review--split {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 1.5em;
+  gap: 20px;
   align-items: start;
 }
 
@@ -169,14 +169,14 @@ function apply(mode: 'new' | 'current') {
   top: 1em;
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 8px;
 }
 
 .source-text {
   max-height: calc(100vh - 10em);
   overflow: auto;
   margin: 0;
-  padding: 1em;
+  padding: 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -191,7 +191,7 @@ function apply(mode: 'new' | 'current') {
 }
 
 .hint {
-  margin: 0.2em 0 0;
+  margin: 2px 0 0;
   font-size: var(--size-12);
   color: var(--text-muted);
 }
@@ -204,7 +204,7 @@ function apply(mode: 'new' | 'current') {
 .fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 0.8em;
+  gap: 12px;
 }
 
 .detected {
@@ -216,22 +216,22 @@ function apply(mode: 'new' | 'current') {
 .blocks {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .block {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 1em;
+  gap: 16px;
   align-items: start;
-  padding: 0.7em 0.9em;
+  padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
 }
 
 .block-heading {
-  margin: 0 0 0.3em;
+  margin: 0 0 4px;
   font-weight: 600;
   font-size: var(--size-14);
 }
@@ -243,7 +243,7 @@ function apply(mode: 'new' | 'current') {
 }
 
 .block-more {
-  margin: 0.2em 0 0;
+  margin: 2px 0 0;
   font-size: var(--size-12);
   color: var(--text-muted);
 }
@@ -251,7 +251,7 @@ function apply(mode: 'new' | 'current') {
 .assign {
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
+  gap: 4px;
 }
 
 .assign-label {
@@ -260,7 +260,7 @@ function apply(mode: 'new' | 'current') {
 }
 
 .assign select {
-  padding: 0.35em 0.5em;
+  padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: var(--shape-md);
   background: var(--surface);
@@ -269,7 +269,7 @@ function apply(mode: 'new' | 'current') {
 .raw {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 8px;
   align-items: flex-start;
 }
 
@@ -278,7 +278,7 @@ function apply(mode: 'new' | 'current') {
   max-height: 18em;
   overflow: auto;
   margin: 0;
-  padding: 0.8em;
+  padding: 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -289,7 +289,7 @@ function apply(mode: 'new' | 'current') {
 .footer {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5em;
+  gap: 8px;
   flex-wrap: wrap;
 }
 </style>

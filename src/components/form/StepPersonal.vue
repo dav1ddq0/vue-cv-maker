@@ -206,11 +206,11 @@ async function removePhoto() {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  padding: 0 1em;
+  padding: 0 16px;
 }
 
 .extras[open] {
-  padding-bottom: 1em;
+  padding-bottom: 16px;
 }
 
 .extras-summary {
@@ -222,7 +222,7 @@ async function removePhoto() {
 }
 
 .extras-note {
-  margin: 0 0 0.8em;
+  margin: 0 0 8px;
   font-size: var(--size-12);
   color: var(--text-muted);
 }
@@ -230,19 +230,19 @@ async function removePhoto() {
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1.4em;
+  gap: 20px;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 0.9em;
+  gap: 12px;
 }
 
 .photo-row {
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -269,7 +269,7 @@ async function removePhoto() {
 .links {
   display: flex;
   flex-direction: column;
-  gap: 0.7em;
+  gap: 8px;
   align-items: flex-start;
 }
 
@@ -282,7 +282,7 @@ async function removePhoto() {
 .link-row {
   display: grid;
   grid-template-columns: 1fr 1.6fr auto;
-  gap: 0.6em;
+  gap: 8px;
   align-items: end;
 }
 

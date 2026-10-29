@@ -218,6 +218,14 @@ body,
   height: 100%;
 }
 
+/* The title of a view (a step, My CVs, Import): one size and weight wherever it is (spec 045). */
+.view-title {
+  margin: 0;
+  font-size: var(--size-24);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 body {
   margin: 0;
   padding-inline: var(--safe-left) var(--safe-right);

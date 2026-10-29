@@ -70,7 +70,7 @@ onMounted(revealActive)
 .wizard-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
+  gap: 12px;
 }
 
 .steps {
@@ -78,7 +78,7 @@ onMounted(revealActive)
   margin: 0;
   padding: 0;
   display: flex;
-  gap: 0.3em;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: thin;
   position: relative; /* offsetParent for revealActive() */

@@ -214,7 +214,7 @@ function onClose() {
 <style scoped>
 .crop {
   width: min(400px, calc(100vw - 32px));
-  padding: 1.3em 1.4em;
+  padding: 20px 20px;
   border: 0;
   border-radius: var(--shape-xl);
   background: var(--md-surface-container-high);
@@ -225,7 +225,7 @@ function onClose() {
 .crop[open] {
   display: flex;
   flex-direction: column;
-  gap: 0.9em;
+  gap: 12px;
 }
 
 .crop::backdrop {
@@ -290,7 +290,7 @@ function onClose() {
 .controls {
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: 8px;
 }
 
 .zoom-label {
@@ -307,6 +307,6 @@ function onClose() {
 .foot {
   display: flex;
   justify-content: flex-end;
-  gap: 0.6em;
+  gap: 8px;
 }
 </style>

@@ -35,7 +35,7 @@ const ratio = computed(() => Math.min(1, Math.max(0, (model.value - props.min) /
   display: flex;
   align-items: center;
   /* The thumb is half outside the track at either end; this keeps it inside the field's padding. */
-  padding-inline: 10px;
+  padding-inline: 12px;
 }
 
 .range {

@@ -99,8 +99,8 @@ function onDragLeave(event: DragEvent) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6em;
-  padding: 1.5em 1em;
+  gap: 8px;
+  padding: 20px 16px;
   text-align: center;
   color: var(--text);
   border: 1.5px dashed var(--dz-border);
@@ -182,7 +182,7 @@ function onDragLeave(event: DragEvent) {
 .copy {
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
+  gap: 2px;
   min-width: 0;
 }
 
@@ -202,8 +202,8 @@ function onDragLeave(event: DragEvent) {
 
 .dropzone--compact {
   flex-direction: row;
-  gap: 0.8em;
-  padding: 0.65em 0.9em;
+  gap: 12px;
+  padding: 8px 12px;
   text-align: left;
 }
 

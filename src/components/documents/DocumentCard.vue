@@ -58,11 +58,11 @@ const initials = computed(
 .main {
   display: flex;
   align-items: center;
-  gap: 0.9em;
+  gap: 12px;
   flex: 1;
   min-width: 0;
   min-height: 96px;
-  padding: 0.7em 0.5em 0.7em 0.8em;
+  padding: 8px 8px 8px 12px;
   border: 0;
   border-radius: var(--shape-lg) 0 0 var(--shape-lg);
   background: transparent;
@@ -89,7 +89,7 @@ const initials = computed(
 .text {
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
+  gap: 2px;
   min-width: 0;
 }
 

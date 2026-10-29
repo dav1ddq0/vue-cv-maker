@@ -58,20 +58,20 @@ async function pick(kind: ExportKind) {
 .list {
   list-style: none;
   margin: 0;
-  padding: 0 0 calc(1em + var(--safe-bottom));
+  padding: 0 0 calc(16px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: 16px;
   width: 100%;
   min-height: 64px;
-  padding: 0.7em 1em;
+  padding: 8px 16px;
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
   background: var(--surface);

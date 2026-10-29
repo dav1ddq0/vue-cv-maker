@@ -120,7 +120,7 @@ function printInstead() {
 <style scoped>
 .export {
   width: min(560px, calc(100vw - 32px));
-  padding: 1.4em 1.5em;
+  padding: 20px 20px;
   border: 0;
   border-radius: var(--shape-xl);
   background: var(--md-surface-container-high);
@@ -131,7 +131,7 @@ function printInstead() {
 .export[open] {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 16px;
 }
 
 .export::backdrop {
@@ -157,7 +157,7 @@ function printInstead() {
 .formats {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 8px;
 }
 
 .format {
@@ -186,7 +186,7 @@ function printInstead() {
 .format-text {
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
+  gap: 2px;
 }
 
 .format-title {
@@ -200,12 +200,12 @@ function printInstead() {
 }
 
 .note {
-  margin: -0.4em 0 0;
+  margin: -4px 0 0;
 }
 
 .badge {
-  margin-left: 0.4em;
-  padding: 0.1em 0.55em;
+  margin-left: 4px;
+  padding: 1.1px 8px;
   border-radius: var(--shape-md);
   background: var(--md-success-container);
   color: var(--md-on-success-container);
@@ -215,14 +215,14 @@ function printInstead() {
 
 
 .check {
-  padding: 0.9em 1em;
+  padding: 12px 16px;
   border-radius: var(--shape-md);
   /* The dialog itself is surface-container-high; one step up or down would vanish in one theme (spec 038). */
   background: var(--md-surface-container-lowest);
 }
 
 .check-title {
-  margin: 0 0 0.4em;
+  margin: 0 0 4px;
   font-size: var(--size-12);
   font-weight: 700;
 }
@@ -238,11 +238,11 @@ function printInstead() {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2em;
+  gap: 2px;
 }
 
 .fix {
-  padding: 0.2em 0;
+  padding: 2px 0;
   border: 0;
   background: none;
   color: var(--md-warning);
@@ -256,7 +256,7 @@ function printInstead() {
 .foot {
   display: flex;
   justify-content: flex-end;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .failed {

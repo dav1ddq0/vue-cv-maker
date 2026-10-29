@@ -31,8 +31,8 @@ const verdict = computed(() => (length.value < MIN ? 'short' : length.value > MA
 .length {
   display: flex;
   align-items: center;
-  gap: 0.75em;
-  margin-top: 0.6em;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 meter {

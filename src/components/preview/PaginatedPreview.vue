@@ -93,7 +93,7 @@ async function repaginate() {
 .paginated {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .status {
@@ -113,13 +113,13 @@ async function repaginate() {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.8em;
+  padding: 12px;
 }
 
 /* paged.js output is injected imperatively, so its styles need :deep. */
 .pages :deep(.pagedjs_page) {
   background: #fff;
   box-shadow: var(--elevation-2);
-  margin: 0 auto 1em;
+  margin: 0 auto 16px;
 }
 </style>

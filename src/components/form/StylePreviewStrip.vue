@@ -35,7 +35,7 @@ const { t } = useI18n()
   z-index: 2;
   display: flex;
   justify-content: center;
-  padding: 0.6em;
+  padding: 8px;
   border-radius: var(--shape-lg);
   background: var(--surface-2);
   /* The first shadow paints over the form's top padding, where scrolled content would peek out

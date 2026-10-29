@@ -166,13 +166,13 @@ function addBlank() {
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1.6em;
+  gap: 24px;
 }
 
 .block {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
+  gap: 12px;
   align-items: flex-start;
 }
 
@@ -190,14 +190,14 @@ function addBlank() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8em;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .page-break {
   display: inline-flex;
   align-items: center;
-  gap: 0.35em;
+  gap: 4px;
   font-size: var(--size-12);
   color: var(--text-muted);
   cursor: pointer;
@@ -218,7 +218,7 @@ function addBlank() {
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.7em;
+  gap: 8px;
   align-items: flex-start;
   width: 100%;
 }
@@ -226,7 +226,7 @@ function addBlank() {
 .section-head {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 0.6em;
+  gap: 8px;
   align-items: end;
   width: 100%;
 }
@@ -234,13 +234,13 @@ function addBlank() {
 .entry {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 8px;
 }
 
 .row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.5em;
+  gap: 8px;
 }
 
 .actions {
@@ -251,13 +251,13 @@ function addBlank() {
 .picker {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 8px;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4em;
+  gap: 4px;
 }
 
 .add-phone {
@@ -267,7 +267,7 @@ function addBlank() {
 }
 
 .sheet-hint {
-  margin: 0 0.4em 0.8em;
+  margin: 0 4px 12px;
   font-size: var(--size-14);
   color: var(--text-muted);
 }
@@ -275,16 +275,16 @@ function addBlank() {
 .tiles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.6em;
-  padding: 0 0.2em 1em;
+  gap: 8px;
+  padding: 0 2px 16px;
 }
 
 .tile {
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: 8px;
   min-height: 64px;
-  padding: 0 0.9em;
+  padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
   background: var(--surface);

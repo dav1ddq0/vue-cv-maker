@@ -79,7 +79,7 @@ const shown = computed(() =>
 .block {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
+  gap: 12px;
 }
 
 .subtitle {
@@ -103,15 +103,15 @@ const shown = computed(() =>
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.8em;
+  gap: 12px;
 }
 
 .card {
   display: grid;
-  gap: 0.3em;
+  gap: 4px;
   width: 100%;
   text-align: left;
-  padding: 0.6em;
+  padding: 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -170,14 +170,14 @@ const shown = computed(() =>
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25em;
+  gap: 4px;
 }
 
 /* Lets someone choose by shape without reading three paragraphs. */
 .tag {
   font-size: var(--size-11);
   letter-spacing: 0.02em;
-  padding: 0.1em 0.45em;
+  padding: 1.1px 4px;
   border-radius: var(--shape-full);
   background: var(--surface-2);
   color: var(--text-muted);
@@ -199,12 +199,12 @@ const shown = computed(() =>
 @media (max-width: 640px) {
   .templates {
     display: flex;
-    gap: 0.7em;
+    gap: 8px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0.2em;
+    scroll-padding-inline: 2px;
     overscroll-behavior-x: contain;
-    padding: 0.2em 0.2em 0.6em;
+    padding: 2px 2px 8px;
   }
 
   .templates > li {

@@ -43,16 +43,16 @@ function onCurrentChange(event: Event) {
 .dates {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.6em;
+  gap: 8px;
   align-items: end;
 }
 
 .current {
   display: flex;
   align-items: center;
-  gap: 0.4em;
+  gap: 4px;
   font-size: var(--size-12);
   color: var(--text-muted);
-  padding-bottom: 0.55em;
+  padding-bottom: 8px;
 }
 </style>

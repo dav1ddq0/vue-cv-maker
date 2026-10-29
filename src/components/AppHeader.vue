@@ -148,7 +148,7 @@ const phoneState = computed(() => {
 
 .views {
   display: flex;
-  gap: 0.2em;
+  gap: 2px;
 }
 
 .view-btn {
@@ -170,7 +170,7 @@ const phoneState = computed(() => {
 .tools {
   display: flex;
   align-items: center;
-  gap: 0.2em;
+  gap: 2px;
 }
 
 .save {
@@ -219,8 +219,8 @@ const phoneState = computed(() => {
 
 @media (max-height: 500px) and (orientation: landscape) {
   .header {
-    padding-top: 0.15em;
-    padding-bottom: 0.15em;
+    padding-top: 2px;
+    padding-bottom: 2px;
   }
 }
 

@@ -66,7 +66,7 @@ async function apply(data: CVData, mode: 'new' | 'current') {
 
 <template>
   <section class="import">
-    <h2 class="title">{{ t('importView.title') }}</h2>
+    <h2 class="title view-title">{{ t('importView.title') }}</h2>
 
     <NoticeBar v-if="error" tone="warning">{{ error }}</NoticeBar>
 
@@ -99,8 +99,8 @@ async function apply(data: CVData, mode: 'new' | 'current') {
 .import {
   display: flex;
   flex-direction: column;
-  gap: 1em;
-  padding: 1.4em;
+  gap: 16px;
+  padding: 20px;
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
@@ -113,19 +113,14 @@ async function apply(data: CVData, mode: 'new' | 'current') {
   }
 }
 
-.title {
-  margin: 0;
-  font-size: var(--size-22);
-}
-
 .card {
-  padding: 1em;
+  padding: 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .card-title {

@@ -76,12 +76,12 @@ function go(view: (typeof VIEWS)[number]) {
 .views {
   display: flex;
   flex-direction: column;
-  padding: 0 0.5em;
+  padding: 0 8px;
 }
 
 .row {
   min-height: 52px;
-  padding: 0 0.8em;
+  padding: 0 12px;
   border: 0;
   border-radius: var(--shape-md);
   background: transparent;
@@ -99,9 +99,9 @@ function go(view: (typeof VIEWS)[number]) {
 .prefs {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
-  margin: 0.6em 1em 0;
-  padding-top: 0.8em;
+  gap: 12px;
+  margin: 8px 16px 0;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
@@ -109,7 +109,7 @@ function go(view: (typeof VIEWS)[number]) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: 16px;
 }
 
 .pref-label {
@@ -120,7 +120,7 @@ function go(view: (typeof VIEWS)[number]) {
 
 
 .note {
-  margin: 0.8em 1em 0;
+  margin: 8px 12px 0;
   font-size: var(--size-12);
   line-height: 1.45;
   color: var(--text-muted);

@@ -47,7 +47,7 @@ function go(id: StepId) {
 .list {
   list-style: none;
   margin: 0;
-  padding: 0 0 calc(1em + var(--safe-bottom));
+  padding: 0 0 calc(16px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   gap: 2px;

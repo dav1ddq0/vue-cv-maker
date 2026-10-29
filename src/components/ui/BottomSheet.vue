@@ -94,7 +94,7 @@ function onBackdropClick(event: MouseEvent) {
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  padding: 0.4em 0.5em 0.2em 1.2em;
+  padding: 4px 8px 2px 16px;
 }
 
 .title {
@@ -112,13 +112,13 @@ function onBackdropClick(event: MouseEvent) {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0 0.8em;
+  padding: 0 12px;
   overscroll-behavior: contain;
 }
 
 .foot {
   flex-shrink: 0;
-  padding: 0.8em 1em calc(1.2em + var(--safe-bottom));
+  padding: 12px 16px calc(16px + var(--safe-bottom));
 }
 
 /* Slide up on open; closing is instant, which also avoids the engines that cannot transition

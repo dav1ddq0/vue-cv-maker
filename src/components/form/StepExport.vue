@@ -94,7 +94,7 @@ const { overflows: sideTooLong } = useSideColumnFit()
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1.2em;
+  gap: 16px;
 }
 
 .options {
@@ -103,7 +103,7 @@ const { overflows: sideTooLong } = useSideColumnFit()
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .option,
@@ -112,8 +112,8 @@ const { overflows: sideTooLong } = useSideColumnFit()
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6em 1em;
-  padding: 0.8em 1em;
+  gap: 8px 16px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -154,7 +154,7 @@ const { overflows: sideTooLong } = useSideColumnFit()
 }
 
 .option-hint {
-  margin: 0.15em 0 0;
+  margin: 2px 0 0;
   font-size: var(--size-12);
   color: var(--text-muted);
 }
@@ -162,6 +162,6 @@ const { overflows: sideTooLong } = useSideColumnFit()
 .paginated {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 </style>

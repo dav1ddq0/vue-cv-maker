@@ -122,7 +122,7 @@ function toggleFallback() {
 .panel {
   width: 340px;
   margin: 0;
-  padding: 1.1em;
+  padding: 16px;
   border: 1px solid var(--border);
   border-radius: var(--shape-md);
   background: var(--surface);
@@ -140,7 +140,7 @@ function toggleFallback() {
 }
 
 .title {
-  margin: 0 0 0.8em;
+  margin: 0 0 12px;
   font-size: 1em;
   font-weight: 700;
 }
@@ -148,12 +148,12 @@ function toggleFallback() {
 .group {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
-  margin-bottom: 1em;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .group--ruled {
-  padding-top: 0.9em;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
@@ -180,7 +180,7 @@ function toggleFallback() {
 .action {
   align-self: flex-start;
   min-height: 36px;
-  padding: 0 0.8em;
+  padding: 0 8px;
   border: 1px solid var(--border);
   border-radius: var(--shape-md);
   background: var(--surface);
@@ -194,7 +194,7 @@ function toggleFallback() {
 .keys {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.4em 1em;
+  gap: 4px 12px;
   margin: 0;
   font-size: var(--size-12);
 }
@@ -204,7 +204,7 @@ function toggleFallback() {
 }
 
 kbd {
-  padding: 0.1em 0.45em;
+  padding: 1.2px 4px;
   border: 1px solid var(--border);
   border-radius: var(--shape-xs);
   font: inherit;

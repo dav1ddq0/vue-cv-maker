@@ -63,12 +63,12 @@ watch(
     <!-- Desktop: the rail (StepRail, beside this form) replaces the tab strip. -->
     <div v-else-if="isDesktop" class="intro">
       <span class="position">{{ t('stepSheet.position', { n: ui.stepIndex + 1, total: ui.steps.length }) }}</span>
-      <h2 class="heading heading--large">{{ t(`steps.${ui.step}`) }}</h2>
+      <h2 class="heading view-title">{{ t(`steps.${ui.step}`) }}</h2>
       <p class="lead">{{ t(`stepIntro.${ui.step}`) }}</p>
     </div>
     <template v-else>
       <WizardNav />
-      <h2 class="heading">{{ t(`steps.${ui.step}`) }}</h2>
+      <h2 class="heading view-title">{{ t(`steps.${ui.step}`) }}</h2>
     </template>
 
     <div class="body">
@@ -95,18 +95,10 @@ watch(
 .wizard {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 16px;
   min-height: 0;
-  /* No bottom padding: the sticky footer anchors to the padding box, so any
-     padding here leaves a gap where content shows through under the bar. */
-  padding: 1em 1.2em 0;
+  /* No bottom padding: the sticky footer anchors to the padding box, so any padding here leaves a gap where content shows through under the bar. */ padding: 16px 16px 0;
   overflow: auto;
-}
-
-.heading {
-  margin: 0;
-  font-size: var(--size-16);
-  font-weight: 600;
 }
 
 .body {
@@ -116,18 +108,13 @@ watch(
 .intro {
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
+  gap: 4px;
 }
 
 .position {
   font-size: var(--size-12);
   font-weight: 500;
   color: var(--text-muted);
-}
-
-.heading--large {
-  font-size: var(--size-24);
-  font-weight: 700;
 }
 
 .lead {
@@ -138,14 +125,14 @@ watch(
 
 @media (min-width: 1001px) {
   .wizard {
-    padding: 1.5em 1.5em 0;
-    gap: 1.25em;
+    padding: 20px 20px 0;
+    gap: 16px;
   }
 }
 
 @media (min-width: 1280px) {
   .wizard {
-    padding: 1.75em 2.5em 0;
+    padding: 24px 36px 0;
   }
 }
 
@@ -153,8 +140,8 @@ watch(
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.6em;
-  padding: 0.8em 0;
+  gap: 8px;
+  padding: 12px 0;
   border-top: 1px solid var(--border);
   position: sticky;
   bottom: 0;
@@ -172,8 +159,8 @@ watch(
 /* A phone held sideways has ~390px of height: give it to the fields. */
 @media (max-height: 500px) and (orientation: landscape) {
   .wizard {
-    gap: 0.5em;
-    padding-top: 0.5em;
+    gap: 8px;
+    padding-top: 8px;
   }
 
   /* The active tab already names the step; keep the heading for screen readers only. */
@@ -186,7 +173,7 @@ watch(
   }
 
   .footer {
-    padding: 0.4em 0;
+    padding: 4px 0;
   }
 }
 </style>

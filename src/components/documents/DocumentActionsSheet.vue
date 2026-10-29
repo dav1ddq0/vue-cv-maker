@@ -35,19 +35,19 @@ watch(() => props.open, () => (confirming.value = false))
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
-  padding: 0 0.2em calc(1em + var(--safe-bottom));
+  gap: 8px;
+  padding: 0 4px calc(16px + var(--safe-bottom));
 }
 
 .confirm {
-  margin: 0.2em 0.4em;
+  margin: 2px 4px;
   color: var(--text-muted);
 }
 
 .pair {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .row {

@@ -91,7 +91,7 @@ const nextName = computed(() => {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.5em;
+  gap: 8px;
 }
 
 .name {

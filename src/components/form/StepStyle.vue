@@ -129,26 +129,26 @@ function previewAccent(id: string): string {
 .step {
   display: flex;
   flex-direction: column;
-  gap: 1.6em;
+  gap: 24px;
 }
 
 .block {
   display: flex;
   flex-direction: column;
-  gap: 0.8em;
+  gap: 12px;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.9em;
+  gap: 12px;
 }
 
 .color-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4em;
+  gap: 4px;
 }
 
 .swatch {
@@ -177,7 +177,7 @@ function previewAccent(id: string): string {
   box-sizing: border-box;
   width: 2.2em;
   height: 2.2em;
-  padding: 3px;
+  padding: 4px;
   border: 0;
   border-radius: 50%;
   background: conic-gradient(#ef4444, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444);

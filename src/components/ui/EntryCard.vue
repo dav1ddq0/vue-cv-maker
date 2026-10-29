@@ -35,7 +35,7 @@ const bodyId = useId()
 .entry-card {
   display: flex;
   flex-direction: column;
-  gap: 0.7em;
+  gap: 8px;
 }
 
 .summary {
@@ -59,7 +59,7 @@ const bodyId = useId()
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 0.1em;
+  gap: 1.4px;
   min-width: 0;
 }
 
@@ -89,6 +89,6 @@ const bodyId = useId()
 .body {
   display: flex;
   flex-direction: column;
-  gap: 0.7em;
+  gap: 8px;
 }
 </style>

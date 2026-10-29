@@ -22,7 +22,7 @@ const name = computed(() => (props.doc.templateId ? getTemplate(props.doc.templa
 .tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
+  gap: 4px;
   min-width: 0;
   font-size: var(--size-12);
   color: var(--text-muted);

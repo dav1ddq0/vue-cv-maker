@@ -88,8 +88,8 @@ function rowLabel(id: StepId): string {
 .progress {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
-  padding: 0 0.5em 0.8em;
+  gap: 8px;
+  padding: 0 8px 12px;
 }
 
 .progress-line {
@@ -211,7 +211,7 @@ function rowLabel(id: StepId): string {
 }
 
 .add {
-  margin: 0.8em 0.25em 0;
+  margin: 8px 4px 0;
   min-height: 40px;
   --container: transparent;
   border: 1px dashed var(--md-outline);
@@ -224,7 +224,7 @@ function rowLabel(id: StepId): string {
 }
 
 .note {
-  margin: 0.8em 0.5em 0;
+  margin: 8px 4px 0;
   font-size: var(--size-11);
   line-height: 1.45;
   color: var(--text-muted);

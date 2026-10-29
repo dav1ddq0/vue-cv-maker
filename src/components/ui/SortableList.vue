@@ -90,7 +90,7 @@ function move(from: number, to: number) {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
 }
 
 .item {
@@ -116,7 +116,7 @@ function move(from: number, to: number) {
 .handle {
   cursor: grab;
   color: var(--text-muted);
-  padding-top: 0.2em;
+  padding-top: 2px;
   user-select: none;
 }
 
@@ -127,7 +127,7 @@ function move(from: number, to: number) {
 .move {
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
+  gap: 2px;
 }
 
 /* The only keyboard and touch alternative to dragging: 32 dp icon buttons with a 48 dp target. */

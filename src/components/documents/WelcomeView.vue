@@ -71,17 +71,17 @@ async function startFromSample() {
 .welcome {
   display: flex;
   flex-direction: column;
-  gap: 1.75em;
+  gap: 24px;
   width: 100%;
   max-width: 980px;
   margin: 0 auto;
-  padding: clamp(1.5em, 6vh, 4em) 1.5em 2em;
+  padding: clamp(20px, 6vh, 56px) 20px 28px;
 }
 
 .intro {
   display: flex;
   flex-direction: column;
-  gap: 0.6em;
+  gap: 8px;
   max-width: 640px;
 }
 
@@ -101,15 +101,15 @@ async function startFromSample() {
 .choices {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1em;
+  gap: 16px;
 }
 
 .choice {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.6em;
-  padding: 1.4em;
+  gap: 8px;
+  padding: 20px;
   border: 1px solid var(--border);
   border-radius: var(--shape-lg);
   background: var(--surface);
@@ -163,7 +163,7 @@ async function startFromSample() {
 
 .cta {
   margin-top: auto;
-  padding-top: 0.4em;
+  padding-top: 4px;
   font-weight: 600;
   color: var(--accent);
 }
@@ -171,7 +171,7 @@ async function startFromSample() {
 .points {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6em 2em;
+  gap: 8px 28px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -180,7 +180,7 @@ async function startFromSample() {
 
 .points li::before {
   content: '✓';
-  margin-right: 0.5em;
+  margin-right: 8px;
   color: var(--md-success);
   font-weight: 700;
 }

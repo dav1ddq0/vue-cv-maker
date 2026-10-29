@@ -160,8 +160,8 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5em 1em;
-  padding: 0.5em 0.9em;
+  gap: 8px 16px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
@@ -186,9 +186,9 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
 .chip {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 8px;
   min-height: 34px;
-  padding: 0 0.7em;
+  padding: 0 8px;
   border: 1px solid var(--border);
   border-radius: var(--shape-md);
   background: var(--surface);
@@ -259,7 +259,7 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
 .scroll {
   flex: 1;
   overflow: auto;
-  padding: 1.2em;
+  padding: 16px;
   display: flex;
   /* safe: a page wider than the panel starts at its left edge instead of overflowing out of reach. */
   justify-content: safe center;
@@ -269,7 +269,7 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
 /* Phones: a slimmer margin so the page uses the width it is fitted to. */
 @media (max-width: 640px) {
   .scroll {
-    padding: 0.8em;
+    padding: 12px;
     /* The scaled page keeps its 794px layout box; nothing useful is out there to scroll to. */
     overflow-x: hidden;
   }
