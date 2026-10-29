@@ -177,7 +177,7 @@ async function confirmDelete(id: string) {
 
 .title {
   margin: 0;
-  font-size: 1.3em;
+  font-size: var(--size-22);
 }
 
 .empty {
@@ -280,7 +280,7 @@ async function confirmDelete(id: string) {
   border-radius: 50%;
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 1.4em;
+  font-size: var(--size-22);
   font-weight: 700;
 }
 
@@ -303,7 +303,7 @@ async function confirmDelete(id: string) {
 
 .meta {
   margin: 0;
-  font-size: 0.8em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
@@ -344,7 +344,7 @@ async function confirmDelete(id: string) {
 }
 
 .confirm-text {
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 </style>

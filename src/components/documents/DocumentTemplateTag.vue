@@ -24,7 +24,7 @@ const name = computed(() => (props.doc.templateId ? getTemplate(props.doc.templa
   align-items: center;
   gap: 0.4em;
   min-width: 0;
-  font-size: 0.8em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;

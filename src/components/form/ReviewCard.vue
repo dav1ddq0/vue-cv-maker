@@ -74,7 +74,7 @@ function message(item: Suggestion): string {
   display: flex;
   align-items: center;
   gap: 0.6em;
-  font-size: 0.9em;
+  font-size: var(--size-14);
   font-weight: 600;
 }
 
@@ -85,7 +85,7 @@ meter {
 
 .empty {
   margin: 0;
-  font-size: 0.9em;
+  font-size: var(--size-14);
   color: var(--text-muted);
 }
 
@@ -113,7 +113,7 @@ meter {
 .level {
   padding: 0.1em 0.5em;
   border-radius: var(--shape-full);
-  font-size: 0.75em;
+  font-size: var(--size-11);
   font-weight: 600;
   white-space: nowrap;
   /* Same width for both levels, so every message starts at the same x. */
@@ -133,7 +133,7 @@ meter {
 }
 
 .text {
-  font-size: 0.9em;
+  font-size: var(--size-14);
 }
 
 /* On a phone the button goes under the text instead of squeezing it. */

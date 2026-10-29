@@ -187,12 +187,12 @@ function onDragLeave(event: DragEvent) {
 }
 
 .title {
-  font-size: 0.92em;
+  font-size: var(--size-14);
   font-weight: 600;
 }
 
 .note {
-  font-size: 0.8em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 

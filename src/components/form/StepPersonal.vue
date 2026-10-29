@@ -223,7 +223,7 @@ async function removePhoto() {
 
 .extras-note {
   margin: 0 0 0.8em;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
@@ -275,7 +275,7 @@ async function removePhoto() {
 
 .subtitle {
   margin: 0;
-  font-size: 0.95em;
+  font-size: var(--size-14);
   font-weight: 600;
 }
 

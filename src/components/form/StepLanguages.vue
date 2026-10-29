@@ -64,7 +64,7 @@ const { t } = useI18n()
 .empty {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9em;
+  font-size: var(--size-14);
 }
 
 .row {
@@ -80,7 +80,7 @@ const { t } = useI18n()
 
 .help {
   margin: 0;
-  font-size: 0.82em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 

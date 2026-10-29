@@ -105,7 +105,7 @@ watch(
 
 .heading {
   margin: 0;
-  font-size: 1.25em;
+  font-size: var(--size-16);
   font-weight: 650;
 }
 
@@ -120,13 +120,13 @@ watch(
 }
 
 .position {
-  font-size: 0.82em;
+  font-size: var(--size-12);
   font-weight: 500;
   color: var(--text-muted);
 }
 
 .heading--large {
-  font-size: 1.6em;
+  font-size: var(--size-24);
   font-weight: 700;
 }
 

@@ -115,7 +115,7 @@ async function apply(data: CVData, mode: 'new' | 'current') {
 
 .title {
   margin: 0;
-  font-size: 1.3em;
+  font-size: var(--size-22);
 }
 
 .card {
@@ -135,7 +135,7 @@ async function apply(data: CVData, mode: 'new' | 'current') {
 
 .card-hint {
   margin: 0;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 

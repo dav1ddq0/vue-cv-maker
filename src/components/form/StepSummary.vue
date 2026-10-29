@@ -42,7 +42,7 @@ meter {
 }
 
 .verdict {
-  font-size: 0.85em;
+  font-size: var(--size-12);
   font-weight: 600;
 }
 

@@ -168,7 +168,7 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
 
 .title {
   margin: 0;
-  font-size: 0.86em;
+  font-size: var(--size-12);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -194,7 +194,7 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;

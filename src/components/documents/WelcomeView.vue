@@ -87,13 +87,13 @@ async function startFromSample() {
 
 .title {
   margin: 0;
-  font-size: clamp(1.7em, 4vw, 2.2em);
+  font-size: clamp(var(--size-28), 4vw, var(--size-32));
   line-height: 1.15;
 }
 
 .lead {
   margin: 0;
-  font-size: 1.05em;
+  font-size: var(--size-16);
   line-height: 1.5;
   color: var(--text-muted);
 }
@@ -152,7 +152,7 @@ async function startFromSample() {
 }
 
 .choice-title {
-  font-size: 1.1em;
+  font-size: var(--size-16);
   font-weight: 700;
 }
 

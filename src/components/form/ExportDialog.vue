@@ -194,7 +194,7 @@ function printInstead() {
 
 .format-hint,
 .note {
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
@@ -208,7 +208,7 @@ function printInstead() {
   border-radius: var(--shape-md);
   background: var(--md-success-container);
   color: var(--md-on-success-container);
-  font-size: 0.72em;
+  font-size: var(--size-11);
   font-weight: 700;
 }
 
@@ -222,13 +222,13 @@ function printInstead() {
 
 .check-title {
   margin: 0 0 0.4em;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   font-weight: 700;
 }
 
 .ok {
   margin: 0;
-  font-size: 0.85em;
+  font-size: var(--size-12);
 }
 
 .missing {
@@ -246,7 +246,7 @@ function printInstead() {
   background: none;
   color: var(--md-warning);
   font: inherit;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   text-decoration: underline;
   cursor: pointer;
 }

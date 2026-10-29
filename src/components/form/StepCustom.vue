@@ -182,7 +182,7 @@ function addBlank() {
 
 .subtitle {
   margin: 0;
-  font-size: 0.95em;
+  font-size: var(--size-14);
   font-weight: 600;
 }
 
@@ -198,21 +198,21 @@ function addBlank() {
   display: inline-flex;
   align-items: center;
   gap: 0.35em;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   cursor: pointer;
 }
 
 .hint {
   margin: 0;
-  font-size: 0.82em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
 .empty {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9em;
+  font-size: var(--size-14);
 }
 
 .section {
@@ -268,7 +268,7 @@ function addBlank() {
 
 .sheet-hint {
   margin: 0 0.4em 0.8em;
-  font-size: 0.9em;
+  font-size: var(--size-14);
   color: var(--text-muted);
 }
 

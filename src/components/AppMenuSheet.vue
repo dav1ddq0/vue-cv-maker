@@ -121,7 +121,7 @@ function go(view: (typeof VIEWS)[number]) {
 
 .note {
   margin: 0.8em 1em 0;
-  font-size: 0.8em;
+  font-size: var(--size-12);
   line-height: 1.45;
   color: var(--text-muted);
 }

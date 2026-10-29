@@ -142,7 +142,7 @@ const phoneState = computed(() => {
 }
 
 .tagline {
-  font-size: 0.76em;
+  font-size: var(--size-11);
   color: var(--text-muted);
 }
 
@@ -174,7 +174,7 @@ const phoneState = computed(() => {
 }
 
 .save {
-  font-size: 0.8em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   min-width: 1.2em;
   text-align: center;

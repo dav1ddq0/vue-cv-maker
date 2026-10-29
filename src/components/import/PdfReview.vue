@@ -180,25 +180,25 @@ function apply(mode: 'new' | 'current') {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  font-size: 0.8em;
+  font-size: var(--size-12);
   line-height: 1.55;
   white-space: pre-wrap;
 }
 
 .title {
   margin: 0;
-  font-size: 1.05em;
+  font-size: var(--size-16);
 }
 
 .hint {
   margin: 0.2em 0 0;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
 .subtitle {
   margin: 0;
-  font-size: 0.95em;
+  font-size: var(--size-14);
 }
 
 .fields {
@@ -209,7 +209,7 @@ function apply(mode: 'new' | 'current') {
 
 .detected {
   margin: 0;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
@@ -233,18 +233,18 @@ function apply(mode: 'new' | 'current') {
 .block-heading {
   margin: 0 0 0.3em;
   font-weight: 650;
-  font-size: 0.9em;
+  font-size: var(--size-14);
 }
 
 .block-line {
   margin: 0;
-  font-size: 0.84em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
 .block-more {
   margin: 0.2em 0 0;
-  font-size: 0.78em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
@@ -255,7 +255,7 @@ function apply(mode: 'new' | 'current') {
 }
 
 .assign-label {
-  font-size: 0.76em;
+  font-size: var(--size-11);
   color: var(--text-muted);
 }
 
@@ -282,7 +282,7 @@ function apply(mode: 'new' | 'current') {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  font-size: 0.78em;
+  font-size: var(--size-12);
   white-space: pre-wrap;
 }
 

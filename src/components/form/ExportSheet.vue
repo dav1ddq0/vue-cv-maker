@@ -97,7 +97,7 @@ async function pick(kind: ExportKind) {
 }
 
 .hint {
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 

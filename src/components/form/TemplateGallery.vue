@@ -84,7 +84,7 @@ const shown = computed(() =>
 
 .subtitle {
   margin: 0;
-  font-size: 0.95em;
+  font-size: var(--size-14);
   font-weight: 600;
 }
 
@@ -175,7 +175,7 @@ const shown = computed(() =>
 
 /* Lets someone choose by shape without reading three paragraphs. */
 .tag {
-  font-size: 0.68em;
+  font-size: var(--size-11);
   letter-spacing: 0.02em;
   padding: 0.1em 0.45em;
   border-radius: var(--shape-full);
@@ -189,7 +189,7 @@ const shown = computed(() =>
 }
 
 .card-desc {
-  font-size: 0.78em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   line-height: 1.35;
 }

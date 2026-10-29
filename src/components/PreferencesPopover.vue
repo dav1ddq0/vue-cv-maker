@@ -162,14 +162,14 @@ function toggleFallback() {
 }
 
 .label {
-  font-size: 0.82em;
+  font-size: var(--size-12);
   font-weight: 600;
 }
 
 .hint,
 .text {
   margin: 0;
-  font-size: 0.8em;
+  font-size: var(--size-12);
   line-height: 1.45;
   color: var(--text-muted);
 }
@@ -186,7 +186,7 @@ function toggleFallback() {
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   font-weight: 600;
   cursor: pointer;
 }
@@ -196,7 +196,7 @@ function toggleFallback() {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.4em 1em;
   margin: 0;
-  font-size: 0.85em;
+  font-size: var(--size-12);
 }
 
 .keys dd {
@@ -208,7 +208,7 @@ kbd {
   border: 1px solid var(--border);
   border-radius: var(--shape-xs);
   font: inherit;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   font-weight: 600;
 }
 </style>

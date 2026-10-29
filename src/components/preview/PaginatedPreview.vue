@@ -98,7 +98,7 @@ async function repaginate() {
 
 .status {
   margin: 0;
-  font-size: 0.82em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   min-height: 1.2em;
 }

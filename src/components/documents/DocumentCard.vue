@@ -83,7 +83,7 @@ const initials = computed(
   background: var(--accent-soft);
   color: var(--accent);
   font-weight: 700;
-  font-size: 1.1em;
+  font-size: var(--size-16);
 }
 
 .text {
@@ -95,14 +95,14 @@ const initials = computed(
 
 .name {
   font-weight: 600;
-  font-size: 1.05em;
+  font-size: var(--size-16);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .meta {
-  font-size: 0.82em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;

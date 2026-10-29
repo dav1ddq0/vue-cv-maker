@@ -51,7 +51,7 @@ function onCurrentChange(event: Event) {
   display: flex;
   align-items: center;
   gap: 0.4em;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
   padding-bottom: 0.55em;
 }

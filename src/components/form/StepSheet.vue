@@ -84,7 +84,7 @@ function go(id: StepId) {
   height: 32px;
   border-radius: 50%;
   border: 2px solid var(--md-outline);
-  font-size: 0.9em;
+  font-size: var(--size-11);
   font-weight: 700;
   color: var(--text-muted);
 }

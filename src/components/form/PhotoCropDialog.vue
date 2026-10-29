@@ -278,7 +278,7 @@ function onClose() {
 .hint,
 .failed {
   margin: 0;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   color: var(--text-muted);
 }
 
@@ -293,7 +293,7 @@ function onClose() {
 }
 
 .zoom-label {
-  font-size: 0.9em;
+  font-size: var(--size-14);
   font-weight: 600;
 }
 

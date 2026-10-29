@@ -90,7 +90,7 @@ function entrySubtitle(item: EducationEntry): string {
 .empty {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9em;
+  font-size: var(--size-14);
 }
 
 .entry {

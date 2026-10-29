@@ -160,7 +160,7 @@ function rowLabel(id: StepId): string {
   box-sizing: border-box;
   border: 2px solid var(--md-outline);
   border-radius: 50%;
-  font-size: 0.75em;
+  font-size: var(--size-11);
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -218,14 +218,14 @@ function rowLabel(id: StepId): string {
   border-radius: var(--shape-full);
   color: var(--md-primary);
   font: inherit;
-  font-size: 0.85em;
+  font-size: var(--size-12);
   font-weight: 600;
   cursor: pointer;
 }
 
 .note {
   margin: 0.8em 0.5em 0;
-  font-size: 0.75em;
+  font-size: var(--size-11);
   line-height: 1.45;
   color: var(--text-muted);
 }
