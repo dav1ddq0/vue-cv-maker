@@ -23,6 +23,8 @@ export interface TextFragment {
   text: string
   fontSize: number
   fontName?: string
+  /** The item is letter-spaced text: a gap next to it is one between letters more often than words. */
+  tracked?: boolean
 }
 
 /** Fragments whose baselines differ by less than this are the same line. */
@@ -34,6 +36,9 @@ const Y_TOLERANCE = 2.5
  * file, an e-mail split at its break points) sit within ±0.03 em; word spaces are 0.17 em or more.
  */
 const WORD_GAP = 0.1
+
+/** ...and next to letter-spaced text, where every letter is that far from the next. */
+const TRACKED_WORD_GAP = 0.3
 
 /**
  * A gap wider than this many font sizes ends a cell: the text on the other side is a different
@@ -62,13 +67,20 @@ const FLOW_LINE_GAP = 2.4
  * which a wide gap splits into cells; `readingOrder` then puts the cells of a page in the order a
  * person reads them, column by column where the page has columns.
  */
-export function groupIntoLines(items: TextItem[], page: number): ExtractedLine[] {
+export function groupIntoLines(items: TextItem[], page: number, boldFonts?: ReadonlySet<string>): ExtractedLine[] {
   const buckets: { y: number; fragments: TextFragment[] }[] = []
 
   for (const item of items) {
     if (!('str' in item) || !item.str.trim()) continue
     const [, , , scaleY, x, y] = item.transform as number[]
-    const fragment = { x, end: x + (item.width || 0), text: item.str, fontSize: Math.abs(scaleY) || 0, fontName: String(item.fontName ?? '') }
+    const fragment = {
+      x,
+      end: x + (item.width || 0),
+      text: item.str,
+      fontSize: Math.abs(scaleY) || 0,
+      fontName: String(item.fontName ?? ''),
+      tracked: (item as TrackedItem).tracked,
+    }
     const bucket = buckets.find((candidate) => Math.abs(candidate.y - y) <= Y_TOLERANCE)
     if (bucket) bucket.fragments.push(fragment)
     else buckets.push({ y, fragments: [fragment] })
@@ -85,7 +97,7 @@ export function groupIntoLines(items: TextItem[], page: number): ExtractedLine[]
         text: collapseLetterSpacing(joinFragments(cell).replace(/\s+/g, ' ').trim()),
         fontSize: Math.max(...cell.map((f) => f.fontSize)),
         fontName: first.fontName ?? '',
-        bold: cell.some((f) => isBold(f.fontName ?? '')),
+        bold: cell.some((f) => (boldFonts ? boldFonts.has(f.fontName ?? '') : isBold(f.fontName ?? ''))),
       }
     }),
   )
@@ -212,6 +224,69 @@ function flows(column: ExtractedLine[]): boolean {
   return close >= 2 && close / (column.length - 1) >= 0.5
 }
 
+/** An item is looked for further on in the glyph stream only if it is this long, and within this many glyphs. */
+const RESYNC_MIN_LETTERS = 6
+const RESYNC_WINDOW = 4000
+
+/**
+ * Gives each text item the spaces the PDF itself draws. pdf.js adds a space wherever two glyphs are
+ * far enough apart, so letter-spaced text comes back as "I ng e ni e r a de da t os" and no rule can
+ * tell those spaces from the ones between words. The stream of glyphs the page draws (`glyphs`, with
+ * a space where the PDF draws a space glyph) has no such guesses. An item that is plainly
+ * letter-spaced takes its text from it. Any other keeps what pdf.js gave: its spaces are mostly real,
+ * and a gap drawn as a margin instead of a space glyph (the " · " between items) would be lost. An
+ * item whose letters are not found in the stream is left alone (spec 040).
+ */
+export type TrackedItem = TextItem & { tracked?: boolean }
+
+/**
+ * Text spread out letter by letter: pieces that are almost all a letter or two ("U C J A"), or one
+ * that is a lone consonant, which no word is ("d atos"). A vowel alone may be a word ("y", "a").
+ */
+function looksTracked(text: string): boolean {
+  const tokens = text.trim().split(/\s+/)
+  if (tokens.length < 2) return false
+  const lone = tokens.some((token) => token.length === 1 && /\p{L}/u.test(token) && !/[aeiouyáéíóú]/iu.test(token))
+  return lone || (tokens.length >= 3 && tokens.join('').length / tokens.length <= 2.2)
+}
+
+export function repairSpaces(items: TextItem[], glyphs: string): TrackedItem[] {
+  const chars = [...glyphs.normalize('NFKC')]
+  const letters: string[] = []
+  const at: number[] = []
+  chars.forEach((ch, index) => {
+    if (!/\s/u.test(ch)) {
+      letters.push(ch)
+      at.push(index)
+    }
+  })
+  const stream = letters.join('')
+  let cursor = 0
+
+  return items.map((original): TrackedItem => {
+    if (!('str' in original)) return original
+    const tracked = looksTracked(original.str)
+    const item: TrackedItem = tracked ? { ...original, tracked } : original
+    const own = [...item.str.normalize('NFKC')].filter((ch) => !/\s/u.test(ch))
+    if (!own.length) return item
+    const needle = own.join('')
+    let start = stream.startsWith(needle, cursor) ? cursor : -1
+    if (start < 0 && own.length >= RESYNC_MIN_LETTERS) {
+      const found = stream.slice(cursor, cursor + RESYNC_WINDOW).indexOf(needle)
+      if (found >= 0) start = cursor + found
+    }
+    if (start < 0) return item
+    cursor = start + own.length
+
+    let drawn = ''
+    own.forEach((ch, index) => {
+      drawn += ch
+      if (index < own.length - 1 && at[start + index + 1]! - at[start + index]! > 1) drawn += ' '
+    })
+    return tracked ? { ...item, str: drawn } : item
+  })
+}
+
 /**
  * Joins a line's fragments left to right, with a space only where there is a gap between two.
  * A PDF draws a word in several pieces when part of it comes from another font file (a "Ł",
@@ -220,10 +295,13 @@ function flows(column: ExtractedLine[]): boolean {
 export function joinFragments(fragments: TextFragment[]): string {
   let text = ''
   let end = -Infinity
+  let tracked = false
   for (const fragment of [...fragments].sort((a, b) => a.x - b.x)) {
-    if (text && fragment.x - end > WORD_GAP * fragment.fontSize) text += ' '
+    const gap = (tracked || fragment.tracked ? TRACKED_WORD_GAP : WORD_GAP) * fragment.fontSize
+    if (text && fragment.x - end > gap) text += ' '
     text += fragment.text
     end = Math.max(end, fragment.end)
+    tracked = !!fragment.tracked
   }
   return text
 }

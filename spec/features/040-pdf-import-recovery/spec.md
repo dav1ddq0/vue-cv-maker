@@ -37,15 +37,33 @@ Causes found by dumping what the extraction returns for each PDF, and what chang
    their own beside rows of items, a list that wraps onto a lower-case line, a level on its own
    line before or after its language, and a row of languages ("Español (Nativo) · Inglés (C1)").
 6. **The place** is also looked for beside the e-mail and phone, for contact blocks in a sidebar.
-7. **The name of a letter-spaced heading** (Monograph). pdf.js returns "Ł UCJA Ø STER" with equal
-   spaces between letters and between words, so the word boundary is gone before the heuristics see
-   it. The PDF's own title ("Łucja Øster-Ñúñez – CV", set by the app's two exports) carries the name
-   with its spaces and case: it is adopted when it has the same letters as the detected name, with
-   control and bidirectional characters removed and a trailing "CV" / "resume" dropped.
-8. **Headings in ordinary case** ("Charlas" in Frame, Banner, Chevron, and "Hobbies" in the real
-   CV). When the known headings are not in capitals and are visibly larger than the text, a short
-   line without digits or punctuation, in the same size within 2 % (an entry's title is about 3 %
-   smaller), in the same column and set apart by the gap above is a heading too.
+7. **Letter-spaced text** (Monograph's name and headline, the headings of the tracked templates).
+   pdf.js returns "I ng e ni e r a de da t os" with spaces wherever two glyphs are far apart, so
+   the word boundary is lost before the heuristics see it. Two repairs:
+   - The glyphs the page draws are read from its operators (`getOperatorList`), where a space is
+     a space glyph. A letter-spaced item takes its text from there (`repairSpaces`); the other items
+     keep pdf.js's text, since a gap drawn as a margin (the " · " between items) has no glyph. An
+     item is letter-spaced when it is made of pieces of a letter or two, or has a lone consonant
+     ("d atos"). A gap next to one is read with a threshold of 0.3 em instead of 0.1, because every
+     letter is that far from the next. The lookahead for an item that is not where the last one
+     ended is bounded.
+   - The PDF's title ("Łucja Øster-Ñúñez – CV", set by the app's two exports), or one part of it
+     that a dash or bar sets apart ("CV – Ada Lovelace – 2024"), is adopted as the name when it has
+     the same letters, with control and bidirectional characters removed. That keeps the case and
+     the "de" of a name set in capitals. A PDF without such a title takes the name from the page,
+     now repaired as above.
+8. **Headings in ordinary case** ("Charlas" in Frame, Banner, Chevron, "Hobbies" in the real CV).
+   When the known headings are not in capitals, a short line without digits or punctuation, in the
+   same size within 2 % (an entry's title is about 3 % smaller), the same weight, in the same
+   column and set apart by a gap at least 0.9 times the headings' own is a heading too. Size alone
+   tells it from the text only when the headings are visibly larger; otherwise it takes headings
+   that are bold while little of the text is. A line followed by its dates is an entry's title.
+9. **Real bold.** pdf.js gives an internal font id, not the font's name, so `bold` was never set.
+   After `getOperatorList` the page's fonts are resolved: a font named "…-Bold", "…-SemiBold",
+   "…-Black" is bold. This is what item 8 uses.
+10. **The headline** is the line under the name in the name's own column (by position, not by order),
+    so contact details set beside the name no longer take its place, and it no longer depends on the
+    name's text, which the title may have changed.
 ## Not in scope
 
 - Bold detection: pdf.js gives an internal font id, not the font's name, so `bold` is never set.
@@ -60,12 +78,14 @@ Causes found by dumping what the extraction returns for each PDF, and what chang
 
 ## Verification
 
-- 553 unit tests (2 skipped: local scratch), plus the typecheck. New: `tests/pdfLayout.test.ts` (cells, reading order, gutters,
+- 569 unit tests (2 skipped: local scratch), plus the typecheck. New: `tests/pdfLayout.test.ts` (cells, reading order, gutters,
   tables, bands, side-by-side headings) and cases in `tests/pdfImport.test.ts` for each rule above.
   Every rule was mutated and its test fails without it (two mutants survived the first round, the
   top band and the style match, and got their tests).
-- `qa:roundtrip` 338/338 (232 before, plus the 104 import checks and the two Monograph name
-  checks, no longer an exception), `qa:e2e` 93/93, `qa:security` 53/53.
+- `qa:roundtrip` 364/364 (232 before, plus the 104 import checks, the 26 names, no longer with an
+  exception, and the 26 headlines), `qa:e2e` 93/93, `qa:security` 53/53.
+- Every rule of items 7–10 was mutated and its test fails without it (five mutants survived the
+  first round and got stronger tests).
 - A real, three-page CV from another tool (Word-like, dates and headings in a left column, skills
   in capitals) was run before and after, looking at structure only: 4 dated experiences before and
   after (now with 12 highlights instead of 0), 30 skill items before and after, 10 languages (9
@@ -78,7 +98,9 @@ Causes found by dumping what the extraction returns for each PDF, and what chang
 
 ## Not changed
 
-- The headline of a letter-spaced template ("I n ge nie ra de d atos…" in Monograph's print) keeps
-  its stray spaces: there is no second copy of it in the PDF to repair it from.
-- A PDF without a title, or with a title that is not the name, gets the name as the page spells it.
-- A heading in ordinary case that is no larger than the text cannot be told from it.
+- A PDF whose producer leaves its spaces out and positions the words instead keeps pdf.js's text,
+  as the repair only touches letter-spaced items.
+- A heading in ordinary case that is neither larger nor bold nor in capitals, or that has no dates
+  guard to rely on (an entry's title with its dates two lines below), cannot be told from the text.
+- A page whose operators cannot be read is used as pdf.js gives it, with no repair and the font ids
+  as the only bold signal.

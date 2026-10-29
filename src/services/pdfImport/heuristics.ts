@@ -66,7 +66,7 @@ export function analyze(doc: ExtractedDocument): ImportDraft {
   const phone = findPhone(lines)
   const links = findLinks(lines)
   const name = describeName(lines, nameIndex, headerLines, doc.title)
-  const headline = findHeadline(headerLines, name.value)
+  const headline = findHeadline(headerLines, lines[nameIndex])
   // The place is in the header or, when the contact details sit in a column of their own, beside them.
   const location = findLocation([...headerLines, ...nearContact(lines, email.value, phone.value)], email.value, phone.value)
 
@@ -154,20 +154,33 @@ function findHeadings(lines: ExtractedLine[], skipIndex: number): HeadingHit[] {
     if (apart && alike) unknown.push({ index, kind: null, text: line.text.trim() })
   })
 
-  // Headings set in ordinary case ("Charlas") have only their size, their place and the gap above
-  // to go by: the size of the known headings, within a hair, in the same column, when that size is
-  // visibly larger than the text. An entry's title is nearly as large, so the match is tight.
+  // Headings set in ordinary case ("Charlas") have only their size, their weight, their place and
+  // the gap above to go by: those of the known headings, within a hair, in the same column. That
+  // tells them from the text only when the headings are visibly larger or the text is not mostly
+  // bold. An entry's title is nearly as large and often as bold, so it is also left out when it
+  // is followed by its dates, and when the gap above it is smaller than the headings' own.
   const bodySize = median(sizes)
-  if (known.length && !knownUpper && knownSize >= bodySize * HEADING_OVER_TEXT) {
+  const knownBold = known.filter((line) => line.bold).length * 2 >= known.length
+  const boldShare = lines.filter((line) => line.bold).length / lines.length
+  const distinct = knownSize >= bodySize * HEADING_OVER_TEXT || (knownBold && boldShare < MOSTLY_BOLD)
+  const gapAbove = (index: number) => {
+    const previous = lines[index - 1]
+    return !previous ? 0 : previous.page === lines[index]!.page ? previous.y - lines[index]!.y : Infinity
+  }
+  const knownGap = median(hits.map((hit) => gapAbove(hit.index)).filter((gap) => gap > 0 && Number.isFinite(gap)))
+  if (known.length && !knownUpper && distinct) {
     lines.forEach((line, index) => {
       if (index === skipIndex || hits.some((hit) => hit.index === index) || unknown.some((hit) => hit.index === index)) return
       const text = line.text.trim()
       if (!text || isUpper(text) || text.split(/\s+/).length > 3 || /[\d.,:;!?@/]/.test(text)) return
-      const previous = lines[index - 1]
-      const gap = !previous ? 0 : previous.page === line.page ? previous.y - line.y : Infinity
+      const gap = gapAbove(index)
       const sameSize = Math.abs(line.fontSize - knownSize) <= knownSize * TITLE_CASE_SIZE_MATCH
+      const sameWeight = line.bold === knownBold
       const sameColumn = known.some((heading) => Math.abs(heading.x - line.x) <= HEADING_COLUMN)
-      if (sameSize && sameColumn && gap > usualGap * SPACED_GAP) unknown.push({ index, kind: null, text })
+      const setApart = gap > usualGap * SPACED_GAP && gap >= knownGap * HEADING_GAP_SHARE
+      const nextLine = lines[index + 1]
+      const hasDates = !!nextLine && DATE_RANGE_RE.test(nextLine.text)
+      if (sameSize && sameWeight && sameColumn && setApart && !hasDates) unknown.push({ index, kind: null, text })
     })
   }
 
@@ -179,6 +192,12 @@ const HEADING_SIZE_MATCH = 0.06
 
 /** ...and, when it is not in capitals, within this much (an entry's title is about 3 % smaller). */
 const TITLE_CASE_SIZE_MATCH = 0.02
+
+/** ...or the text is bold for less than this share of its lines, and the headings are. */
+const MOSTLY_BOLD = 0.4
+
+/** The gap above a heading is at least this share of the usual gap above the known ones. */
+const HEADING_GAP_SHARE = 0.9
 
 /** Headings must be this much larger than the text for size alone to tell them from it. */
 const HEADING_OVER_TEXT = 1.02
@@ -299,13 +318,14 @@ function findNameIndex(lines: ExtractedLine[]): number {
  */
 function nameFromTitle(title: string | undefined, detected: string): string | null {
   if (!title) return null
-  const candidate = title
-    .replace(/[\p{Cc}\p{Cf}]/gu, '')
-    .replace(/\s*[–—|·-]\s*(?:cv|curriculum(?: vitae)?|resume|résumé|currículum)\s*$/iu, '')
-    .replace(/\s+/g, ' ')
-    .trim()
+  const clean = title.replace(/[\p{Cc}\p{Cf}]/gu, '').replace(/\s+/g, ' ').trim()
   const letters = (value: string) => value.normalize('NFC').toLocaleUpperCase().replace(/[^\p{L}]/gu, '')
-  return candidate && letters(candidate) === letters(detected) ? candidate : null
+  // The whole title, or one of the parts a dash or bar sets apart ("CV – Ada Lovelace – 2024").
+  const parts = [clean, ...clean.split(/\s+[–—|·-]\s+/)]
+  const part = parts.find((candidate) => candidate && letters(candidate) === letters(detected))
+  if (part) return part
+  const stripped = clean.replace(/\s*[–—|·-]\s*(?:cv|curriculum(?: vitae)?|resume|résumé|currículum)\s*$/iu, '').trim()
+  return stripped && letters(stripped) === letters(detected) ? stripped : null
 }
 
 function describeName(
@@ -331,10 +351,20 @@ function describeName(
   }
 }
 
-function findHeadline(headerLines: ExtractedLine[], name: string): DetectedField<string> {
-  const index = headerLines.findIndex((l) => l.text.trim() === name || titleCaseIfShouting(l.text.trim()) === name)
-  const next = headerLines[index + 1]
-  if (!next) return { value: '', confidence: 'low' }
+/** The line under the name, in its own column: contact details beside it (above it, in reading order) are skipped. */
+const HEADLINE_ALIGN = 14
+
+function findHeadline(headerLines: ExtractedLine[], nameLine: ExtractedLine | undefined): DetectedField<string> {
+  const index = nameLine ? headerLines.indexOf(nameLine) : -1
+  const centre = (line: ExtractedLine) => (line.x + line.end) / 2
+  const below = nameLine
+    ? headerLines
+        .filter((line) => line !== nameLine && line.page === nameLine.page && line.y < nameLine.y)
+        .filter((line) => Math.abs(line.x - nameLine.x) <= HEADLINE_ALIGN || Math.abs(centre(line) - centre(nameLine)) <= HEADLINE_ALIGN)
+        .sort((a, b) => b.y - a.y)[0]
+    : undefined
+  const next = below ?? headerLines[index + 1]
+  if (!next || index < 0) return { value: '', confidence: 'low' }
   const text = next.text.trim()
   if (!text || EMAIL_RE.test(text) || PHONE_RE.test(text) || text.length > 80) {
     return { value: '', confidence: 'low' }

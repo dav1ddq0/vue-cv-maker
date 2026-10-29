@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { groupIntoLines, readingOrder, type ExtractedLine } from '@/services/pdfImport/layout'
+import { groupIntoLines, joinFragments, readingOrder, repairSpaces, type ExtractedLine } from '@/services/pdfImport/layout'
 
 /** A pdf.js text item at (x, y), `width` wide, in `size` type. */
 const item = (str: string, x: number, y: number, width: number, size = 10) =>
@@ -110,5 +110,53 @@ describe('readingOrder, columns above full-width text (spec 040)', () => {
       'IDIOMAS', 'language 0', 'language 1', 'language 2', 'language 3',
       'summary 0 that crosses the page', 'summary 1 that crosses the page', 'summary 2 that crosses the page', 'summary 3 that crosses the page',
     ])
+  })
+})
+
+describe('repairSpaces (spec 040)', () => {
+  const item = (str: string) => ({ str, transform: [10, 0, 0, 10, 40, 700], width: str.length * 5, height: 10, fontName: 'f1', dir: 'ltr', hasEOL: false }) as never
+  const strs = (items: Array<{ str?: string }>) => items.map((it) => it.str)
+
+  it('takes the text of a letter-spaced item from the glyphs the page draws, with its real spaces', () => {
+    const fixed = repairSpaces([item('I ng e ni e r a de da t os · “ca l i da d”')], 'Ingeniera de datos · “calidad”')
+    expect(strs(fixed)).toEqual(['Ingeniera de datos · “calidad”'])
+  })
+
+  it('removes the space pdf.js puts after a lone consonant in a word that is not letter-spaced as a whole', () => {
+    expect(strs(repairSpaces([item('d atos')], 'datos'))).toEqual(['datos'])
+  })
+
+  it('leaves an item with ordinary words as pdf.js gave it, since a gap drawn as a margin has no glyph', () => {
+    expect(strs(repairSpaces([item('Español (Nativo) · Inglés (C1)')], 'Español (Nativo)·Inglés (C1)'))).toEqual(['Español (Nativo) · Inglés (C1)'])
+  })
+
+  it('marks letter-spaced items so a gap next to them is read as a letter gap', () => {
+    const [letters, words] = repairSpaces([item('U C J A'), item('Estudio Nube')], 'UCJAEstudioNube') as Array<{ tracked?: boolean }>
+    expect(letters!.tracked).toBe(true)
+    expect(words!.tracked).toBeUndefined()
+  })
+
+  it('finds each item where the last one ended, and skips one the stream does not hold', () => {
+    const fixed = repairSpaces([item('A B C'), item('hidden text not drawn at all'), item('P Q R S T U V W')], 'ABC PQRSTUVW')
+    expect(strs(fixed)).toEqual(['ABC', 'hidden text not drawn at all', 'PQRSTUVW'])
+  })
+
+  it('looks a long item up further on when glyphs the items do not hold came before it', () => {
+    const fixed = repairSpaces([item('A B C'), item('P Q R S T U V W')], 'ABC watermark PQRSTUVW')
+    expect(strs(fixed)).toEqual(['ABC', 'PQRSTUVW'])
+    expect(strs(repairSpaces([item('A B C'), item('P Q')], 'ABC watermark PQ'))).toEqual(['ABC', 'P Q'])
+  })
+
+  it('leaves everything alone when the page has no readable glyphs', () => {
+    expect(strs(repairSpaces([item('U C J A')], ''))).toEqual(['U C J A'])
+  })
+})
+
+describe('joinFragments next to letter-spaced text (spec 040)', () => {
+  it('reads a gap of a letter and a half as one between letters, and a wider one as a word space', () => {
+    const f = (text: string, x: number, tracked?: boolean) => ({ x, end: x + text.length * 5, text, fontSize: 10, tracked })
+    expect(joinFragments([f('Ł', 0), f('UCJA', 6.4, true)])).toBe('ŁUCJA')
+    expect(joinFragments([f('UCJA', 0, true), f('ØSTER', 24.8, true)])).toBe('UCJA ØSTER')
+    expect(joinFragments([f('Ł', 0), f('ucja', 6.4)])).toBe('Ł ucja')
   })
 })

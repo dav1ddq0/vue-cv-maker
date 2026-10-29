@@ -3,7 +3,7 @@
 //     in the crop dialog, then downloaded as direct PDF, print, HTML and JSON (spec 037).
 //   - Each download is checked for what it holds, the JSON is uploaded again (exact round trip, the
 //     photo shows) and both PDFs go through PDF import (name and e-mail recovered whole).
-//   - The sections PDF import rebuilds are checked too (spec 040): the experiences, education entries,
+//   - The name, the headline and the sections PDF import rebuilds are checked too (spec 040): the experiences, education entries,
 //     skill items and languages of the uploaded CV come back in number, in every template and both PDFs.
 //     The CV is the app's own, so this measures the heuristics on the 13 layouts, not on any PDF.
 // Usage: npm run qa:roundtrip (builds first). Files in .qa/roundtrip/.
@@ -161,6 +161,7 @@ const pdfImages = (file) => execFileSync('pdfimages', ['-list', file]).toString(
         await exportJson(p, f(`from-${kind}.json`))
         const got = JSON.parse(fs.readFileSync(f(`from-${kind}.json`), 'utf8'))
         if (!NAME_NOT_RECOVERED.has(id)) check(id, `${kind} PDF import recovers the name`, got.personal.fullName === src.personal.fullName, JSON.stringify(got.personal.fullName))
+        check(id, `${kind} PDF import recovers the headline`, fold(got.personal.headline) === fold(src.personal.headline), JSON.stringify(got.personal.headline))
         check(id, `${kind} PDF import recovers the e-mail`, got.personal.email === src.personal.email, JSON.stringify(got.personal.email))
         const items = (cv) => cv.skills.reduce((n, g) => n + g.items.length, 0)
         for (const [what, found, wanted] of [['experiences', got.experience.length, src.experience.length], ['education entries', got.education.length, src.education.length], ['skill items', items(got), items(src)], ['languages', got.languages.length, src.languages.length]]) {

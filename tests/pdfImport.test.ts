@@ -489,3 +489,94 @@ describe('headings in ordinary case (spec 040)', () => {
     expect(draft.unclassified.filter((b) => b.heading)).toEqual([])
   })
 })
+
+describe('the name of a CV titled with more than the name (spec 040)', () => {
+  const named = (title: string) => analyze({ ...doc([{ text: 'ADA DE LOVELACE', fontSize: 22, y: 800 }, { text: 'RESUMEN', y: 760 }, { text: 'Texto.', y: 746 }]), title })
+
+  it('takes the part of the title that spells the name', () => {
+    expect(named('CV – Ada de Lovelace – 2024').fullName.value).toBe('Ada de Lovelace')
+    expect(named('Ada de Lovelace | Matemática').fullName.value).toBe('Ada de Lovelace')
+  })
+
+  it('keeps the page spelling when no part of the title is the name', () => {
+    expect(named('Currículum 2024').fullName.value).toBe('Ada De Lovelace')
+  })
+})
+
+describe('the headline under the name (spec 040)', () => {
+  it('is the line under the name in its own column, not the contact details beside it', () => {
+    const at = (text: string, x: number, y: number, fontSize = 10) => ({ text, x, y, fontSize, end: x + 150 })
+    const draft = analyze(
+      doc([
+        at('Ada Lovelace', 45, 800, 22),
+        at('ada@example.com', 459, 790, 8),
+        at('Londres, Reino Unido', 459, 778, 8),
+        at('Matemática y programadora', 45, 770),
+        at('RESUMEN', 45, 730, 9),
+        at('Texto.', 45, 716),
+      ]),
+    )
+    expect(draft.headline.value).toBe('Matemática y programadora')
+  })
+
+  it('does not take the name line for the headline when the name was spelled from the title', () => {
+    const draft = analyze({ ...doc([{ text: 'ADA LOVELACE', fontSize: 22, y: 800 }, { text: 'Matemática', y: 780 }, { text: 'RESUMEN', y: 740 }, { text: 'Texto.', y: 726 }]), title: 'Ada Lovelace – CV' })
+    expect(draft.fullName.value).toBe('Ada Lovelace')
+    expect(draft.headline.value).toBe('Matemática')
+  })
+})
+
+describe('headings as bold as the text (spec 040)', () => {
+  const at = (text: string, y: number, extra: Partial<ExtractedLine> = {}) => ({ text, y, fontSize: 10, ...extra })
+  const bold = { bold: true }
+  const page = (extra: Array<Partial<ExtractedLine> & { text: string }> = []) =>
+    doc([
+      at('Ada Lovelace', 830, { fontSize: 22, bold: true }),
+      at('Experiencia', 800, bold),
+      at('Analista de sistemas en Babbage Co', 784),
+      at('Escribió el primer programa.', 770),
+      at('Tradujo notas sobre la máquina.', 756),
+      at('Formó a tres personas.', 742),
+      at('Diseñó un método de cálculo.', 728),
+      at('Formación', 690, bold),
+      at('Matemáticas, Universidad de Londres', 674),
+      at('Premios', 634, bold),
+      at('Medalla de oro de la sociedad', 618),
+      at('Otro reconocimiento', 604),
+      ...extra,
+    ])
+
+  it('finds a heading that is only set apart and bold like the known ones, when little of the text is bold', () => {
+    const draft = analyze(page())
+    expect(draft.unclassified.find((b) => b.heading === 'Premios')!.lines).toEqual(['Medalla de oro de la sociedad', 'Otro reconocimiento'])
+    expect(draft.sections.find((s) => s.kind === 'education')!.lines).toHaveLength(1)
+  })
+
+  it('does not take a bold title followed by its dates for a heading', () => {
+    const draft = analyze(page([at('Jefa de proyecto', 560, bold), at('Babbage Co · mar 2020 - 2023', 546)]))
+    expect(draft.unclassified.find((b) => b.heading === 'Jefa de proyecto')).toBeUndefined()
+    expect(draft.unclassified.find((b) => b.heading === 'Premios')).toBeDefined()
+  })
+
+  it('does not take a bold line that is not set apart as much as the headings are', () => {
+    const draft = analyze(page([at('Otro título', 576, bold), at('Texto de debajo.', 562)]))
+    expect(draft.unclassified.find((b) => b.heading === 'Otro título')).toBeUndefined()
+    expect(draft.unclassified.find((b) => b.heading === 'Premios')).toBeDefined()
+  })
+
+  it('does not take a line that is set apart like a heading but is not bold like one', () => {
+    const draft = analyze(page([at('Notas sueltas', 560), at('Texto de debajo.', 546)]))
+    expect(draft.unclassified.find((b) => b.heading === 'Notas sueltas')).toBeUndefined()
+    expect(draft.unclassified.find((b) => b.heading === 'Premios')).toBeDefined()
+  })
+
+  it('finds such a heading when it is set apart as the known ones are', () => {
+    const draft = analyze(page([at('Idiomas extra', 560, bold), at('Texto de debajo.', 546)]))
+    expect(draft.unclassified.find((b) => b.heading === 'Idiomas extra')).toBeDefined()
+  })
+
+  it('does nothing when most of the text is bold, since weight then tells nothing', () => {
+    const lines = page().lines.map((line) => ({ ...line, bold: true }))
+    expect(analyze({ ...page(), lines }).unclassified.find((b) => b.heading === 'Premios')).toBeUndefined()
+  })
+})
