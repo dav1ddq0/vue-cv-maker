@@ -48,6 +48,28 @@ import f40 from '@fontsource/caladea/files/caladea-latin-ext-700-normal.woff?url
 import f41 from '@fontsource/caladea/files/caladea-latin-700-normal.woff?url'
 import f42 from '@fontsource/caladea/files/caladea-latin-ext-400-italic.woff?url'
 import f43 from '@fontsource/caladea/files/caladea-latin-400-italic.woff?url'
+import f44 from '@fontsource/gelasio/files/gelasio-latin-ext-400-normal.woff?url'
+import f45 from '@fontsource/gelasio/files/gelasio-latin-400-normal.woff?url'
+import f46 from '@fontsource/gelasio/files/gelasio-latin-ext-600-normal.woff?url'
+import f47 from '@fontsource/gelasio/files/gelasio-latin-600-normal.woff?url'
+import f48 from '@fontsource/gelasio/files/gelasio-latin-ext-700-normal.woff?url'
+import f49 from '@fontsource/gelasio/files/gelasio-latin-700-normal.woff?url'
+import f50 from '@fontsource/gelasio/files/gelasio-latin-ext-400-italic.woff?url'
+import f51 from '@fontsource/gelasio/files/gelasio-latin-400-italic.woff?url'
+import f52 from '@fontsource/arimo/files/arimo-latin-ext-400-normal.woff?url'
+import f53 from '@fontsource/arimo/files/arimo-latin-400-normal.woff?url'
+import f54 from '@fontsource/arimo/files/arimo-latin-ext-600-normal.woff?url'
+import f55 from '@fontsource/arimo/files/arimo-latin-600-normal.woff?url'
+import f56 from '@fontsource/arimo/files/arimo-latin-ext-700-normal.woff?url'
+import f57 from '@fontsource/arimo/files/arimo-latin-700-normal.woff?url'
+import f58 from '@fontsource/arimo/files/arimo-latin-ext-400-italic.woff?url'
+import f59 from '@fontsource/arimo/files/arimo-latin-400-italic.woff?url'
+import f60 from '@fontsource/tinos/files/tinos-latin-ext-400-normal.woff?url'
+import f61 from '@fontsource/tinos/files/tinos-latin-400-normal.woff?url'
+import f62 from '@fontsource/tinos/files/tinos-latin-ext-700-normal.woff?url'
+import f63 from '@fontsource/tinos/files/tinos-latin-700-normal.woff?url'
+import f64 from '@fontsource/tinos/files/tinos-latin-ext-400-italic.woff?url'
+import f65 from '@fontsource/tinos/files/tinos-latin-400-italic.woff?url'
 
 /** Face file name (`inter-latin-400-normal`) → WOFF URL. */
 export const WOFF: Record<string, string> = {
@@ -95,4 +117,26 @@ export const WOFF: Record<string, string> = {
   'caladea-latin-700-normal': f41,
   'caladea-latin-ext-400-italic': f42,
   'caladea-latin-400-italic': f43,
+  'gelasio-latin-ext-400-normal': f44,
+  'gelasio-latin-400-normal': f45,
+  'gelasio-latin-ext-600-normal': f46,
+  'gelasio-latin-600-normal': f47,
+  'gelasio-latin-ext-700-normal': f48,
+  'gelasio-latin-700-normal': f49,
+  'gelasio-latin-ext-400-italic': f50,
+  'gelasio-latin-400-italic': f51,
+  'arimo-latin-ext-400-normal': f52,
+  'arimo-latin-400-normal': f53,
+  'arimo-latin-ext-600-normal': f54,
+  'arimo-latin-600-normal': f55,
+  'arimo-latin-ext-700-normal': f56,
+  'arimo-latin-700-normal': f57,
+  'arimo-latin-ext-400-italic': f58,
+  'arimo-latin-400-italic': f59,
+  'tinos-latin-ext-400-normal': f60,
+  'tinos-latin-400-normal': f61,
+  'tinos-latin-ext-700-normal': f62,
+  'tinos-latin-700-normal': f63,
+  'tinos-latin-ext-400-italic': f64,
+  'tinos-latin-400-italic': f65,
 }

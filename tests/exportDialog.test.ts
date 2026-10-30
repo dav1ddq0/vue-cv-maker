@@ -99,12 +99,21 @@ describe('ExportDialog direct PDF (spec 031)', () => {
     wrapper.unmount()
   })
 
-  it('says when the CV font cannot be embedded', async () => {
+  it('says when the CV font cannot be embedded and has no stand-in', async () => {
+    const cv = useCvStore()
+    cv.data.style.fontFamily = "'Palatino Linotype', Palatino, 'Book Antiqua', serif"
+    const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
+    await wrapper.setProps({ open: true })
+    expect(wrapper.text()).toContain('La fuente Palatino depende de cada equipo')
+    wrapper.unmount()
+  })
+
+  it('says nothing for a font the PDF draws in a stand-in of the same widths (Georgia, spec 050)', async () => {
     const cv = useCvStore()
     cv.data.style.fontFamily = "Georgia, 'Times New Roman', serif"
     const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
     await wrapper.setProps({ open: true })
-    expect(wrapper.text()).toContain('La fuente Georgia depende de cada equipo')
+    expect(wrapper.text()).not.toContain('depende de cada equipo')
     wrapper.unmount()
   })
 })

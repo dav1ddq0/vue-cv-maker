@@ -8,6 +8,7 @@
  * loaded on demand.
  */
 import type { CVData } from '@/types/cv'
+import { withStandIns } from '@/core/fontStandIns'
 import { familyNames } from './fonts'
 import { exportCss, paginateInto, releasePagination } from './pdf'
 import { isFontFace, renderTemplateHtml, resolvePhoto } from './render'
@@ -185,12 +186,36 @@ export function transformText(text: string, transform: string): string {
   return text
 }
 
+/** The solid, unblurred shadows of a box-shadow (rings and offset copies): x, y, spread and colour, topmost first. */
+export function solidShadows(value: string): { dx: number; dy: number; spread: number; color: Rgba }[] {
+  if (!value || value === 'none') return []
+  const shadows: { dx: number; dy: number; spread: number; color: Rgba }[] = []
+  // Split on the commas between shadows, not those inside rgb( … ) or color( … ).
+  for (const part of value.split(/,(?![^(]*\))/)) {
+    if (/\binset\b/.test(part)) continue
+    const colorText = /(?:rgba?|color)\([^)]*\)/.exec(part)?.[0] ?? ''
+    const color = parseColor(colorText)
+    const [dx = 0, dy = 0, blur = 0, spread = 0] = part.replace(colorText, '').trim().split(/\s+/).map(parseFloat)
+    if (color && blur === 0 && visibleColor(color)) shadows.push({ dx, dy, spread, color })
+  }
+  return shadows
+}
+
 function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
   const r = el.getBoundingClientRect()
   if (r.width < 0.5 || r.height < 0.5) return
   const x = X(c, r.left), y = Y(c, r.top), w = r.width * c.k, h = r.height * c.k
   const radius = Math.min(lengthOf(style.borderTopLeftRadius, Math.min(r.width, r.height)), r.width / 2, r.height / 2) * c.k
   const alpha = opacityOf(c, el)
+  // Under the box, the lowest shadow first: a ring around a photo or a dot is a bigger shape behind it.
+  for (const { dx, dy, spread, color } of solidShadows(style.boxShadow).reverse()) {
+    const s = spread * c.k
+    c.doc.save()
+    if (radius > 0) c.doc.roundedRect(x + dx * c.k - s, y + dy * c.k - s, w + 2 * s, h + 2 * s, Math.max(0, radius + s))
+    else c.doc.rect(x + dx * c.k - s, y + dy * c.k - s, w + 2 * s, h + 2 * s)
+    c.doc.fillColor(rgbOf(color), color.a * alpha).fill()
+    c.doc.restore()
+  }
   const bg = parseColor(style.backgroundColor)
   if (visibleColor(bg)) {
     c.doc.save()
@@ -339,7 +364,10 @@ function drawSvg(c: Ctx, svg: SVGSVGElement) {
     }
     const strokeWidth = parseFloat(style.strokeWidth) || 0
     if (visibleColor(stroke) && strokeWidth > 0) {
-      c.doc.path(d).lineWidth(strokeWidth).strokeColor(rgbOf(stroke), stroke.a * (parseFloat(style.strokeOpacity) || 1) * alpha).stroke()
+      // `non-scaling-stroke` keeps the width in screen px whatever the viewBox scale; otherwise it is in user units.
+      const scale = style.vectorEffect === 'non-scaling-stroke' ? Math.sqrt(Math.abs(m.a * m.d - m.b * m.c)) || 1 : 1
+      c.doc.path(d).lineWidth(strokeWidth / scale).lineCap(style.strokeLinecap as 'butt' | 'round' | 'square').lineJoin(style.strokeLinejoin as 'miter' | 'round' | 'bevel')
+        .strokeColor(rgbOf(stroke), stroke.a * (parseFloat(style.strokeOpacity) || 1) * alpha).stroke()
     }
     c.doc.restore()
   }
@@ -367,7 +395,7 @@ async function drawText(c: Ctx, node: Text, style: CSSStyleDeclaration, el: Elem
   const parsed = parseColor(style.color)
   if (!visibleColor(parsed)) return
   const color = { ...parsed, a: parsed.a * opacityOf(c, el) }
-  const stack = familyNames(style.fontFamily)
+  const stack = withStandIns(familyNames(style.fontFamily))
   const weight = Number(style.fontWeight) || 400
   const italic = style.fontStyle !== 'normal'
   const size = parseFloat(style.fontSize) * c.k
@@ -561,6 +589,8 @@ async function drawPage(c: Ctx, page: Element) {
     const style = getComputedStyle(el)
     if (style.display === 'none' || style.visibility === 'hidden' || opacityOf(c, el) === 0) continue
     if (el instanceof SVGSVGElement) {
+      // The svg element is a CSS box too (the discs behind the contact icons), then its shapes.
+      drawBox(c, el, style)
       drawSvg(c, el)
       continue
     }

@@ -60,6 +60,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **047** · A guard against being framed (clickjacking on hosts that cannot send headers)
 - **048** · Transitions: steps slide, views fade, the preview toggles use View Transitions
 - **049** · Monogram: a diagonal two-tone header with initials or a photo; LinkedIn and GitHub icons
+- **050** · The PDF download looks like the page: stand-in fonts for Georgia/Arial/Times, SVG boxes, ring shadows, round strokes
 
 ## Next 🔜
 

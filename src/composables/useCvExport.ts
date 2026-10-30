@@ -2,6 +2,8 @@ import { computed, ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { downloadBlob, exportHtml, exportJson, printCv, printTitle } from '@/services/export'
 import { FONT_OPTIONS } from '@/core/stylePresets'
+import { FONT_STAND_INS } from '@/core/fontStandIns'
+import { familyNames } from '@/services/export/fonts'
 
 /** `pdfFile` downloads the PDF directly (spec 031); `pdf` goes through the print dialog. */
 export type ExportKind = 'pdfFile' | 'pdf' | 'html' | 'json'
@@ -22,7 +24,8 @@ export function useCvExport() {
    */
   const systemFont = computed(() => {
     const option = FONT_OPTIONS.find((font) => font.value === cv.data.style.fontFamily)
-    return option && !option.bundled ? option.label : null
+    // Georgia, Arial and the like are drawn in a bundled stand-in of the same widths (spec 050): no note for them.
+    return option && !option.bundled && !familyNames(option.value).some((name) => name in FONT_STAND_INS) ? option.label : null
   })
 
   /** Runs one export; `false` when the direct PDF failed (nothing else is lost). */

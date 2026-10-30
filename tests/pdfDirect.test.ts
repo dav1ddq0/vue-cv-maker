@@ -63,7 +63,7 @@ describe('direct PDF helpers (spec 031)', () => {
   it('has the WOFF twin of every bundled CV face, by built or dev file name', () => {
     const css = readFileSync(join(process.cwd(), 'src/styles/fonts.css'), 'utf8')
     const names = [...css.matchAll(/url\('@fontsource\/[\w-]+\/files\/([\w-]+)\.woff2'\)/g)].map((m) => m[1]!)
-    expect(names.length).toBe(44)
+    expect(names.length).toBe(66)
     for (const name of names) expect(WOFF[name], name).toBeTruthy()
     expect(woffFor('/vue-cv-maker/assets/inter-latin-400-normal-C38fXH4l.woff2')).toBe(WOFF['inter-latin-400-normal'])
     expect(woffFor('/node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2')).toBe(WOFF['inter-latin-400-normal'])
@@ -92,5 +92,25 @@ describe('direct PDF helpers (spec 031)', () => {
     expect(shapePath(el('path', { d: 'M0 0 H100 A100 100 0 0 1 0 100 Z' }))).toBe('M0 0 H100 A100 100 0 0 1 0 100 Z')
     expect(shapePath(el('rect', { x: '1', y: '2', width: '3', height: '4' }))).toBe('M1 2 H4 V6 H1 Z')
     expect(shapePath(el('line', { x1: '0', y1: '0', x2: '5', y2: '5' }))).toBe('M0 0 L5 5')
+  })
+})
+
+describe('what the direct PDF draws that it used to leave out (spec 050)', () => {
+  it('puts a bundled stand-in after each system font it cannot embed', async () => {
+    const { withStandIns } = await import('@/core/fontStandIns')
+    expect(withStandIns(['georgia', 'times new roman', 'serif'])).toEqual(['georgia', 'gelasio', 'times new roman', 'tinos', 'serif'])
+    expect(withStandIns(['helvetica neue', 'helvetica', 'arial', 'sans-serif'])).toEqual(['helvetica neue', 'arimo', 'helvetica', 'arimo', 'arial', 'arimo', 'sans-serif'])
+    expect(withStandIns(['inter', 'system-ui'])).toEqual(['inter', 'system-ui'])
+  })
+
+  it('reads the solid, unblurred shadows of a box-shadow, topmost first, and skips the rest', async () => {
+    const { solidShadows } = await import('@/services/export/pdfDirect')
+    expect(solidShadows('rgb(255, 255, 255) 0px 0px 0px 2.66667px')).toEqual([{ dx: 0, dy: 0, spread: 2.66667, color: { r: 255, g: 255, b: 255, a: 1 } }])
+    const two = solidShadows('rgba(0, 0, 0, 0.5) 3px 4px 0px 1px, rgb(10, 20, 30) 0px 0px 0px 6px')
+    expect(two.map((s) => [s.dx, s.dy, s.spread])).toEqual([[3, 4, 1], [0, 0, 6]])
+    // Blurred, inset and absent shadows are not drawn.
+    expect(solidShadows('rgba(0, 0, 0, 0.3) 0px 1px 2px 0px, rgba(0, 0, 0, 0.15) 0px 1px 3px 1px')).toEqual([])
+    expect(solidShadows('inset rgb(0, 0, 0) 0px 0px 0px 2px')).toEqual([])
+    expect(solidShadows('none')).toEqual([])
   })
 })
