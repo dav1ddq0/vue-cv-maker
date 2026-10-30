@@ -130,6 +130,24 @@ async function phone(browser) {
   await p.context().close()
 }
 
+/** A browser without View Transitions (Firefox, older Safari): the switch happens, with no animation and no error. */
+async function withoutViewTransitions(browser) {
+  const B = 'transitions'
+  const p = await open(browser, { ...devices['Pixel 7'], initScript: () => { document.startViewTransition = undefined } })
+  check(B, 'no View Transitions: the API is absent for this run', (await p.evaluate(() => typeof document.startViewTransition)) === 'undefined')
+  await startSample(p)
+  await p.getByRole('button', { name: /^Vista previa$/ }).click()
+  await settled(p)
+  check(B, 'no View Transitions: Preview still opens', (await p.locator('.editor--preview-open').count()) === 1)
+  await p.getByRole('button', { name: /^Editar$/ }).click()
+  await settled(p)
+  await p.getByRole('button', { name: /Siguiente/ }).first().click()
+  await settled(p)
+  check(B, 'no View Transitions: the form is back and the next step shows', (await p.locator('.editor--preview-open').count()) === 0 && (await p.locator('.trigger .name').first().innerText()) === 'Resumen')
+  check(B, 'no View Transitions: no console errors', p.errs.length === 0, p.errs.join(' | '))
+  await p.context().close()
+}
+
 async function reducedMotion(browser) {
   const B = 'transitions'
   const p = await open(browser, { ...devices['Pixel 7'], reducedMotion: 'reduce' })
@@ -148,7 +166,7 @@ async function reducedMotion(browser) {
 }
 
 async function run(browser) {
-  await Promise.all([desktop(browser), phone(browser), reducedMotion(browser)])
+  await Promise.all([desktop(browser), phone(browser), reducedMotion(browser), withoutViewTransitions(browser)])
 }
 
 module.exports = { run }

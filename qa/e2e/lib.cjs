@@ -1,5 +1,10 @@
 // Shared helpers: one Chromium, condition-based waits instead of fixed sleeps, timings recorded.
-const { chromium } = require('playwright')
+// QA_BROWSER=firefox or webkit runs the suite on that engine (installed with `npx playwright install <name>`).
+const { chromium: engine, devices } = (() => {
+  const playwright = require('playwright')
+  return { chromium: playwright[process.env.QA_BROWSER || 'chromium'], devices: playwright.devices }
+})()
+const chromium = engine
 
 // Set by run.cjs once the preview server is up.
 const BASE = process.env.BASE
@@ -30,8 +35,10 @@ async function until(fn, { timeout = 8000, every = 20 } = {}) {
   }
 }
 
-async function open(browser, opts = {}) {
+async function open(browser, { initScript, ...opts } = {}) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'es-ES', acceptDownloads: true, ...opts })
+  // Runs in every page before the app does (a browser without an API, say).
+  if (initScript) await ctx.addInitScript(initScript)
   const p = await ctx.newPage()
   // CPU=4 slows the page's CPU 4× (Chromium emulation), for a modest laptop or a phone.
   if (process.env.CPU) await (await ctx.newCDPSession(p)).send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.CPU) })

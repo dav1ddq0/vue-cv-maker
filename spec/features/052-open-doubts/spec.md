@@ -71,3 +71,15 @@ emerald, amber, sand and red — each named in both languages (`style.colorNames
 colour picker stays next to them. The palette tests now cover every colour a template declares
 (contrast for its ink and as text on paper, and a name in each language); a test mounts the step
 with Classic (five swatches) and Monogram (nine, in order), mutation-checked.
+
+## 7 · Browsers without View Transitions, and other engines
+
+Only Chromium is installed for Playwright, so Firefox and Safari could not be run. What was done:
+
+- The `transitions` block of `qa:e2e` has a run with `document.startViewTransition` removed before
+  the app loads (what Firefox and Safari before 18 give): Preview opens, Edit comes back, the next
+  step shows, with no console error. Mutation-checked (without the API guard it fails with
+  `startViewTransition is not a function`).
+- `qa/e2e/lib.cjs` takes `QA_BROWSER=firefox` or `QA_BROWSER=webkit` to run the whole suite on that
+  engine once it is installed (`npx playwright install firefox webkit`, a download that has to be run by
+  the user). Not run on them yet.
