@@ -228,7 +228,31 @@ export function shadowLayers(blur: number, spread: number, opacity: number): { o
   })
 }
 
-function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
+/**
+ * A soft shadow as a PNG with alpha, blurred by the canvas itself (σ = blur / 2, as CSS): the exact
+ * falloff, smooth at any zoom. `null` where the canvas cannot blur (then the layered shadow is used).
+ * The picture is the shape grown by the spread, with `pad` px of room around it for the blur.
+ */
+async function softShadowPng(width: number, height: number, radius: number, blur: number, color: Rgba): Promise<{ bytes: Uint8Array; pad: number } | null> {
+  const scale = 2
+  const pad = Math.ceil(blur * 1.5)
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.ceil((width + 2 * pad) * scale)
+  canvas.height = Math.ceil((height + 2 * pad) * scale)
+  const ctx = canvas.getContext('2d')
+  if (!ctx || !('filter' in ctx)) return null
+  ctx.scale(scale, scale)
+  // The filter works in bitmap pixels, not in the scaled coordinates: σ is scaled by hand.
+  ctx.filter = `blur(${(blur / 2) * scale}px)`
+  ctx.fillStyle = `rgba(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)}, ${color.a})`
+  ctx.beginPath()
+  ctx.roundRect(pad, pad, width, height, Math.max(0, radius))
+  ctx.fill()
+  const png = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+  return png ? { bytes: new Uint8Array(await png.arrayBuffer()), pad } : null
+}
+
+async function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
   const r = el.getBoundingClientRect()
   if (r.width < 0.5 || r.height < 0.5) return
   const x = X(c, r.left), y = Y(c, r.top), w = r.width * c.k, h = r.height * c.k
@@ -236,6 +260,14 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
   const alpha = opacityOf(c, el)
   // Under the box, the lowest shadow first: a ring around a photo or a dot is a bigger shape behind it.
   for (const { dx, dy, blur, spread, color } of outerShadows(style.boxShadow).reverse()) {
+    if (blur > 0) {
+      const w0 = r.width + 2 * spread, h0 = r.height + 2 * spread
+      const shadow = w0 > 0 && h0 > 0 ? await softShadowPng(w0, h0, Math.max(0, radius / c.k + spread), blur, { ...color, a: color.a * alpha }) : null
+      if (shadow) {
+        c.doc.image(shadow.bytes, X(c, r.left + dx - spread - shadow.pad), Y(c, r.top + dy - spread - shadow.pad), { width: (w0 + 2 * shadow.pad) * c.k, height: (h0 + 2 * shadow.pad) * c.k })
+        continue
+      }
+    }
     for (const grow of shadowLayers(blur, spread, color.a * alpha)) {
       const s = grow.offset * c.k
       if (w + 2 * s <= 0 || h + 2 * s <= 0) continue
@@ -620,11 +652,11 @@ async function drawPage(c: Ctx, page: Element) {
     if (style.display === 'none' || style.visibility === 'hidden' || opacityOf(c, el) === 0) continue
     if (el instanceof SVGSVGElement) {
       // The svg element is a CSS box too (the discs behind the contact icons), then its shapes.
-      drawBox(c, el, style)
+      await drawBox(c, el, style)
       drawSvg(c, el)
       continue
     }
-    drawBox(c, el, style)
+    await drawBox(c, el, style)
     if (el instanceof HTMLImageElement) await drawImage(c, el, style)
     if (el.hasAttribute(MARKER_ATTR)) drawMarker(c, el)
   }

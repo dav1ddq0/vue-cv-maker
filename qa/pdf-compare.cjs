@@ -286,7 +286,7 @@ async function compareLook(browser, page) {
   const [print] = renderPages(printPdf, FIXTURE_DPI)
   const [conv] = renderPages(directPdf, FIXTURE_DPI)
   const [a, b] = [inked(print), inked(conv)]
-  check('look: soft shadow, ring, SVG disc and round stroke inked as much as the print (± 8 %)', Math.abs(a - b) / a <= 0.08, `inked pixels print ${a}, direct ${b}`)
+  check('look: soft shadow, ring, SVG disc and round stroke inked as much as the print (± 4 %)', Math.abs(a - b) / a <= 0.04, `inked pixels print ${a}, direct ${b}`)
 }
 
 /* ---- side-column warning ---------------------------------------------------------------------- */

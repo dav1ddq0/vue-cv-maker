@@ -34,3 +34,12 @@ embeds the stand-in's faces too, so the file looks the same when opened elsewher
 Verification: a unit test of the stack builder; the `fidelity` e2e block checks every template's
 page stack; on this machine (no Georgia) the preview computes `Georgia, Gelasio, "Times New Roman",
 Tinos, serif` and loads Gelasio.
+
+## 3 · The soft shadow was banded
+
+Spec 051 drew a blurred shadow as 24 nested translucent shapes; zoomed in the steps showed. It is now
+a PNG with alpha blurred by the canvas itself (σ = blur / 2, as CSS), embedded under the box with
+its offset and spread: smooth, and the same falloff as Chrome's. Where the canvas cannot blur
+(`ctx.filter` missing, as in older Safari) the layered shadow of spec 051 is the fallback. The look
+fixture now ink within 4 % of the print (1.4 % measured; it was 3.5 % with layers), and its limit
+went from 8 % to 4 %.
