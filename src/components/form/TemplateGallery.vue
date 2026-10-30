@@ -106,10 +106,17 @@ const shown = computed(() =>
   gap: 12px;
 }
 
+.templates > li {
+  display: flex;
+}
+
+/* Every card of a row as tall as the tallest: the description and the tags differ in length. */
 .card {
   display: grid;
+  align-content: start;
   gap: 4px;
   width: 100%;
+  height: 100%;
   text-align: left;
   padding: 8px;
   border: 1px solid var(--border);

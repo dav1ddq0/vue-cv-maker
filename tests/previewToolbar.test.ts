@@ -29,7 +29,7 @@ describe('preview toolbar (spec 018)', () => {
     await into!.trigger('click')
     expect(value()).toBe('80 %')
     for (let i = 0; i < 10; i++) await out!.trigger('click')
-    expect(value()).toBe('40 %')
+    expect(value()).toBe('30 %')
     expect(out!.attributes('disabled')).toBeDefined()
   })
 

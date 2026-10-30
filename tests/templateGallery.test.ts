@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TemplateGallery from '@/components/form/TemplateGallery.vue'
@@ -41,5 +42,14 @@ describe('TemplateGallery', () => {
 
     await ats.trigger('click')
     expect(wrapper.findAll('button.card')).toHaveLength(templates.length)
+  })
+})
+
+describe('TemplateGallery layout (spec 052)', () => {
+  it('stretches each card to the height of its row, whatever its description and tags', () => {
+    const source = readFileSync('src/components/form/TemplateGallery.vue', 'utf8')
+    const css = source.slice(source.indexOf('<style'))
+    expect(css).toMatch(/\.templates > li\s*\{[^}]*display:\s*flex/)
+    expect(css).toMatch(/\.card\s*\{[^}]*height:\s*100%/)
   })
 })

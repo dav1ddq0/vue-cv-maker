@@ -15,6 +15,7 @@ const { devices } = require('playwright')
 
 /** Every format the interface is built for, with the themes it is checked in. Each is walked the same way. */
 const PROFILES = [
+  { name: 'small laptop 1024×768', opts: { viewport: { width: 1024, height: 768 } }, themes: ['light'] },
   { name: 'laptop 1280×800', opts: { viewport: { width: 1280, height: 800 } }, themes: ['light'] },
   { name: 'desktop 1440×900', opts: { viewport: { width: 1440, height: 900 } }, themes: ['light', 'dark'] },
   { name: 'desktop 1920×1080', opts: { viewport: { width: 1920, height: 1080 } }, themes: ['dark'] },
@@ -64,6 +65,16 @@ const COLLECT = `(() => {
     }
     if (/(auto|scroll)/.test(s.overflowX) && el.scrollWidth > el.clientWidth + 1) out.overflow.push({ l: 'scrolls sideways: ' + label(el), by: el.scrollWidth - el.clientWidth })
   }
+  // The template cards of one row are one height (spec 052).
+  const rows = new Map()
+  for (const card of document.querySelectorAll('button.card')) {
+    const r = card.getBoundingClientRect()
+    if (r.height < 1) continue
+    const key = Math.round(r.top)
+    if (!rows.has(key)) rows.set(key, [])
+    rows.get(key).push(Math.round(r.height))
+  }
+  out.uneven = [...rows.values()].filter((h) => Math.max(...h) - Math.min(...h) > 2).map((h) => h.join('/'))
   if (document.documentElement.scrollWidth > innerWidth + 1) out.overflow.push({ l: 'the page scrolls sideways', by: document.documentElement.scrollWidth - innerWidth })
   return out
 })()`
@@ -75,7 +86,7 @@ const COLLECT = `(() => {
   process.env.BASE = server.url
   const { chromium, check, results, open, settled, startSample, step } = require('./e2e/lib.cjs')
   const browser = await chromium.launch()
-  const seen = { btnHeight: new Map(), size: new Map(), weight: new Map(), radius: new Map(), shadow: new Map(), input: new Map(), overflow: new Map(), btn: new Map(), field: new Map(), title: new Map() }
+  const seen = { btnHeight: new Map(), size: new Map(), weight: new Map(), radius: new Map(), shadow: new Map(), input: new Map(), overflow: new Map(), uneven: new Map(), btn: new Map(), field: new Map(), title: new Map() }
   const note = (map, key, where) => { if (!map.has(key)) map.set(key, []); if (map.get(key).length < 3) map.get(key).push(where) }
   let views = 0
 
@@ -98,6 +109,7 @@ const COLLECT = `(() => {
     }
     for (const i of d.inputs) note(seen.input, i.l, where)
     for (const o of d.overflow) note(seen.overflow, `${o.l} (+${o.by}px)`, where)
+    for (const row of d.uneven) note(seen.uneven, `a row of cards of ${row} px`, where)
     // The height of a touch-sized call to action (48 and up) is its own; the look of every variant is not.
     for (const b of d.buttons) {
       note(seen.btn, `${b.l} | ${b.radius} ${b.size} w${b.weight}`, where)
@@ -188,6 +200,7 @@ const COLLECT = `(() => {
   check('scale', 'corner radii are the shape scale', !seen.radius.size, none(seen.radius))
   check('scale', 'blurred shadows are elevation tokens', !seen.shadow.size, none(seen.shadow))
   check('controls', 'no input shows the browser\'s own grey', !seen.input.size, none(seen.input))
+  check('controls', 'the template cards of a row are one height', !seen.uneven.size, none(seen.uneven))
   check('controls', 'nothing sticks out of its box or scrolls sideways', !seen.overflow.size, none(seen.overflow))
   const variants = new Map()
   for (const key of seen.btn.keys()) { const [kind, look] = key.split(' | '); if (!variants.has(kind)) variants.set(kind, new Set()); variants.get(kind).add(look) }

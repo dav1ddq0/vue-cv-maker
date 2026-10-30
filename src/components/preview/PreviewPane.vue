@@ -59,7 +59,8 @@ const effectiveZoom = computed(() => {
   return Math.min(1, available.value / PAGE_PX)
 })
 
-const ZOOM_MIN = 0.4
+/** Low enough that fitting the narrowest panel (about 300 px, at 1024 px wide) needs no sideways scroll. */
+const ZOOM_MIN = 0.3
 const ZOOM_MAX = 1.2
 const ZOOM_STEP = 0.1
 const zoomPercent = computed(() => Math.round(zoom.value * 100))

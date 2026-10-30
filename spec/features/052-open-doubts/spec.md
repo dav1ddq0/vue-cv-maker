@@ -83,3 +83,21 @@ Only Chromium is installed for Playwright, so Firefox and Safari could not be ru
 - `qa/e2e/lib.cjs` takes `QA_BROWSER=firefox` or `QA_BROWSER=webkit` to run the whole suite on that
   engine once it is installed (`npx playwright install firefox webkit`, a download that has to be run by
   the user). Not run on them yet.
+
+## 8 · The "overflow" in the Template step
+
+The report never said what overflowed, so the step was swept at 15 widths (320 to 1920 px), light and
+dark, for the candidates offered earlier. Two were real, one was not:
+
+- **The preview scrolled sideways at 1024 px** (a laptop at that width): the narrowest preview panel
+  is about 300 px and the page could not be zoomed below 40 % (317 px), so the paper stuck out by
+  3 px (the panel scrolled 19 px). `ZOOM_MIN` is now 30 %, so fitting needs no sideways scroll.
+- **The template cards of one row had different heights** (up to about 100 px, from the length of the
+  description and the tags), on the grid and in the phone's carousel. The cards now stretch to the
+  tallest of their row (`.templates > li { display: flex }`, `.card { height: 100% }`).
+- **The last card under the sticky footer** did not happen: at the end of the scroll it always clears
+  the footer.
+
+The consistency suite has a new 1024 × 768 profile and a check that the cards of a row are one
+height (11 checks over 316 views); both were mutation-checked by reverting each fix. A unit test
+pins the gallery CSS, and the zoom test now expects 30 %.
