@@ -5,4 +5,4 @@
 - [x] 3 · Soft shadows as a blurred PNG — commit: 0e57738
 - [x] 4 · Static guard over every template's CSS — commit: 054d33e
 - [x] 5 · Remove the unused system-font note — commit: 55c4515
-- [x] 6 · A palette of its own for a template (Monogram: nine colours) — commit: pending
+- [x] 6 · A palette of its own for a template (Monogram: nine colours) — commit: 5ff2a27
