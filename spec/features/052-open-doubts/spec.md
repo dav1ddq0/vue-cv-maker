@@ -43,3 +43,12 @@ its offset and spread: smooth, and the same falloff as Chrome's. Where the canva
 (`ctx.filter` missing, as in older Safari) the layered shadow of spec 051 is the fallback. The look
 fixture now ink within 4 % of the print (1.4 % measured; it was 3.5 % with layers), and its limit
 went from 8 % to 4 %.
+
+## 4 · The CSS scan only saw the sample CV
+
+The `fidelity` block of `qa:e2e` scans the computed CSS of the sample CV, so a style used only in a
+rarely shown state (a custom section, a long list, a page break) could slip through. A static guard,
+`tests/templatePdfSafe.test.ts`, now reads the CSS of every template and the pieces they share
+(`LevelDots`, `Breakable`) and rejects what the direct PDF cannot paint: gradients, background
+images, filters, text shadows, underlines, outlines, blend modes, inset shadows and corners of
+different radii. Each rule was mutation-tested with a bad line in a template.
