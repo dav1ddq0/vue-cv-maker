@@ -41,12 +41,16 @@ async function run(browser, outDir) {
 
   const unsupported = []
   const standard = []
+  const noStandIn = []
   for (const id of IDS) {
     await p.locator('nav button.row', { hasText: 'Plantilla y estilo' }).first().click()
     await p.getByRole('button', { name: new RegExp('^' + id, 'i') }).first().click()
     await p.waitForSelector(`.pane .cv-page article.${id}`, { timeout: 4000 })
     await settled(p)
     for (const found of await p.evaluate(UNSUPPORTED)) unsupported.push(`${id}: ${found}`)
+    // A computer without Georgia must fall back to the face the PDF uses, not to whatever it has (spec 052).
+    const stack = await p.evaluate(() => getComputedStyle(document.querySelector('.pane .cv-page article')).fontFamily)
+    if ((/georgia|iowan/i.test(stack) && !/gelasio/i.test(stack)) || (/arial|helvetica/i.test(stack) && !/arimo/i.test(stack))) noStandIn.push(`${id}: ${stack}`)
 
     await p.locator('nav button.row', { hasText: 'Exportar' }).first().click()
     await settled(p)
@@ -60,6 +64,7 @@ async function run(browser, outDir) {
   }
   check(B, 'no template uses CSS the direct PDF cannot draw (gradients, inset shadows, filters, underlines…)', unsupported.length === 0, unsupported.join(' · '))
   check(B, 'every template, in its own default font, goes out in embedded fonts', standard.length === 0, standard.join(' · '))
+  check(B, 'the page falls back to the PDF\'s stand-in font when the system one is missing', noStandIn.length === 0, noStandIn.join(' · '))
   check(B, 'no console errors while downloading them all', p.errs.length === 0, p.errs.slice(0, 3).join(' | '))
   await p.context().close()
 }

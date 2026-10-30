@@ -3,6 +3,7 @@ import printCss from '@/styles/print.css?raw'
 import { collectDocumentCss, renderTemplateHtml, resolvePhoto } from './render'
 import { downloadBlob, slugify } from './download'
 import { embeddedFontCss } from './fonts'
+import { fontStackWithStandIns } from '@/core/fontStandIns'
 
 /**
  * A single `.html` file with the CSS and the CV's font embedded, no external references.
@@ -16,7 +17,7 @@ export async function buildStandaloneHtml(data: CVData, templateId: string): Pro
   try {
     const body = await renderTemplateHtml(rendered, templateId)
     // The app's @font-face URLs mean nothing in a file opened from disk: the CV's own font is inlined.
-    const fonts = await embeddedFontCss(data.style.fontFamily)
+    const fonts = await embeddedFontCss(fontStackWithStandIns(data.style.fontFamily))
     const css = `${fonts}\n${collectDocumentCss({ fontFaces: false })}\n${printCss}`
     const title = escapeHtml(data.personal.fullName || data.meta.title)
 

@@ -19,3 +19,18 @@ extreme case, and the export dialog's side-column warning (spec 033) covers it. 
 levels (one row each) are not changed.
 
 Verification: a unit test per template (8 skills: bullets; 11: one line), mutation-checked.
+
+## 2 · The page and the PDF could use different fonts on a computer without Georgia, Arial or Times
+
+The PDF draws Georgia in Gelasio, but the page showed whatever the computer fell back to (on Linux,
+DejaVu Serif), so the two could differ. The CV's `--cv-font` now carries each stand-in right after the
+system font it stands for (`Georgia, 'Gelasio', 'Times New Roman', 'Tinos', serif`;
+`core/fontStandIns.ts`, `fontStackWithStandIns`, applied in `styleVars`). A computer that has
+Georgia still shows Georgia; one that has not shows Gelasio, as the PDF does. Stored documents are
+not touched (the stored value is still the one the select matches). The standalone HTML export
+embeds the stand-in's faces too, so the file looks the same when opened elsewhere (it grows by about
+0.7 MB for these fonts, as any CV font does).
+
+Verification: a unit test of the stack builder; the `fidelity` e2e block checks every template's
+page stack; on this machine (no Georgia) the preview computes `Georgia, Gelasio, "Times New Roman",
+Tinos, serif` and loads Gelasio.

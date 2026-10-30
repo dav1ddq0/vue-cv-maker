@@ -127,3 +127,14 @@ describe('what the direct PDF draws that it used to leave out (spec 050)', () =>
     expect(outerShadows('none')).toEqual([])
   })
 })
+
+describe('the font stack of the page (spec 052)', () => {
+  it('puts each stand-in right after the system font it stands for, once', async () => {
+    const { fontStackWithStandIns } = await import('@/core/fontStandIns')
+    expect(fontStackWithStandIns("Georgia, 'Times New Roman', serif")).toBe("Georgia, 'Gelasio', 'Times New Roman', 'Tinos', serif")
+    expect(fontStackWithStandIns("'Helvetica Neue', Helvetica, Arial, sans-serif")).toBe("'Helvetica Neue', 'Arimo', Helvetica, Arial, sans-serif")
+    expect(fontStackWithStandIns("Tahoma, 'DejaVu Sans', Verdana, sans-serif")).toBe("Tahoma, 'DejaVu Sans', Verdana, sans-serif")
+    expect(fontStackWithStandIns("'Source Sans 3', 'Segoe UI', sans-serif")).toBe("'Source Sans 3', 'Segoe UI', sans-serif")
+    expect(fontStackWithStandIns('')).toBe('')
+  })
+})

@@ -1,4 +1,5 @@
 import type { CVData, LanguageEntry, MaritalStatus, PersonalDetails, SkillGroup, StyleTokens } from '@/types/cv'
+import { fontStackWithStandIns } from '@/core/fontStandIns'
 
 /**
  * Helpers shared by every template. They are *pure functions* on purpose:
@@ -144,7 +145,7 @@ export function styleVars(style: StyleTokens): Record<string, string> {
     '--cv-accent': style.accentColor,
     '--cv-on-accent': onAccent(style.accentColor),
     '--cv-accent-text': accentText(style.accentColor),
-    '--cv-font': style.fontFamily,
+    '--cv-font': fontStackWithStandIns(style.fontFamily),
     '--cv-font-scale': String(style.fontScale),
     '--cv-spacing-scale': String(style.spacingScale),
     '--cv-page-margin': style.pageMargin,
