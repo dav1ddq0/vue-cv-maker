@@ -6,8 +6,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">
   <rect width="120" height="160" fill="#fff"/>
   <rect width="50" height="160" fill="currentColor" opacity="0.08"/>
   <rect width="120" height="37" fill="currentColor" opacity="0.24"/>
-  <circle cx="25" cy="32" r="15" fill="currentColor" opacity="0.24"/>
-  <circle cx="25" cy="32" r="13" fill="currentColor" opacity="0.55"/>
+  <circle cx="25" cy="18.5" r="13" fill="currentColor" opacity="0.55"/>
   <rect x="58" y="12" width="48" height="8" rx="1.5" fill="currentColor"/>
   <rect x="58" y="24" width="34" height="8" rx="1.5" fill="currentColor"/>
   <rect x="58" y="35" width="26" height="1.8" rx="0.9" fill="currentColor"/>
