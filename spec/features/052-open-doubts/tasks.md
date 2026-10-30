@@ -9,4 +9,4 @@
 - [x] 7 · A no-View-Transitions run in the e2e, and QA_BROWSER for other engines — commit: aaf39d2
 - [x] 8 · Template step: preview sideways scroll at 1024 px and uneven cards — commit: 321ce57
 - [x] 9 · Firefox: the persistence prompt no longer blocks the stored CVs — commit: ab7aa86
-- [x] 10 · The e2e suite on other engines (QA_BROWSER) — commit: pending
+- [x] 10 · The e2e suite on other engines (QA_BROWSER) — commit: dffaf5a
