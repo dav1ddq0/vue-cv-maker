@@ -64,7 +64,7 @@ function onKeydown(event: KeyboardEvent) {
   })
   if (!action) return
   if (action === 'collapsePreview') {
-    ui.previewExpanded = false
+    ui.setPreviewExpanded(false)
     return
   }
   event.preventDefault()
@@ -94,35 +94,56 @@ function onKeydown(event: KeyboardEvent) {
       </NoticeBar>
     </div>
 
-    <StartupFailed v-if="startupFailed" @reload="reload" />
+    <Transition name="view" mode="out-in">
+      <StartupFailed v-if="startupFailed" key="failed" @reload="reload" />
 
-    <main
-      v-else-if="ui.view === 'editor'"
-      class="editor"
-      :class="{ 'editor--preview-open': ui.previewOpen, 'editor--rail': isDesktop, 'editor--expanded': isDesktop && ui.previewExpanded }"
-    >
-      <StepRail v-if="isDesktop" class="editor-rail" :compact="ui.previewExpanded" />
-      <CvWizard class="editor-form" />
-      <PreviewPane class="editor-preview" />
-    </main>
+      <main
+        v-else-if="ui.view === 'editor'"
+        key="editor"
+        class="editor"
+        :class="{ 'editor--preview-open': ui.previewOpen, 'editor--rail': isDesktop, 'editor--expanded': isDesktop && ui.previewExpanded }"
+      >
+        <StepRail v-if="isDesktop" class="editor-rail" :compact="ui.previewExpanded" />
+        <CvWizard class="editor-form" />
+        <PreviewPane class="editor-preview" />
+      </main>
 
-    <main v-else-if="ui.view === 'documents'" class="scroll-view">
-      <DocumentList />
-    </main>
+      <main v-else-if="ui.view === 'documents'" key="documents" class="scroll-view">
+        <DocumentList />
+      </main>
 
-    <main v-else-if="ui.view === 'welcome'" class="scroll-view">
-      <WelcomeView />
-    </main>
+      <main v-else-if="ui.view === 'welcome'" key="welcome" class="scroll-view">
+        <WelcomeView />
+      </main>
 
-    <main v-else class="scroll-view">
-      <ImportView />
-    </main>
+      <main v-else key="import" class="scroll-view">
+        <ImportView />
+      </main>
+    </Transition>
 
     <MobileDock v-if="ui.view === 'editor' && !startupFailed" />
   </div>
 </template>
 
 <style scoped>
+/* Moving between the editor, My CVs, Import and the welcome screen: a short fade with a small lift (spec 048). */
+.view-enter-active {
+  transition: opacity var(--duration-medium) var(--motion-emphasized-decelerate), transform var(--duration-medium) var(--motion-emphasized-decelerate);
+}
+
+.view-leave-active {
+  transition: opacity var(--duration-short) var(--motion-standard);
+}
+
+.view-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.view-leave-to {
+  opacity: 0;
+}
+
 .app {
   display: flex;
   flex-direction: column;

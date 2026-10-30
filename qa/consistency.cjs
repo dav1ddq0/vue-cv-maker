@@ -73,7 +73,7 @@ const COLLECT = `(() => {
   fs.mkdirSync(OUT, { recursive: true })
   const server = await startServer('preview')
   process.env.BASE = server.url
-  const { chromium, check, results, open, startSample, step } = require('./e2e/lib.cjs')
+  const { chromium, check, results, open, settled, startSample, step } = require('./e2e/lib.cjs')
   const browser = await chromium.launch()
   const seen = { btnHeight: new Map(), size: new Map(), weight: new Map(), radius: new Map(), shadow: new Map(), input: new Map(), overflow: new Map(), btn: new Map(), field: new Map(), title: new Map() }
   const note = (map, key, where) => { if (!map.has(key)) map.set(key, []); if (map.get(key).length < 3) map.get(key).push(where) }
@@ -81,6 +81,8 @@ const COLLECT = `(() => {
 
   const grab = async (p, where) => {
     views++
+    // Audit the page at rest, not while a step is sliding in (spec 048).
+    await settled(p)
     const d = await p.evaluate(COLLECT)
     for (const t of d.text) {
       if (!SIZES.has(t.size)) note(seen.size, `${t.size} ${t.l}`, where)

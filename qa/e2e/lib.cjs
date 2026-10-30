@@ -48,14 +48,32 @@ const preview = (p) => p.locator('.pane .cv-page, .cv-page').first()
 const previewText = (p) => preview(p).innerText()
 const previewHas = (p, text, timeout) => until(async () => (await previewText(p)).includes(text), { timeout })
 
+/** Waits until the page stops moving: no CSS transition or animation running for a few frames (spec 048). */
+async function settled(p) {
+  await p.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let quiet = 0
+        const tick = () => {
+          quiet = document.getAnimations().length === 0 ? quiet + 1 : 0
+          if (quiet >= 4) resolve()
+          else requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }),
+  )
+}
+
 async function step(p, name) {
   await p.locator('nav button.row', { hasText: name }).first().click()
   await p.getByRole('heading', { name, exact: true }).first().waitFor({ timeout: 5000 }).catch(() => {})
+  await settled(p)
 }
 
 async function startSample(p) {
   await p.getByRole('button', { name: /Desde un ejemplo/ }).click()
   await previewHas(p, 'Nadia Martín Reyes')
+  await settled(p)
 }
 
 /** Every value in the app's IndexedDB store, as one string: "has this reached storage yet?". */
@@ -86,4 +104,4 @@ const idbDocCount = (p) =>
 
 const overflow = (p) => p.evaluate(() => document.documentElement.scrollWidth - innerWidth)
 
-module.exports = { chromium, BASE, results, timings, check, timing, sleep, until, open, preview, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow }
+module.exports = { settled, chromium, BASE, results, timings, check, timing, sleep, until, open, preview, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow }

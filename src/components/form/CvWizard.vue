@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useTemplateRef, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useI18n } from '@/i18n'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -47,6 +47,16 @@ const STEP_COMPONENTS = {
 
 const current = computed(() => STEP_COMPONENTS[ui.step])
 
+/** Which way the step slides: forward to a later step, back to an earlier one (spec 048). Set before the render. */
+const direction = ref<'forward' | 'back'>('forward')
+watch(
+  () => ui.stepIndex,
+  (next, previous) => {
+    direction.value = next >= previous ? 'forward' : 'back'
+  },
+  { flush: 'sync' },
+)
+
 /** A new step starts at its top: the form is one scroller, and it kept the last step's position. */
 const root = useTemplateRef<HTMLElement>('root')
 watch(
@@ -72,7 +82,11 @@ watch(
     </template>
 
     <div class="body">
-      <component :is="current" :key="ui.step" />
+      <Transition :name="`step-${direction}`" mode="out-in">
+        <div :key="ui.step" class="step">
+          <component :is="current" />
+        </div>
+      </Transition>
     </div>
 
     <footer class="footer">
@@ -103,6 +117,31 @@ watch(
 
 .body {
   flex: 1;
+  /* A step sliding in or out must not add a sideways scrollbar. */
+  overflow-x: clip;
+}
+
+/* The step slides a little in the direction of travel and fades: out fast, in with the decelerate curve. */
+.step-forward-enter-active,
+.step-back-enter-active {
+  transition: opacity var(--duration-medium) var(--motion-emphasized-decelerate), transform var(--duration-medium) var(--motion-emphasized-decelerate);
+}
+
+.step-forward-leave-active,
+.step-back-leave-active {
+  transition: opacity var(--duration-short) var(--motion-standard), transform var(--duration-short) var(--motion-standard);
+}
+
+.step-forward-enter-from,
+.step-back-leave-to {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+.step-forward-leave-to,
+.step-back-enter-from {
+  opacity: 0;
+  transform: translateX(-16px);
 }
 
 .intro {

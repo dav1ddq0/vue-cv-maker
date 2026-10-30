@@ -126,7 +126,7 @@ const scaleStyle = computed(() => ({ transform: `scale(${effectiveZoom.value})` 
           :aria-label="t(ui.previewExpanded ? 'preview.collapse' : 'preview.expand')"
           :title="t(ui.previewExpanded ? 'preview.collapse' : 'preview.expand')"
           :aria-pressed="ui.previewExpanded"
-          @click="ui.previewExpanded = !ui.previewExpanded"
+          @click="ui.setPreviewExpanded(!ui.previewExpanded)"
         >
           <svg v-if="ui.previewExpanded" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" /></svg>
           <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /></svg>

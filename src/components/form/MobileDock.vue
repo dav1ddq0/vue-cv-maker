@@ -19,11 +19,11 @@ const isLast = computed(() => ui.stepIndex === ui.steps.length - 1)
 <template>
   <div class="dock">
     <div class="switch" role="group" :aria-label="t('dock.label')">
-      <button type="button" class="mode m3-state" :aria-label="t('dock.edit')" :aria-pressed="!ui.previewOpen" @click="ui.previewOpen = false">
+      <button type="button" class="mode m3-state" :aria-label="t('dock.edit')" :aria-pressed="!ui.previewOpen" @click="ui.setPreviewOpen(false)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" /></svg>
         <span class="mode-label">{{ t('dock.edit') }}</span>
       </button>
-      <button type="button" class="mode m3-state" :aria-label="t('preview.title')" :aria-pressed="ui.previewOpen" @click="ui.previewOpen = true">
+      <button type="button" class="mode m3-state" :aria-label="t('preview.title')" :aria-pressed="ui.previewOpen" @click="ui.setPreviewOpen(true)">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
         <span class="mode-label">{{ t('preview.title') }}</span>
       </button>

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { readPrefs, writePrefs } from '@/services/prefs'
 import { isStorageAvailable, requestPersistence } from '@/services/storage'
 import { DARK_QUERY, resolveTheme, systemPrefersDark, type ThemeChoice } from '@/core/theme'
+import { withViewTransition } from '@/core/viewTransition'
 
 export const STEPS = [
   'personal',
@@ -55,6 +56,15 @@ export const useUiStore = defineStore('ui', () => {
     previewExpanded.value = false
   }
 
+  /** The mobile Edit / Preview switch and the desktop full-width preview animate as one View Transition (spec 048). */
+  function setPreviewOpen(open: boolean) {
+    if (previewOpen.value !== open) withViewTransition(() => (previewOpen.value = open))
+  }
+
+  function setPreviewExpanded(expanded: boolean) {
+    if (previewExpanded.value !== expanded) withViewTransition(() => (previewExpanded.value = expanded))
+  }
+
   function nextStep() {
     const at = stepIndex.value
     if (at < STEPS.length - 1) step.value = STEPS[at + 1]
@@ -103,6 +113,8 @@ export const useUiStore = defineStore('ui', () => {
     storageAvailable,
     storagePersisted,
     goTo,
+    setPreviewOpen,
+    setPreviewExpanded,
     nextStep,
     prevStep,
     setTheme,

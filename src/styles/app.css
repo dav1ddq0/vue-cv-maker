@@ -283,6 +283,28 @@ textarea {
   border: 0;
 }
 
+/*
+ * View Transitions (spec 048): the old and new layout cross-fade, and a named element moves between
+ * its boxes. Durations and curves are the motion tokens; with reduced motion the helper does not
+ * start one at all (core/viewTransition.ts).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(*) {
+    animation-duration: var(--duration-medium);
+    animation-timing-function: var(--motion-standard);
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--duration-medium);
+  }
+}
+
+/* The desktop preview keeps its identity across the full-width switch, so it grows instead of fading. */
+.editor--rail .editor-preview {
+  view-transition-name: cv-preview;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

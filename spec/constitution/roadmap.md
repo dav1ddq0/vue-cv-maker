@@ -58,6 +58,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **045** · Consistency everywhere: one view title, spacing on the 4 px grid, the browser suite over a device matrix
 - **046** · Cobalt: a template with a tinted header, a round photo and a pale sidebar
 - **047** · A guard against being framed (clickjacking on hosts that cannot send headers)
+- **048** · Transitions: steps slide, views fade, the preview toggles use View Transitions
 
 ## Next 🔜
 

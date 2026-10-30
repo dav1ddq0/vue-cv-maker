@@ -21,7 +21,7 @@ const { t } = useI18n()
         <CvRenderer :data="cv.data" :template-id="cv.templateId" />
       </div>
     </div>
-    <button type="button" class="expand" :aria-label="t('preview.show')" @click="ui.previewOpen = true">
+    <button type="button" class="expand" :aria-label="t('preview.show')" @click="ui.setPreviewOpen(true)">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" /></svg>
     </button>
   </div>

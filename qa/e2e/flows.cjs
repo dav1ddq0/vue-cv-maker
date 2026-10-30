@@ -1,7 +1,7 @@
 // Functional blocks. Each runs in its own browser context (its own IndexedDB), so they run in parallel.
 const fs = require('fs')
 const path = require('path')
-const { BASE, check, until, sleep, open, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow } = require('./lib.cjs')
+const { settled, BASE, check, until, sleep, open, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow } = require('./lib.cjs')
 
 /** A · writing a CV from blank: every step, links, validation, persistence, undo/redo. */
 async function mainFlow(browser) {
@@ -9,6 +9,7 @@ async function mainFlow(browser) {
   const p = await open(browser)
   check(B, 'first run shows the welcome view', await p.getByRole('heading', { name: 'Empieza tu CV' }).isVisible())
   await p.getByRole('button', { name: /En blanco/ }).click()
+  await settled(p)
   check(B, 'blank goes to Datos personales', await p.getByRole('heading', { name: 'Datos personales' }).isVisible())
 
   await p.getByLabel('Nombre completo').fill('Lucía Pérez Gómez')
