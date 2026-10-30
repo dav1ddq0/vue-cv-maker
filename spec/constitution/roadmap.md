@@ -62,6 +62,7 @@ _Completed before this SDD process was adopted; listed here for context, not tra
 - **049** · Monogram: a diagonal two-tone header with initials or a photo; LinkedIn and GitHub icons
 - **050** · The PDF download looks like the page: stand-in fonts for Georgia/Arial/Times, SVG boxes, ring shadows, round strokes
 - **051** · What 050 left: Palatino, Tahoma and Verdana stand-ins, and soft shadows in the PDF
+- **052** · The open doubts, one at a time (long sidebars, fonts on screen, shadows, scans, palette…)
 
 ## Next 🔜
 

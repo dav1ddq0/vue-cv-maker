@@ -77,3 +77,20 @@ describe('linkKind', () => {
     expect(linkKind('http://[bad')).toBe('link')
   })
 })
+
+describe('Monogram: a long list of skills (spec 052)', () => {
+  const withSkills = (n: number) => {
+    const data = createSampleCV()
+    data.skills = [{ id: 'g', category: '', items: Array.from({ length: n }, (_, i) => ({ name: `Skill ${i}` })) }]
+    return mount(Monogram, { props: { data } })
+  }
+
+  it('gives a short unnamed group a bullet each, and a long one a single line, so the sidebar stays short', () => {
+    const short = withSkills(8)
+    expect(short.findAll('aside .bullets li')).toHaveLength(8)
+    const long = withSkills(11)
+    expect(long.find('aside .bullets').exists()).toBe(false)
+    expect(long.find('aside .skill-items').text()).toContain('Skill 10')
+  })
+})
+

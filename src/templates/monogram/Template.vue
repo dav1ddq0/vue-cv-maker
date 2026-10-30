@@ -38,6 +38,9 @@ const sections = computed(() => resolveSections(props.data))
 const languages = computed(() => resolveLanguages(props.data))
 const letters = computed(() => monogramLetters(props.data.personal.fullName))
 
+/** More skills than this in one unnamed group go on a line instead of a bullet each. */
+const MAX_BULLETS = 10
+
 const SIDEBAR_KINDS = new Set(['skills', 'languages'])
 const sidebarSections = computed(() => sections.value.filter((s) => SIDEBAR_KINDS.has(s.kind)))
 const mainSections = computed(() => sections.value.filter((s) => !SIDEBAR_KINDS.has(s.kind) && s.kind !== 'summary'))
@@ -98,8 +101,8 @@ const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Cont
                   <LevelDots v-if="item.level" :score="item.level" :label="levelAccessibleLabel(item.level, language)" />
                 </div>
               </template>
-              <!-- A named group reads as a labelled line, which is also how a PDF import takes it back; bullets for the unnamed one. -->
-              <p v-else-if="group.category" class="skill-items">{{ skillNames(group).join(' · ') }}</p>
+              <!-- A named group, or one too long for a column of bullets, reads as a line: the sidebar must not outgrow the page, which would push the career onto a later one. -->
+              <p v-else-if="group.category || group.items.length > MAX_BULLETS" class="skill-items">{{ skillNames(group).join(' · ') }}</p>
               <ul v-else class="bullets">
                 <li v-for="name in skillNames(group)" :key="name">{{ name }}</li>
               </ul>
