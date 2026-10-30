@@ -83,7 +83,7 @@ watch(
 
     <div class="body">
       <Transition :name="`step-${direction}`" mode="out-in">
-        <div :key="ui.step" class="step">
+        <div :key="ui.step" class="step-frame">
           <component :is="current" />
         </div>
       </Transition>
@@ -142,6 +142,17 @@ watch(
 .step-back-enter-from {
   opacity: 0;
   transform: translateX(-16px);
+}
+
+/* Reduced motion: no slide and no fade, so not even a blank frame between the two forms. */
+@media (prefers-reduced-motion: reduce) {
+  .step-forward-enter-from,
+  .step-forward-leave-to,
+  .step-back-enter-from,
+  .step-back-leave-to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .intro {

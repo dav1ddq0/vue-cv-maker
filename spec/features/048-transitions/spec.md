@@ -38,4 +38,17 @@ Before, nothing animated between screens: a step, a view or the preview appeared
 - The browser suites now wait for the page to rest (`settled` in `qa/e2e/lib.cjs`) after a step
   change and before an audit: the animation is real, and a check that read content mid-slide
   failed three times before that.
+- **A transitions block in `qa:e2e`** (`qa/e2e/transitions.cjs`, 12 checks): the order of travel (out
+  left then in from the right going forward; the reverse going back), six quick clicks on Next,
+  alternating back and next, typed data and scroll position across steps, the full-width preview
+  and Escape (one View Transition each), My CVs with a single view on screen, the phone's Edit /
+  Preview switch including interruptions, no sideways scroll, no console errors, and reduced motion
+  (no View Transition, no fade). Mutation-tested: a direction that is always forward and a missing
+  reduced-motion guard each fail a check.
+- Found by that block: with reduced motion a step still passed through one blank frame (the
+  transition cut to 0.01 ms still holds the faded state for a frame), so the step and view
+  transitions are neutralised under `prefers-reduced-motion: reduce`; and the wrapper class `step`
+  clashed with the steps' own root `.step`, now `step-frame`.
+- Tried in the local Android emulator (API 34, Chrome 113 over DevTools): the step fades and
+  slides both ways, Edit / Preview starts a View Transition each way, no sideways scroll, no errors.
 - Not checked on real iOS Safari.

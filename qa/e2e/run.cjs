@@ -14,6 +14,7 @@ const { ROOT, startServer } = require('../lib/server.cjs')
   const { chromium, results, timings } = require('./lib.cjs')
   const perf = require('./perf.cjs')
   const flows = require('./flows.cjs')
+  const transitions = require('./transitions.cjs')
 
   const started = Date.now()
   const browser = await chromium.launch()
@@ -41,6 +42,7 @@ const { ROOT, startServer } = require('../lib/server.cjs')
       timed('layout', () => flows.noLayoutShift(browser))(),
       timed('phone', () => flows.phone(browser))(),
       timed('widths', () => flows.widths(browser))(),
+      timed('transitions', () => transitions.run(browser))(),
     ])
   } finally {
     await browser.close()

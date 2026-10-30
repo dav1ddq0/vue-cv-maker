@@ -144,6 +144,14 @@ function onKeydown(event: KeyboardEvent) {
   opacity: 0;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .view-enter-from,
+  .view-leave-to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .app {
   display: flex;
   flex-direction: column;
