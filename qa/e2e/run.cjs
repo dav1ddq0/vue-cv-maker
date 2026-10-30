@@ -11,7 +11,7 @@ const { ROOT, startServer } = require('../lib/server.cjs')
   fs.mkdirSync(outDir, { recursive: true })
   const server = await startServer('preview')
   process.env.BASE = server.url
-  const { chromium, results, timings } = require('./lib.cjs')
+  const { chromium, results, timings, ENGINE } = require('./lib.cjs')
   const perf = require('./perf.cjs')
   const flows = require('./flows.cjs')
   const transitions = require('./transitions.cjs')
@@ -32,20 +32,25 @@ const { ROOT, startServer } = require('../lib/server.cjs')
   }
 
   try {
-    await timed('perf', () => perf.run(browser, outDir))()
+    // The performance block prints with page.pdf() and the rename block reads an SVG page's storage: Chromium only.
+    if (ENGINE === 'chromium') await timed('perf', () => perf.run(browser, outDir))()
+    else console.log(`(perf and rename blocks skipped on ${ENGINE}: they need Chromium)`)
     const printed = path.join(outDir, 'printed.pdf')
-    await Promise.all([
-      timed('main', () => flows.mainFlow(browser))(),
-      timed('custom+style', () => flows.customAndStyle(browser))(),
-      timed('export+import', () => flows.exportImport(browser, outDir, fs.existsSync(printed) ? printed : null))(),
-      timed('docs+prefs', () => flows.documentsAndPrefs(browser))(),
-      timed('rename', () => flows.renameMigration(browser))(),
-      timed('layout', () => flows.noLayoutShift(browser))(),
-      timed('phone', () => flows.phone(browser))(),
-      timed('widths', () => flows.widths(browser))(),
-      timed('transitions', () => transitions.run(browser))(),
-      timed('fidelity', () => fidelity.run(browser, outDir))(),
-    ])
+    const blocks = [
+      timed('main', () => flows.mainFlow(browser)),
+      timed('custom+style', () => flows.customAndStyle(browser)),
+      timed('export+import', () => flows.exportImport(browser, outDir, fs.existsSync(printed) ? printed : null)),
+      timed('docs+prefs', () => flows.documentsAndPrefs(browser)),
+      ...(ENGINE === 'chromium' ? [timed('rename', () => flows.renameMigration(browser))] : []),
+      timed('layout', () => flows.noLayoutShift(browser)),
+      timed('phone', () => flows.phone(browser)),
+      timed('widths', () => flows.widths(browser)),
+      timed('transitions', () => transitions.run(browser)),
+      timed('fidelity', () => fidelity.run(browser, outDir)),
+    ]
+    // Other engines are slower with every block at once, and the animation checks sample frames: one at a time there.
+    if (ENGINE === 'chromium') await Promise.all(blocks.map((block) => block()))
+    else for (const block of blocks) await block()
   } finally {
     await browser.close()
     server.stop()

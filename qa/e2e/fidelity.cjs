@@ -24,7 +24,8 @@ const UNSUPPORTED = () => {
       if (s.textDecorationLine !== 'none') note('text-decoration ' + s.textDecorationLine)
       if (s.mixBlendMode !== 'normal') note('mix-blend-mode')
       if (new Set(['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map((k) => s[k])).size > 1) note('corners of different radii')
-      if (pseudo && !/^"[^"]*"$/.test(s.content)) note('generated content other than a string')
+      // An <img> has no ::before; Firefox still reports a content for it.
+      if (pseudo && !(el instanceof HTMLImageElement) && !/^"[^"]*"$/.test(s.content)) note('generated content other than a string')
     }
   }
   return [...new Set(out)]

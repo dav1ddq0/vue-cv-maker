@@ -101,3 +101,26 @@ dark, for the candidates offered earlier. Two were real, one was not:
 The consistency suite has a new 1024 × 768 profile and a check that the cards of a row are one
 height (11 checks over 316 views); both were mutation-checked by reverting each fix. A unit test
 pins the gallery CSS, and the zoom test now expects 30 %.
+
+## 9 · Firefox (and a bug it found)
+
+Firefox 1543 (Playwright's build) installed with `playwright install firefox`; the whole e2e suite
+now runs on it with `QA_BROWSER=firefox npm run qa:e2e`.
+
+**A real bug.** On Firefox the app opened an empty editor and not the person's stored CVs (or the
+welcome screen). `navigator.storage.persist()` answers only when the person answers Firefox's
+permission prompt, and `probeEnvironment` awaited it before `cv.init()` opened the CVs, so until
+then (and for ever in a headless run) nothing was loaded. Now only the storage probe is awaited;
+persistence is recorded when it answers (a refusal still shows the notice). A unit test, with a
+persistence request that never answers, fails without the fix.
+
+**The suite on other engines:** the performance block (prints with `page.pdf`, Chromium only) and
+the rename block (reads an SVG page's storage) are skipped there; blocks run one at a time (eleven
+at once made Firefox miss animation frames); Playwright's own driver warnings (`juggler`) are not
+counted as console errors; the CSS scan ignores the `::before` Firefox reports for an `<img>`.
+Result: 98/98 on Firefox, 123/123 on Chromium. View Transitions run on this Firefox too (the Edit /
+Preview and full-width switches start one each).
+
+**WebKit** is downloaded but cannot start: the machine lacks `libevent-2.1-7t64`, `libavif16` and
+`libmanette-0.2-0`, which need `sudo apt-get install` — to be done by the person who owns the
+machine. `QA_BROWSER=webkit npm run qa:e2e` then runs the same suite.

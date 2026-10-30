@@ -45,6 +45,8 @@ async function open(browser, { initScript, ...opts } = {}) {
   p.errs = []
   p.on('pageerror', (e) => p.errs.push('pageerror: ' + e.message))
   p.on('console', (m) => {
+    // Playwright's own Firefox driver (juggler) logs warnings about itself; they are not the app's.
+    if (/juggler/.test(m.text())) return
     if (m.type() === 'error' || (m.type() === 'warning' && !/\[vite\]/.test(m.text()))) p.errs.push(m.type() + ': ' + m.text().slice(0, 200))
   })
   await p.goto(BASE, { waitUntil: 'networkidle' })
@@ -111,4 +113,6 @@ const idbDocCount = (p) =>
 
 const overflow = (p) => p.evaluate(() => document.documentElement.scrollWidth - innerWidth)
 
-module.exports = { settled, chromium, BASE, results, timings, check, timing, sleep, until, open, preview, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow }
+const ENGINE = process.env.QA_BROWSER || 'chromium'
+
+module.exports = { ENGINE, settled, chromium, BASE, results, timings, check, timing, sleep, until, open, preview, previewText, previewHas, step, startSample, idbDump, idbDocCount, overflow }
