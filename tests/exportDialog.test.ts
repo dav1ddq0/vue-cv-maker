@@ -98,18 +98,6 @@ describe('ExportDialog direct PDF (spec 031)', () => {
     await vi.waitFor(() => expect(exporters.printCv).toHaveBeenCalledTimes(1))
     wrapper.unmount()
   })
-
-  it('says nothing about the font for any font of the style step: each has a bundled stand-in (specs 050, 051)', async () => {
-    const { FONT_OPTIONS } = await import('@/core/stylePresets')
-    for (const option of FONT_OPTIONS) {
-      const cv = useCvStore()
-      cv.data.style.fontFamily = option.value
-      const wrapper = mount(ExportDialog, { props: { open: false }, attachTo: document.body })
-      await wrapper.setProps({ open: true })
-      expect(wrapper.text(), option.id).not.toContain('depende de cada equipo')
-      wrapper.unmount()
-    }
-  })
 })
 
 describe('ExportDialog side column check (spec 033)', () => {

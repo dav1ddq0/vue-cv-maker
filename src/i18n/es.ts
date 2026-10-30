@@ -410,7 +410,6 @@ export default {
     pdfFileFailed: 'No se pudo generar el PDF. Tu CV no ha cambiado: puedes guardarlo desde el diálogo de impresión.',
     printInstead: 'Imprimir en su lugar',
     sideTooLong: 'La columna lateral no cabe en una página, así que el contenido principal empezará en la página 2. Acorta competencias o idiomas, o elige una plantilla de una columna.',
-    systemFontNote: 'La fuente {font} depende de cada equipo y no se puede incrustar: la descarga usa una estándar parecida. Imprimir la conserva.',
     pdf: 'PDF (imprimir)',
     pdfHint: 'Texto seleccionable y enlaces clicables, legible por sistemas ATS.',
     html: 'HTML autocontenido',

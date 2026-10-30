@@ -11,7 +11,7 @@ const emit = defineEmits<{ close: [] }>()
 
 const { t } = useI18n()
 const cv = useCvStore()
-const { busy, failed, systemFont, run } = useCvExport()
+const { busy, failed, run } = useCvExport()
 
 const OPTIONS: { kind: ExportKind; title: string; hint: string }[] = [
   { kind: 'pdfFile', title: 'exportView.pdfFile', hint: 'exportView.pdfFileHint' },
@@ -45,7 +45,6 @@ async function pick(kind: ExportKind) {
             <span class="name">{{ t(option.title) }}</span>
             <span class="hint">{{ t(option.hint) }}</span>
             <span v-if="option.kind === 'pdf'" class="hint">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</span>
-            <span v-if="option.kind === 'pdfFile' && systemFont" class="hint">{{ t('exportView.systemFontNote', { font: systemFont }) }}</span>
           </span>
           <span class="action">{{ actionLabel(option.kind) }}</span>
         </button>

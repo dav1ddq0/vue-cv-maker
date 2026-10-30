@@ -52,3 +52,11 @@ rarely shown state (a custom section, a long list, a page break) could slip thro
 (`LevelDots`, `Breakable`) and rejects what the direct PDF cannot paint: gradients, background
 images, filters, text shadows, underlines, outlines, blend modes, inset shadows and corners of
 different radii. Each rule was mutation-tested with a bad line in a template.
+
+## 5 · The "depends on each computer" note of the export dialog could no longer appear
+
+Every font of the style select now has a bundled stand-in (specs 050, 051), so the note under "PDF"
+in the export dialog, the sheet and the export step, and the `systemFont` value behind it in
+`useCvExport`, could never show. Removed, with the `exportView.systemFontNote` strings (en, es) and
+the export-dialog test that asserted the old note. Kept: the "depends on the computer" label of
+the font select itself, which is still true of the page (not of the PDF).

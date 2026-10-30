@@ -1,9 +1,6 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { downloadBlob, exportHtml, exportJson, printCv, printTitle } from '@/services/export'
-import { FONT_OPTIONS } from '@/core/stylePresets'
-import { FONT_STAND_INS } from '@/core/fontStandIns'
-import { familyNames } from '@/services/export/fonts'
 
 /** `pdfFile` downloads the PDF directly (spec 031); `pdf` goes through the print dialog. */
 export type ExportKind = 'pdfFile' | 'pdf' | 'html' | 'json'
@@ -17,16 +14,6 @@ export function useCvExport() {
   const cv = useCvStore()
   const busy = ref<ExportKind | null>(null)
   const failed = ref<ExportKind | null>(null)
-
-  /**
-   * A font "según el equipo" has no file a web page can embed: the direct PDF draws it in the nearest
-   * PDF standard font. Its label, so the interface can say so; `null` for bundled fonts.
-   */
-  const systemFont = computed(() => {
-    const option = FONT_OPTIONS.find((font) => font.value === cv.data.style.fontFamily)
-    // Georgia, Arial and the like are drawn in a bundled stand-in of the same widths (spec 050): no note for them.
-    return option && !option.bundled && !familyNames(option.value).some((name) => name in FONT_STAND_INS) ? option.label : null
-  })
 
   /** Runs one export; `false` when the direct PDF failed (nothing else is lost). */
   async function run(kind: ExportKind): Promise<boolean> {
@@ -54,5 +41,5 @@ export function useCvExport() {
     }
   }
 
-  return { busy, failed, systemFont, run }
+  return { busy, failed, run }
 }

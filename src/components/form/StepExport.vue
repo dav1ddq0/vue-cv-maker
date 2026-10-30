@@ -14,7 +14,7 @@ const cv = useCvStore()
 const { t } = useI18n()
 
 const showPaginated = ref(false)
-const { busy, failed, systemFont, run } = useCvExport()
+const { busy, failed, run } = useCvExport()
 const { overflows: sideTooLong } = useSideColumnFit()
 </script>
 
@@ -31,7 +31,6 @@ const { overflows: sideTooLong } = useSideColumnFit()
         <div>
           <h3 class="option-title">{{ t('exportView.pdfFile') }}</h3>
           <p class="option-hint">{{ t('exportView.pdfFileHint') }}</p>
-          <p v-if="systemFont" class="option-hint">{{ t('exportView.systemFontNote', { font: systemFont }) }}</p>
         </div>
         <BaseButton variant="primary" :disabled="busy !== null" @click="run('pdfFile')">
           {{ busy === 'pdfFile' ? t('exportView.preparing') : t('exportView.downloadPdf') }}

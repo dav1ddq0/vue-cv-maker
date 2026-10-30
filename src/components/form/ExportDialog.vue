@@ -20,7 +20,7 @@ const emit = defineEmits<{ close: [] }>()
 const ui = useUiStore()
 const cv = useCvStore()
 const { t } = useI18n()
-const { busy, failed, systemFont, run } = useCvExport()
+const { busy, failed, run } = useCvExport()
 const { overflows: sideTooLong } = useSideColumnFit()
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
@@ -91,7 +91,6 @@ function printInstead() {
       </label>
     </div>
     <p v-if="kind === 'pdf'" class="note">{{ t('exportDialog.printNote', { file: printTitle(cv.data) }) }}</p>
-    <p v-if="kind === 'pdfFile' && systemFont" class="note">{{ t('exportView.systemFontNote', { font: systemFont }) }}</p>
     <div v-if="failed === 'pdfFile'" class="failed" role="alert">
       <p class="failed-text">{{ t('exportView.pdfFileFailed') }}</p>
       <BaseButton variant="secondary" @click="printInstead">{{ t('exportView.printInstead') }}</BaseButton>
