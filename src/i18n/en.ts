@@ -274,6 +274,10 @@ const en: typeof es = {
       description:
         'Serif single column with a centered masthead and hairline rules. The typography carries the weight, not the color.',
     },
+    monogram: {
+      description:
+        "Serif résumé with a diagonal two-tone header: a monogram of your initials, or your photo, beside the name and summary. A pale sidebar for contact and skills.",
+    },
     cobalt: {
       description:
         'Colored header band with a round photo, a pale sidebar for contact, skills and languages, and the career on the right.',

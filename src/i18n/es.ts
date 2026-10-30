@@ -275,6 +275,10 @@ export default {
       description:
         'Serif a una columna con cabecera centrada y filetes finos. El peso lo lleva la tipografía, no el color.',
     },
+    monogram: {
+      description:
+        "Currículum serif con cabecera diagonal de dos tonos: un monograma con tus iniciales, o tu foto, junto al nombre y el resumen. Barra lateral pálida para contacto y competencias.",
+    },
     cobalt: {
       description:
         'Cabecera de color con foto redonda, barra lateral pálida para contacto, competencias e idiomas, y la trayectoria a la derecha.',
