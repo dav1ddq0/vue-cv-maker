@@ -69,8 +69,9 @@ describe('readable ink on accent', () => {
 
   it('gives every palette colour at least 4.5:1 for its ink', async () => {
     const { onAccent, contrastRatio } = await import('@/templates/shared')
-    for (const color of PALETTE) {
-      expect(contrastRatio(color, onAccent(color))!).toBeGreaterThanOrEqual(4.5)
+    const { templates } = await import('@/templates/registry')
+    for (const color of [...PALETTE, ...templates.flatMap((t) => t.palette ?? [])]) {
+      expect(contrastRatio(color, onAccent(color))!, color).toBeGreaterThanOrEqual(4.5)
     }
   })
 
@@ -114,7 +115,7 @@ describe('accent for text on light surfaces', () => {
   it('holds for every palette colour and every template default', async () => {
     const { accentText, contrastRatio } = await import('@/templates/shared')
     const { templates } = await import('@/templates/registry')
-    const accents = [...PALETTE, ...templates.map((t) => t.defaults!.accentColor)]
+    const accents = [...PALETTE, ...templates.flatMap((t) => t.palette ?? []), ...templates.map((t) => t.defaults!.accentColor)]
     for (const accent of accents) {
       expect(contrastRatio(accentText(accent), '#ffffff')!).toBeGreaterThanOrEqual(4.5)
     }
@@ -151,8 +152,10 @@ describe('palette names', () => {
     const en = (await import('@/i18n/en')).default
     for (const [name, dictionary] of [['es', es], ['en', en]] as const) {
       const names = dictionary.style.colorNames as Record<string, string>
-      for (const color of PALETTE) expect(names[color.slice(1)], `${name}.style.colorNames.${color.slice(1)}`).toBeTruthy()
-      expect(Object.keys(names).sort()).toEqual(PALETTE.map((c) => c.slice(1)).sort())
+      const { templates } = await import('@/templates/registry')
+      const colors = [...new Set([...PALETTE, ...templates.flatMap((t) => t.palette ?? [])])]
+      for (const color of colors) expect(names[color.slice(1)], `${name}.style.colorNames.${color.slice(1)}`).toBeTruthy()
+      expect(Object.keys(names).sort()).toEqual(colors.map((c) => c.slice(1)).sort())
     }
   })
 })

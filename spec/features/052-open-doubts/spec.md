@@ -60,3 +60,14 @@ in the export dialog, the sheet and the export step, and the `systemFont` value 
 `useCvExport`, could never show. Removed, with the `exportView.systemFontNote` strings (en, es) and
 the export-dialog test that asserted the old note. Kept: the "depends on the computer" label of
 the font select itself, which is still true of the page (not of the PDF).
+
+## 6 · The nine colours of the reference
+
+The reference had a row of nine swatches. Adding them to the shared palette would have changed every
+template, so a template can now declare its own: `TemplateDefinition.palette` (optional,
+`types/template.ts`). The style step shows `palette ?? PALETTE` for the template in use
+(`StepStyle.vue`). Monogram declares nine — graphite, slate, navy, cobalt (its default), teal,
+emerald, amber, sand and red — each named in both languages (`style.colorNames`), and the custom
+colour picker stays next to them. The palette tests now cover every colour a template declares
+(contrast for its ink and as text on paper, and a name in each language); a test mounts the step
+with Classic (five swatches) and Monogram (nine, in order), mutation-checked.

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useCvStore } from '@/stores/cv'
 import { useI18n } from '@/i18n'
 import { useCapabilities } from '@/composables/useCapabilities'
-import { applyTemplateDefaults, templates } from '@/templates/registry'
+import { applyTemplateDefaults, getTemplate, templates } from '@/templates/registry'
 import BaseField from '@/components/ui/BaseField.vue'
 import RangeSlider from '@/components/ui/RangeSlider.vue'
 import TemplateGallery from './TemplateGallery.vue'
@@ -21,6 +21,8 @@ const accentReason = reasonFor('accentColor')
 const fontReason = reasonFor('customFont')
 
 const style = computed(() => cv.data.style)
+/** The swatches of the template in use, if it has its own family of colours, else the shared ones (spec 052). */
+const palette = computed(() => getTemplate(cv.templateId).palette ?? PALETTE)
 
 /**
  * Picking a template also adopts its accent and face — but only while the user
@@ -64,7 +66,7 @@ function previewAccent(id: string): string {
         >
           <div class="color-row" role="group" :aria-label="t('style.palette')">
             <button
-              v-for="color in PALETTE"
+              v-for="color in palette"
               :key="color"
               type="button"
               class="swatch"
