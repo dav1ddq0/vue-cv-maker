@@ -96,9 +96,20 @@ export const useUiStore = defineStore('ui', () => {
 
   const isDismissed = (id: string) => dismissedNotices.value.includes(id)
 
+  /**
+   * Whether storage works is awaited (the app needs the answer to start); whether it is persistent is
+   * not: Firefox answers `persist()` only when the person answers its permission prompt, and waiting
+   * for that left the stored CVs unopened until then (spec 052).
+   */
   async function probeEnvironment() {
     storageAvailable.value = await isStorageAvailable()
-    storagePersisted.value = storageAvailable.value ? await requestPersistence() : false
+    if (!storageAvailable.value) {
+      storagePersisted.value = false
+      return
+    }
+    void requestPersistence().then((persisted) => {
+      storagePersisted.value = persisted
+    })
   }
 
   return {
