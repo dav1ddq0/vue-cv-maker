@@ -70,6 +70,9 @@ import f62 from '@fontsource/tinos/files/tinos-latin-ext-700-normal.woff?url'
 import f63 from '@fontsource/tinos/files/tinos-latin-700-normal.woff?url'
 import f64 from '@fontsource/tinos/files/tinos-latin-ext-400-italic.woff?url'
 import f65 from '@fontsource/tinos/files/tinos-latin-400-italic.woff?url'
+import f66 from '@fontsource/dejavu-sans/files/dejavu-sans-latin-400-normal.woff?url'
+import f67 from '@fontsource/dejavu-sans/files/dejavu-sans-latin-700-normal.woff?url'
+import f68 from '@fontsource/dejavu-sans/files/dejavu-sans-latin-400-italic.woff?url'
 
 /** Face file name (`inter-latin-400-normal`) → WOFF URL. */
 export const WOFF: Record<string, string> = {
@@ -139,4 +142,7 @@ export const WOFF: Record<string, string> = {
   'tinos-latin-700-normal': f63,
   'tinos-latin-ext-400-italic': f64,
   'tinos-latin-400-italic': f65,
+  'dejavu-sans-latin-400-normal': f66,
+  'dejavu-sans-latin-700-normal': f67,
+  'dejavu-sans-latin-400-italic': f68,
 }

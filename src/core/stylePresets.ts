@@ -44,8 +44,8 @@ export const FONT_OPTIONS: FontOption[] = [
   { id: 'timesNewRoman', label: 'Times New Roman', value: "'Times New Roman', Times, 'Liberation Serif', serif", bundled: false },
   { id: 'garamond', label: 'Garamond', value: "Garamond, 'EB Garamond', 'Times New Roman', serif", bundled: true },
   { id: 'palatino', label: 'Palatino', value: "'Palatino Linotype', Palatino, 'Book Antiqua', serif", bundled: false },
-  { id: 'tahoma', label: 'Tahoma', value: "Tahoma, 'DejaVu Sans', Verdana, sans-serif", bundled: false },
-  { id: 'verdana', label: 'Verdana', value: "Verdana, 'DejaVu Sans', Geneva, sans-serif", bundled: false },
+  { id: 'tahoma', label: 'Tahoma', value: "Tahoma, 'DejaVu Sans', Verdana, sans-serif", bundled: true },
+  { id: 'verdana', label: 'Verdana', value: "Verdana, 'DejaVu Sans', Geneva, sans-serif", bundled: true },
 ]
 
 /** Page margins offered by the style step; anything else in a file falls back to the default. */

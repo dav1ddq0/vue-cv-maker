@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { FONT_OPTIONS } from '@/core/stylePresets'
 import { familyNames } from '@/services/export/fonts'
+import { withStandIns } from '@/core/fontStandIns'
 
 const css = readFileSync(join(process.cwd(), 'src/styles/fonts.css'), 'utf8')
 const faces = [...css.matchAll(/@font-face \{([^}]*)\}/g)].map((m) => {
@@ -15,7 +16,7 @@ const faces = [...css.matchAll(/@font-face \{([^}]*)\}/g)].map((m) => {
 })
 
 /** The CV fonts the style step offers; the interface font (Roboto Flex) is not one of them. */
-const CV_FAMILIES = ['inter', 'source sans 3', 'jetbrains mono', 'eb garamond', 'carlito', 'caladea', 'gelasio', 'arimo', 'tinos']
+const CV_FAMILIES = ['inter', 'source sans 3', 'jetbrains mono', 'eb garamond', 'carlito', 'caladea', 'gelasio', 'arimo', 'tinos', 'dejavu sans']
 const shipped = new Set(faces.map((face) => face.family))
 
 describe('bundled fonts (specs 026, 029)', () => {
@@ -39,6 +40,13 @@ describe('bundled fonts (specs 026, 029)', () => {
     for (const option of FONT_OPTIONS) {
       const ships = familyNames(option.value).some((name) => shipped.has(name))
       expect({ id: option.id, bundled: ships }).toEqual({ id: option.id, bundled: option.bundled })
+    }
+  })
+
+  it('gives every font option a bundled face for the PDF: in its stack or as a stand-in (specs 050, 051)', () => {
+    for (const option of FONT_OPTIONS) {
+      const stack = withStandIns(familyNames(option.value))
+      expect({ id: option.id, drawn: stack.some((name) => shipped.has(name)) }).toEqual({ id: option.id, drawn: true })
     }
   })
 

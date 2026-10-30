@@ -246,6 +246,49 @@ async function compareFixture(browser, page) {
   }
 }
 
+/* ---- fixture: shadows, SVG boxes and round strokes (spec 050) ----------------------------------- */
+
+const LOOK_HTML = `
+<div style="padding:30mm;margin:0">
+  <div style="width:40mm;height:20mm;background:#fff;box-shadow:0 3mm 6mm rgba(0,0,0,.7)"></div>
+  <div style="width:30mm;height:15mm;margin:30mm 0 0;background:#fff;box-shadow:0 0 0 4mm #666"></div>
+  <svg viewBox="0 0 24 24" style="display:block;width:14mm;height:14mm;margin:30mm 0 0;background:#000;border-radius:50%;box-sizing:content-box;padding:2mm"><path d="M4 12h16" style="fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round"/></svg>
+</div>`
+
+/** Pixels that are not white: a missing shadow, ring or disc is a visible drop in this count. */
+const inked = (img) => img.pixels.reduce((n, v) => n + (v < 245 ? 1 : 0), 0)
+
+async function compareLook(browser, page) {
+  const printPage = await browser.newPage()
+  await printPage.setContent(`<!doctype html><html><head><style>${FIXTURE_CSS} body{margin:0}</style></head><body>${LOOK_HTML}</body></html>`)
+  const printPdf = path.join(OUT, 'look.print.pdf')
+  fs.writeFileSync(printPdf, await printPage.pdf({ preferCSSPageSize: true, printBackground: true }))
+  await printPage.close()
+  const direct = await page.evaluate(
+    async ([html, css, SRC]) => {
+      const { paginateInto, releasePagination } = await import(`${SRC}/services/export/pdf.ts`)
+      const { pdfFromPagination } = await import(`${SRC}/services/export/pdfDirect.ts`)
+      const host = document.createElement('div')
+      host.style.cssText = 'position:fixed;left:-10000px;top:0'
+      document.body.appendChild(host)
+      try {
+        if (!(await paginateInto(host, html, { app: css, print: '' }))) throw new Error('Pagination failed')
+        return window.__base64(await pdfFromPagination(host, 'Look', 'en'))
+      } finally {
+        releasePagination(host)
+        host.remove()
+      }
+    },
+    [LOOK_HTML, FIXTURE_CSS, SRC],
+  )
+  const directPdf = path.join(OUT, 'look.direct.pdf')
+  fs.writeFileSync(directPdf, Buffer.from(direct, 'base64'))
+  const [print] = renderPages(printPdf, FIXTURE_DPI)
+  const [conv] = renderPages(directPdf, FIXTURE_DPI)
+  const [a, b] = [inked(print), inked(conv)]
+  check('look: soft shadow, ring, SVG disc and round stroke inked as much as the print (± 8 %)', Math.abs(a - b) / a <= 0.08, `inked pixels print ${a}, direct ${b}`)
+}
+
 /* ---- side-column warning ---------------------------------------------------------------------- */
 
 async function checkSideColumn(page) {
@@ -277,6 +320,7 @@ async function checkSideColumn(page) {
     const only = process.argv[2]?.split(',')
     const ids = only ?? (await page.evaluate(async (SRC) => (await import(`${SRC}/templates/registry.ts`)).templates.map((t) => t.id), SRC))
     await compareFixture(browser, page)
+    await compareLook(browser, page)
     await checkSideColumn(page)
     await compareTemplates(page, server.url, ids)
     check('no page errors', errors.length === 0, errors.join(' | '))

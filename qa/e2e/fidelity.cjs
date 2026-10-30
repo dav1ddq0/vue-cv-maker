@@ -6,7 +6,7 @@ const { check, open, settled, startSample } = require('./lib.cjs')
 
 const IDS = ['aurora', 'banner', 'chevron', 'classic', 'cobalt', 'compact', 'editorial', 'facet', 'frame', 'harbor', 'ledger', 'meridian', 'modern', 'monogram', 'monograph']
 
-/** Runs in the page: CSS on the CV that the direct PDF has no way to draw. Solid box-shadows (rings) are drawn. */
+/** Runs in the page: CSS on the CV that the direct PDF has no way to draw. Outer box-shadows (rings, soft shadows) are drawn. */
 const UNSUPPORTED = () => {
   const out = []
   const page = document.querySelector('.pane .cv-page')
@@ -17,8 +17,7 @@ const UNSUPPORTED = () => {
       if (pseudo && (s.content === 'none' || s.content === 'normal')) continue
       const note = (what) => out.push(`${what} @ ${where(el, pseudo)}`)
       if (s.backgroundImage !== 'none') note('background-image / gradient')
-      // A blurred shadow: the third length of a shadow is its blur.
-      if (s.boxShadow !== 'none' && s.boxShadow.split(/,(?![^(]*\))/).some((part) => /inset/.test(part) || parseFloat(part.replace(/(?:rgba?|color)\([^)]*\)/, '').trim().split(/\s+/)[2]) > 0)) note('blurred or inset box-shadow')
+      if (/\binset\b/.test(s.boxShadow)) note('inset box-shadow')
       if (s.filter !== 'none') note('filter')
       if (s.textShadow !== 'none') note('text-shadow')
       if (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) note('outline')
@@ -59,7 +58,7 @@ async function run(browser, outDir) {
     const loose = fonts.filter((name) => !name.includes('+'))
     if (loose.length) standard.push(`${id}: ${loose.join(' ')}`)
   }
-  check(B, 'no template uses CSS the direct PDF cannot draw (gradients, blurred shadows, filters, underlines…)', unsupported.length === 0, unsupported.join(' · '))
+  check(B, 'no template uses CSS the direct PDF cannot draw (gradients, inset shadows, filters, underlines…)', unsupported.length === 0, unsupported.join(' · '))
   check(B, 'every template, in its own default font, goes out in embedded fonts', standard.length === 0, standard.join(' · '))
   check(B, 'no console errors while downloading them all', p.errs.length === 0, p.errs.slice(0, 3).join(' | '))
   await p.context().close()

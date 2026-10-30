@@ -63,7 +63,7 @@ describe('direct PDF helpers (spec 031)', () => {
   it('has the WOFF twin of every bundled CV face, by built or dev file name', () => {
     const css = readFileSync(join(process.cwd(), 'src/styles/fonts.css'), 'utf8')
     const names = [...css.matchAll(/url\('@fontsource\/[\w-]+\/files\/([\w-]+)\.woff2'\)/g)].map((m) => m[1]!)
-    expect(names.length).toBe(66)
+    expect(names.length).toBe(69)
     for (const name of names) expect(WOFF[name], name).toBeTruthy()
     expect(woffFor('/vue-cv-maker/assets/inter-latin-400-normal-C38fXH4l.woff2')).toBe(WOFF['inter-latin-400-normal'])
     expect(woffFor('/node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2')).toBe(WOFF['inter-latin-400-normal'])
@@ -103,14 +103,27 @@ describe('what the direct PDF draws that it used to leave out (spec 050)', () =>
     expect(withStandIns(['inter', 'system-ui'])).toEqual(['inter', 'system-ui'])
   })
 
-  it('reads the solid, unblurred shadows of a box-shadow, topmost first, and skips the rest', async () => {
-    const { solidShadows } = await import('@/services/export/pdfDirect')
-    expect(solidShadows('rgb(255, 255, 255) 0px 0px 0px 2.66667px')).toEqual([{ dx: 0, dy: 0, spread: 2.66667, color: { r: 255, g: 255, b: 255, a: 1 } }])
-    const two = solidShadows('rgba(0, 0, 0, 0.5) 3px 4px 0px 1px, rgb(10, 20, 30) 0px 0px 0px 6px')
+  it('lays a soft shadow out as layers whose opacities add up to the shadow\'s, widest first', async () => {
+    const { shadowLayers } = await import('@/services/export/pdfDirect')
+    expect(shadowLayers(0, 3, 0.5)).toEqual([{ offset: 3, alpha: 0.5 }])
+    const layers = shadowLayers(12, 0, 0.6)
+    expect(layers.length).toBeGreaterThan(8)
+    const offsets = layers.map((l) => l.offset)
+    expect([...offsets].sort((a, b) => b - a)).toEqual(offsets)
+    expect(offsets[0]).toBeGreaterThan(0)
+    expect(offsets.at(-1)).toBeLessThan(0)
+    const total = 1 - layers.reduce((product, l) => product * (1 - l.alpha), 1)
+    expect(total).toBeCloseTo(0.6, 5)
+  })
+
+  it('reads the outer shadows of a box-shadow, topmost first, with their blur, and skips inset and absent ones', async () => {
+    const { outerShadows } = await import('@/services/export/pdfDirect')
+    expect(outerShadows('rgb(255, 255, 255) 0px 0px 0px 2.66667px')).toEqual([{ dx: 0, dy: 0, blur: 0, spread: 2.66667, color: { r: 255, g: 255, b: 255, a: 1 } }])
+    const two = outerShadows('rgba(0, 0, 0, 0.5) 3px 4px 0px 1px, rgb(10, 20, 30) 0px 0px 0px 6px')
     expect(two.map((s) => [s.dx, s.dy, s.spread])).toEqual([[3, 4, 1], [0, 0, 6]])
-    // Blurred, inset and absent shadows are not drawn.
-    expect(solidShadows('rgba(0, 0, 0, 0.3) 0px 1px 2px 0px, rgba(0, 0, 0, 0.15) 0px 1px 3px 1px')).toEqual([])
-    expect(solidShadows('inset rgb(0, 0, 0) 0px 0px 0px 2px')).toEqual([])
-    expect(solidShadows('none')).toEqual([])
+    const soft = outerShadows('rgba(0, 0, 0, 0.3) 0px 1px 2px 0px, rgba(0, 0, 0, 0.15) 0px 1px 3px 1px')
+    expect(soft.map((s) => [s.dy, s.blur, s.spread])).toEqual([[1, 2, 0], [1, 3, 1]])
+    expect(outerShadows('inset rgb(0, 0, 0) 0px 0px 0px 2px')).toEqual([])
+    expect(outerShadows('none')).toEqual([])
   })
 })

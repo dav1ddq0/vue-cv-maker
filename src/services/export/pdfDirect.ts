@@ -186,19 +186,46 @@ export function transformText(text: string, transform: string): string {
   return text
 }
 
-/** The solid, unblurred shadows of a box-shadow (rings and offset copies): x, y, spread and colour, topmost first. */
-export function solidShadows(value: string): { dx: number; dy: number; spread: number; color: Rgba }[] {
+/** The outer shadows of a box-shadow (rings, offset copies, soft shadows): offsets, blur, spread and colour, topmost first. */
+export function outerShadows(value: string): { dx: number; dy: number; blur: number; spread: number; color: Rgba }[] {
   if (!value || value === 'none') return []
-  const shadows: { dx: number; dy: number; spread: number; color: Rgba }[] = []
+  const shadows: { dx: number; dy: number; blur: number; spread: number; color: Rgba }[] = []
   // Split on the commas between shadows, not those inside rgb( … ) or color( … ).
   for (const part of value.split(/,(?![^(]*\))/)) {
     if (/\binset\b/.test(part)) continue
     const colorText = /(?:rgba?|color)\([^)]*\)/.exec(part)?.[0] ?? ''
     const color = parseColor(colorText)
     const [dx = 0, dy = 0, blur = 0, spread = 0] = part.replace(colorText, '').trim().split(/\s+/).map(parseFloat)
-    if (color && blur === 0 && visibleColor(color)) shadows.push({ dx, dy, spread, color })
+    if (color && visibleColor(color)) shadows.push({ dx, dy, blur, spread, color })
   }
   return shadows
+}
+
+/** The inverse of the normal distribution's upper tail: z such that P(Z > z) = p (Abramowitz & Stegun 26.2.23). */
+function normalTailInverse(p: number): number {
+  const q = Math.min(p, 1 - p)
+  const t = Math.sqrt(-2 * Math.log(q))
+  const z = t - (2.515517 + 0.802853 * t + 0.010328 * t * t) / (1 + 1.432788 * t + 0.189269 * t * t + 0.001308 * t ** 3)
+  return p <= 0.5 ? z : -z
+}
+
+/**
+ * A soft shadow as nested translucent shapes: PDF has no blur, so the shape is grown by `offset` px
+ * (shrunk when negative) in layers of `alpha`, placed where a Gaussian of σ = blur / 2 reaches each
+ * step of the shadow's opacity, so the layers add up to the same falloff the browser paints. No blur:
+ * one layer of the colour's own alpha, the ring or offset copy it is.
+ */
+export function shadowLayers(blur: number, spread: number, opacity: number): { offset: number; alpha: number }[] {
+  const target = Math.min(0.999, Math.max(0, opacity))
+  if (!(blur > 0)) return [{ offset: spread, alpha: target }]
+  const n = 24
+  const alpha = 1 - Math.pow(1 - target, 1 / n)
+  const sigma = blur / 2
+  return Array.from({ length: n }, (_, i) => {
+    // After k layers the shadow reaches (1 − (1 − alpha)^k) of the full opacity, `share` of the way up.
+    const share = Math.min(0.999, (1 - Math.pow(1 - alpha, i + 1)) / target)
+    return { offset: spread + sigma * normalTailInverse(share), alpha }
+  })
 }
 
 function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
@@ -208,13 +235,16 @@ function drawBox(c: Ctx, el: Element, style: CSSStyleDeclaration) {
   const radius = Math.min(lengthOf(style.borderTopLeftRadius, Math.min(r.width, r.height)), r.width / 2, r.height / 2) * c.k
   const alpha = opacityOf(c, el)
   // Under the box, the lowest shadow first: a ring around a photo or a dot is a bigger shape behind it.
-  for (const { dx, dy, spread, color } of solidShadows(style.boxShadow).reverse()) {
-    const s = spread * c.k
-    c.doc.save()
-    if (radius > 0) c.doc.roundedRect(x + dx * c.k - s, y + dy * c.k - s, w + 2 * s, h + 2 * s, Math.max(0, radius + s))
-    else c.doc.rect(x + dx * c.k - s, y + dy * c.k - s, w + 2 * s, h + 2 * s)
-    c.doc.fillColor(rgbOf(color), color.a * alpha).fill()
-    c.doc.restore()
+  for (const { dx, dy, blur, spread, color } of outerShadows(style.boxShadow).reverse()) {
+    for (const grow of shadowLayers(blur, spread, color.a * alpha)) {
+      const s = grow.offset * c.k
+      if (w + 2 * s <= 0 || h + 2 * s <= 0) continue
+      c.doc.save()
+      if (radius > 0) c.doc.roundedRect(x + dx * c.k - s, y + dy * c.k - s, w + 2 * s, h + 2 * s, Math.max(0, radius + s))
+      else c.doc.rect(x + dx * c.k - s, y + dy * c.k - s, w + 2 * s, h + 2 * s)
+      c.doc.fillColor(rgbOf(color), grow.alpha).fill()
+      c.doc.restore()
+    }
   }
   const bg = parseColor(style.backgroundColor)
   if (visibleColor(bg)) {

@@ -50,5 +50,5 @@ with `--ignore-scripts`; 66 faces declared in `styles/fonts.css` (Latin and Lati
 - 650 unit tests (stand-ins, solid shadows, the export note), `vue-tsc`, `qa:pdf` 127/127,
   `qa:roundtrip` 420/420, `qa:security` 55/55. Rasterised and compared with the page: the icons,
   ring and serif now match.
-- Not covered: Palatino, Tahoma and Verdana still use a PDF standard font in the download; blurred
+- Not covered then (done in spec 051): Palatino, Tahoma and Verdana in the download; blurred
   shadows would still be dropped if a template used one (the scan would say so).
