@@ -205,6 +205,20 @@ async function hostilePdfImport(browser, origin, check, until) {
   check(B, 'no dialog, no page error', seen.dialogs.length === 0 && seen.errors.length === 0, [...seen.dialogs, ...seen.errors].join(' | '))
 }
 
+/** Clickjacking: another page that frames the app gets a link, not the editor (spec 047). */
+async function framedApp(browser, url, check) {
+  const B = 'frame'
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+  const p = await ctx.newPage()
+  await p.setContent(`<iframe id="f" src="${url}" width="1200" height="800"></iframe>`)
+  const frame = await (await p.waitForSelector('#f')).contentFrame()
+  await frame.waitForLoadState('networkidle').catch(() => {})
+  const found = await frame.evaluate(() => ({ app: Boolean(document.querySelector('#app')), buttons: document.querySelectorAll('button').length, links: document.querySelectorAll('a').length }))
+  check(B, 'the app does not start inside a frame', !found.app && found.buttons === 0, JSON.stringify(found))
+  check(B, 'the frame offers a link that opens it on its own', found.links === 1)
+  await ctx.close()
+}
+
 ;(async () => {
   fs.rmSync(OUT, { recursive: true, force: true })
   fs.mkdirSync(OUT, { recursive: true })
@@ -216,6 +230,7 @@ async function hostilePdfImport(browser, origin, check, until) {
   try {
     for (const name of ['evil', 'typeconfusion']) await hostileJson(browser, name, origin, check, until)
     await hostilePdfImport(browser, origin, check, until)
+    await framedApp(browser, server.url, check)
   } finally {
     await browser.close()
     server.stop()
