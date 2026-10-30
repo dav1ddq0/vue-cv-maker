@@ -21,13 +21,12 @@ describe('Cobalt (spec 046)', () => {
     expect(without.find('img.photo').exists()).toBe(false)
   })
 
-  it('draws a different icon for e-mail, phone, location and links', () => {
+  it('draws a different icon for e-mail, phone, location, LinkedIn and GitHub', () => {
     const wrapper = mount(Cobalt, { props: { data: createSampleCV() } })
     const icons = wrapper.findAll('.contact').map((row) => row.find('path').attributes('d'))
-    // Sample CV: e-mail, phone, location, two links.
+    // Sample CV: e-mail, phone, location, then LinkedIn and GitHub, each with its own glyph.
     expect(icons).toHaveLength(5)
-    expect(new Set(icons).size).toBe(4)
-    expect(icons[3]).toBe(icons[4])
+    expect(new Set(icons).size).toBe(5)
   })
 
   it('keeps skills and languages in the sidebar and the career in the main column', () => {

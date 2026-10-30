@@ -15,6 +15,7 @@ import { computed } from 'vue'
 import type { CVData } from '@/types/cv'
 import Breakable from '@/templates/Breakable.vue'
 import LevelDots from '@/templates/LevelDots.vue'
+import { CONTACT_ICONS, contactKind, linkKind } from '@/templates/contactIcons'
 import {
   absoluteUrl,
   contactLines,
@@ -39,24 +40,10 @@ const SIDEBAR_KINDS = new Set(['skills', 'languages'])
 const sidebarSections = computed(() => sections.value.filter((s) => SIDEBAR_KINDS.has(s.kind)))
 const mainSections = computed(() => sections.value.filter((s) => !SIDEBAR_KINDS.has(s.kind)))
 
-type ContactKind = 'mail' | 'phone' | 'pin' | 'info'
-const contactItems = computed(() => {
-  const { email, phone, location } = props.data.personal
-  return contactLines(props.data).map((text) => ({
-    text,
-    kind: (text === email ? 'mail' : text === phone ? 'phone' : text === location ? 'pin' : 'info') as ContactKind,
-  }))
-})
+const contactItems = computed(() =>
+  contactLines(props.data).map((text) => ({ text, kind: contactKind(text, props.data.personal) })),
+)
 const contactTitle = computed(() => (language.value === 'en' ? 'Contact' : 'Contacto'))
-
-/** Stroke paths of the 24-unit icons drawn inside the contact discs. */
-const ICONS: Record<ContactKind | 'link', string> = {
-  phone: 'M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z',
-  mail: 'M3 6h18v12H3zM3 7l9 6 9-6',
-  pin: 'M12 21s-6-5.6-6-10.5a6 6 0 0 1 12 0C18 15.4 12 21 12 21zM12 8.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
-  info: 'M12 11v6M12 7.5v.5M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0z',
-  link: 'M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18',
-}
 </script>
 
 <template>
@@ -74,11 +61,11 @@ const ICONS: Record<ContactKind | 'link', string> = {
         <section v-if="contactItems.length || data.personal.links.length" class="side-section">
           <h2 class="section-title">{{ contactTitle }}</h2>
           <p v-for="(item, i) in contactItems" :key="i" class="contact">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path :d="ICONS[item.kind]" /></svg>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path :d="CONTACT_ICONS[item.kind]" /></svg>
             <span><Breakable :text="item.text" /></span>
           </p>
           <p v-for="link in data.personal.links" :key="link.id" class="contact">
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path :d="ICONS.link" /></svg>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path :d="CONTACT_ICONS[linkKind(link.url)]" /></svg>
             <a :href="absoluteUrl(link.url)"><Breakable :text="link.label || displayUrl(link.url)" /></a>
           </p>
         </section>
