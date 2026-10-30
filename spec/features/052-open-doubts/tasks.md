@@ -4,4 +4,4 @@
 - [x] 2 · Stand-ins in the page font stack and the HTML export — commit: d4e8115
 - [x] 3 · Soft shadows as a blurred PNG — commit: 0e57738
 - [x] 4 · Static guard over every template's CSS — commit: 054d33e
-- [x] 5 · Remove the unused system-font note — commit: pending
+- [x] 5 · Remove the unused system-font note — commit: 55c4515
